@@ -32,7 +32,8 @@ def model_training_module(X_train, y_train, X_test, y_test, epoch, batchsize):
 
 def main():
     # Local File import
-    df = pd.read_csv('Sentinel_2.csv')
+    data_path = "CSV/Sentinel_2.csv"
+    df = pd.read_csv(data_path)
 
     # Seperate Label from Dataframe
     X = df.iloc[:, :-1].values

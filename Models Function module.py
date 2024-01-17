@@ -310,7 +310,8 @@ def multi_layer_perceptron(x_train, y_train, x_test, y_test):
 
 def main():
     # Local File import
-    df = pd.read_csv('Sentinel_2.csv')
+    data_path = "CSV/Sentinel_2.csv"
+    df = pd.read_csv('data_path')
 
     # Seperate Label from Dataframe
     x = df.iloc[:, 0:len(df.columns)-1].values ## Training Data
@@ -325,7 +326,7 @@ def main():
     print('\n', knn_report_df)
 
     rdf_trained, rdf_accuracy, rdf_report_df = random_forest(x_train, y_train, x_test, y_test)
-    print('\n Random Forest Accuracy : ', rdf_accuracy)
+    print('\nRandom Forest Accuracy : ', rdf_accuracy)
     print('\n', rdf_report_df)
 
     lightgbm_trained, light_gbm_accuracy, light_gbm_report_df = train_lightgbm(x_train, y_train, x_test, y_test)
