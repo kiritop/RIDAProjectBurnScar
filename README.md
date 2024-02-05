@@ -1,11 +1,11 @@
 # RIDA Project BurnScar
 ## Project title: Temporal-based burnt scar profiling for modelling risk of forest fires in ASEAN countries
 ## Project Description:
-• Extension of the previous Newton project: a prototype of burnt scar detection in remote sensing images (periodically captured through a passive satellite by GISTDA and DoF: Department of Forestry).
-• Improve the performance of the previous detection model published, which focused on the explainable-AI-directed approach.
-• Aggregate the detection results over the temporal domain (e.g., years) to determine the risk of different areas.
-• The aggregated result/risk will be published via the online map platform (GISTDA: https://fire.gistda.or.th/dashboard.html and DoF: https://wildfire.forest.go.th/firemap/index.html) in conjunction with other analysis outcomes (e.g., hot spot report, land use, weather summary and prediction).
-• This porject funding by the United Kingdom Government
+1. Extension of the previous Newton project: a prototype of burnt scar detection in remote sensing images (periodically captured through a passive satellite by GISTDA and DoF: Department of Forestry).
+2. Improve the performance of the previous detection model published, which focused on the explainable-AI-directed approach.
+3. Aggregate the detection results over the temporal domain (e.g., years) to determine the risk of different areas.
+4. The aggregated result/risk will be published via the online map platform (GISTDA: https://fire.gistda.or.th/dashboard.html and DoF: https://wildfire.forest.go.th/firemap/index.html) in conjunction with other analysis outcomes (e.g., hot spot report, land use, weather summary and prediction).
+5. This porject funding by the United Kingdom Government
 
 ## Project Output:
 1. The prototype of the burnt scar profiling system and associated libraries of programs implementing data loading, data pre-processing, burnt scar
