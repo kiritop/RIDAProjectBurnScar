@@ -22,6 +22,7 @@ practice.
 5. Publication of the techniques and system developed in this project: one draft of a journal article and another draft for an international conference
 presentation.
 ## Project Scope:
-• Area coverage: Northern Thailand and those nearby regions in the neighbouring countries (i.e., Laos, Myanmar and Vietnam)
-• Images from Sentienl-2
-## Duration: 6 months
+- Area coverage: Northern Thailand and those nearby regions in the neighbouring countries (i.e., Laos, Myanmar and Vietnam)
+- Images from Sentienl-2
+## Duration: 
+6 months
