@@ -9,5 +9,5 @@ root.render(
   <Provider store={store}> {/* ตรวจสอบว่ามี Provider และกำหนด store ให้กับ Provider อย่างถูกต้องหรือไม่ */}
     <App />
   </Provider>
-
 );
+
