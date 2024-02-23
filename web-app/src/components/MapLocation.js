@@ -72,7 +72,6 @@ const MapLocation = () => {
           const url = `https://api.waqi.info/feed/geo:${location.lat};${location.long}/?token=${APIkey}`;
           try {
             const response = await axios.get(url);
-            console.log(response.data);
             return response.data;
           } catch (error) {
             console.error(error);

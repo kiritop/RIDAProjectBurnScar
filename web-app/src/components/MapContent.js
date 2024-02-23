@@ -2,6 +2,7 @@ import React from "react";
 import "leaflet/dist/leaflet.css";
 import BaseMap from "./layers/BaseMap";
 import MapLocation from "./MapLocation";
+import MapHotspot from "./MapHotspot";
 
 import { MapContainer } from "react-leaflet";
 
@@ -18,6 +19,7 @@ const MapContent = () => {
         minZoom={5}
       >
         <BaseMap />
+        <MapHotspot />
         <MapLocation />
       </MapContainer>
     </div>
