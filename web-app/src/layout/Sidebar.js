@@ -25,7 +25,7 @@ export default function Sidebar() {
 
   return (
     <Box>
-      <Drawer anchor={'left'} open={true} onClose={() => {}}>
+      <Drawer anchor={'left'} open={true} onClose={() => {}} hideBackdrop={true}>
         {list()}
       </Drawer>
     </Box>

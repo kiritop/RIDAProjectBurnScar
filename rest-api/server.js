@@ -2,8 +2,10 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const cors = require('cors');
+const AdmZip = require('adm-zip');
+const shapefile = require('shapefile');
 
-let users = require('./user.json');
+let users = require('./data/user.json');
 let server = express();
 server.use(bodyParser.json());  // ให้ server(express) ใช้งานการ parse json
 server.use(morgan('dev')); // ให้ server(express) ใช้งานการ morgam module
@@ -15,6 +17,29 @@ server.get('/user', function (req, res, next) {
     message: 'OK',
     data: users
   })
+});
+
+server.get('/read-shapefile', async (req, res) => {
+  // Assuming the zipfile is in the same directory as your script
+  // const zip = new AdmZip('./data/USA Fire Predicted GIS file-20240228T171559Z-001.zip');
+
+  // Extract all files to /output directory
+  // zip.extractAllTo('./output', /*overwrite*/true);
+
+  // Assuming the shapefile is named 'shapefile.shp'
+  const shapefilePath = './output/USA Fire Predicted GIS file/USA_Fire_Predicted.shp';
+
+  let features = [];
+  await shapefile.open(shapefilePath)
+      .then(source => source.read()
+          .then(function log(result) {
+              if (result.done) return;
+              features.push(result.value);
+              return source.read().then(log);
+          })
+      );
+
+  res.json(features);
 });
 
 server.post('/user', function (req, res, next) {

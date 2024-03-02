@@ -1,0 +1,9 @@
+.sidebar {
+  position: absolute;
+  width: 200px;
+  height: 100%;
+  background-color: white;
+  overflow: auto;
+  z-index: 999;
+  right: 0; /* ใส่บรรทัดนี้เพื่อย้าย sidebar ไปด้านขวา */
+}

@@ -3,6 +3,8 @@ import "leaflet/dist/leaflet.css";
 import BaseMap from "./layers/BaseMap";
 import MapLocation from "./MapLocation";
 import MapHotspot from "./MapHotspot";
+import MapBurnScar from "./MapBurnScar";
+import SideTab from "./SideTab";
 
 import { MapContainer } from "react-leaflet";
 
@@ -11,16 +13,17 @@ const MapContent = () => {
   return (
     <div>
       <MapContainer
-        style={{ width: "100%", height: "100vh" }}
+        style={{ width: "100%", height: "100vh", pointerEvents: "auto"  }}
         center={[13, 100]}
-       
         zoom={6}
         maxZoom={18}
         minZoom={5}
       >
         <BaseMap />
-        <MapHotspot />
+        {/* <MapBurnScar /> */}
+        {/* <MapHotspot /> */}
         <MapLocation />
+        <SideTab />
       </MapContainer>
     </div>
   );
