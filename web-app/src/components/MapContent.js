@@ -4,16 +4,29 @@ import BaseMap from "./layers/BaseMap";
 import MapLocation from "./MapLocation";
 import MapHotspot from "./MapHotspot";
 import MapBurnScar from "./MapBurnScar";
-import SideTab from "./SideTab";
+import SideTabs from "./SideTabs";
+import FilterOptions from './FilterOptions';
 
 import { MapContainer } from "react-leaflet";
 
+const tabs = [
+  { 
+    name: 'Filter Options', 
+    content: <FilterOptions 
+                options={['Option 1', 'Option 2']} 
+                onFilterChange={(e) => console.log(e.target.name, e.target.checked)} 
+              /> 
+  },
+  // Add more tabs as needed
+];
+
 const MapContent = () => {
 
+  
   return (
-    <div>
+    
       <MapContainer
-        style={{ width: "100%", height: "100vh", pointerEvents: "auto"  }}
+        style={{ width: "100%", height: 'calc(100vh - 64px)', pointerEvents: "auto"  }}
         center={[13, 100]}
         zoom={6}
         maxZoom={18}
@@ -23,9 +36,9 @@ const MapContent = () => {
         {/* <MapBurnScar /> */}
         {/* <MapHotspot /> */}
         <MapLocation />
-        <SideTab />
+        {/* <SideTabs tabs={tabs} /> */}
       </MapContainer>
-    </div>
+    
   );
 };
 

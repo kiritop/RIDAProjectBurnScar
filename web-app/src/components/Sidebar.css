@@ -1,4 +1,4 @@
-.sidebar {
+.side-tabs {
   position: absolute;
   width: 200px;
   height: 100%;
@@ -6,4 +6,9 @@
   overflow: auto;
   z-index: 999;
   right: 0; /* ใส่บรรทัดนี้เพื่อย้าย sidebar ไปด้านขวา */
+  pointer-events: none;
 }
+
+/* .side-tabs .tab-list button, .side-tabs .tab-content {
+  pointer-events: auto;
+} */
