@@ -8,7 +8,7 @@ import ArticleIcon from '@mui/icons-material/Article';
 export default function Header() {
   return (
     <AppBar position="static" style={{ backgroundColor: '#FFFFFF' }}>
-      <Toolbar>
+      <Toolbar variant="dense">
         <Box sx={{ flexGrow: 1 }} />
         <IconButton color="inherit">
           <MapIcon style={{ color: '#0093FF' }} />
