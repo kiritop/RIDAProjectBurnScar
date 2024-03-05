@@ -1,12 +1,38 @@
-import { AppBar, Toolbar, Typography } from '@mui/material';
+import React from 'react';
+import { AppBar, Toolbar, IconButton, Typography } from '@mui/material';
+import MapIcon from '@mui/icons-material/Map';
+import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
+import InfoIcon from '@mui/icons-material/Info';
+import ArticleIcon from '@mui/icons-material/Article';
 
 function Header() {
   return (
     <AppBar position="static">
       <Toolbar>
-        <Typography variant="h6">
-          Your App Name
-        </Typography>
+        <IconButton color="inherit">
+          <MapIcon />
+          <Typography variant="h6" component="div">
+            Map
+          </Typography>
+        </IconButton>
+        <IconButton color="inherit">
+          <ShoppingBagIcon />
+          <Typography variant="h6" component="div">
+            Service
+          </Typography>
+        </IconButton>
+        <IconButton color="inherit">
+          <InfoIcon />
+          <Typography variant="h6" component="div">
+            About us
+          </Typography>
+        </IconButton>
+        <IconButton color="inherit">
+          <ArticleIcon />
+          <Typography variant="h6" component="div">
+            Blog
+          </Typography>
+        </IconButton>
       </Toolbar>
     </AppBar>
   );

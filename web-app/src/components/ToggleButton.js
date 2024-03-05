@@ -1,11 +1,14 @@
 // ToggleButton.js
 import React from 'react';
-import { Button } from '@mui/material';
-import CheckIcon from '@mui/icons-material/Check';
-export default function ToggleButton({ toggleDrawer }) {
+import { Button , IconButton } from '@mui/material';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+
+export default function ToggleButton({ isOpen, toggleDrawer }) {
   return (
-    <Button 
+    <Button  
       onClick={toggleDrawer} 
+      variant="contained"
       style={{ 
         position: 'absolute', 
         top: '20%', 
@@ -13,7 +16,8 @@ export default function ToggleButton({ toggleDrawer }) {
         zIndex: 1000  
       }}
     >
-      <CheckIcon />
+      {isOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+      ฟหฟห
     </Button>
   );
 }

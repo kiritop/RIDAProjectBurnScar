@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from 'react';
 import "leaflet/dist/leaflet.css";
 import BaseMap from "./layers/BaseMap";
 import MapLocation from "./MapLocation";
@@ -6,23 +6,11 @@ import MapHotspot from "./MapHotspot";
 import MapBurnScar from "./MapBurnScar";
 import SideTabs from "./SideTabs";
 import FilterOptions from './FilterOptions';
-
 import { MapContainer } from "react-leaflet";
-
-const tabs = [
-  { 
-    name: 'Filter Options', 
-    content: <FilterOptions 
-                options={['Option 1', 'Option 2']} 
-                onFilterChange={(e) => console.log(e.target.name, e.target.checked)} 
-              /> 
-  },
-  // Add more tabs as needed
-];
+import Sidebar from "../layout/Sidebar";
+import ToggleButton from './ToggleButton';
 
 const MapContent = () => {
-
-  
   return (
     
       <MapContainer
@@ -33,10 +21,12 @@ const MapContent = () => {
         minZoom={5}
       >
         <BaseMap />
+        {/* <ToggleButton isOpen={isOpen} toggleDrawer={toggleDrawer} /> */}
         {/* <MapBurnScar /> */}
         {/* <MapHotspot /> */}
-        <MapLocation />
+        {/* <MapLocation /> */}
         {/* <SideTabs tabs={tabs} /> */}
+        {/* <Sidebar isOpen={isOpen} /> */}
       </MapContainer>
     
   );
