@@ -1,23 +1,24 @@
 // ToggleButton.js
 import React from 'react';
-import { Button , IconButton } from '@mui/material';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import { Fab } from '@mui/material';
+import { styled } from '@mui/system';
+import LayersIcon  from '@mui/icons-material/Layers';
+
+const StyledFab = styled(Fab)({
+  position: 'absolute',
+  top: '20%',
+  right: 16,
+  color: '#0093FF', // สีของไอคอน
+  backgroundColor: '#FFFFFF', // สีของปุ่ม
+  '&:hover': {
+    backgroundColor: '#e0e0e0', // สีของปุ่มเมื่อผู้ใช้เลื่อนเมาส์ไปวางบนปุ่ม
+  },
+});
 
 export default function ToggleButton({ isOpen, toggleDrawer }) {
   return (
-    <Button  
-      onClick={toggleDrawer} 
-      variant="contained"
-      style={{ 
-        position: 'absolute', 
-        top: '20%', 
-        left: '10px',
-        zIndex: 1000  
-      }}
-    >
-      {isOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-      ฟหฟห
-    </Button>
+    <StyledFab color="inherit" onClick={toggleDrawer} >
+      <LayersIcon  />
+    </StyledFab>
   );
 }

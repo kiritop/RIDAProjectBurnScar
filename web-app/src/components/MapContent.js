@@ -14,7 +14,7 @@ const MapContent = () => {
   return (
     
       <MapContainer
-        style={{ width: "100%", height: 'calc(100vh - 64px)', pointerEvents: "auto"  }}
+        style={{ width: "100%", height: 'calc(100vh - 48px)', pointerEvents: "auto"  }}
         center={[13, 100]}
         zoom={6}
         maxZoom={18}

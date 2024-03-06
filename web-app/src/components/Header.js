@@ -1,41 +1,53 @@
-import React from 'react';
-import { AppBar, Toolbar, IconButton, Typography, Box } from '@mui/material';
-import MapIcon from '@mui/icons-material/Map';
-import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
-import InfoIcon from '@mui/icons-material/Info';
-import ArticleIcon from '@mui/icons-material/Article';
+import * as React from 'react';
+import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import MenuIcon from '@mui/icons-material/Menu';
+
+const pages = ['Products', 'Pricing', 'Blog'];
+const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+
 
 export default function Header() {
+
+  const [anchorElNav, setAnchorElNav] = React.useState(null);
+  const [anchorElUser, setAnchorElUser] = React.useState(null);
+
+  const handleOpenNavMenu = (event) => {
+    setAnchorElNav(event.currentTarget);
+  };
+  const handleOpenUserMenu = (event) => {
+    setAnchorElUser(event.currentTarget);
+  };
+
+  const handleCloseNavMenu = () => {
+    setAnchorElNav(null);
+  };
+
+  const handleCloseUserMenu = () => {
+    setAnchorElUser(null);
+  };
+
   return (
-    <AppBar position="static" style={{ backgroundColor: '#FFFFFF' }}>
-      <Toolbar variant="dense">
-        <Box sx={{ flexGrow: 1 }} />
-        <IconButton color="inherit">
-          <MapIcon style={{ color: '#0093FF' }} />
-          <Typography variant="h6" component="div" style={{ color: '#0093FF' }}>
-            Map
+    <AppBar position="static">
+        <Toolbar variant="dense">
+          <IconButton
+            size="large"
+            edge="start"
+            color="inherit"
+            aria-label="menu"
+            sx={{ mr: 2 }}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            News
           </Typography>
-        </IconButton>
-        <IconButton color="inherit">
-          <ShoppingBagIcon style={{ color: '#0093FF' }} />
-          <Typography variant="h6" component="div" style={{ color: '#0093FF' }}>
-            Service
-          </Typography>
-        </IconButton>
-        <IconButton color="inherit">
-          <InfoIcon style={{ color: '#0093FF' }} />
-          <Typography variant="h6" component="div" style={{ color: '#0093FF' }}>
-            About us
-          </Typography>
-        </IconButton>
-        <IconButton color="inherit">
-          <ArticleIcon style={{ color: '#0093FF' }} />
-          <Typography variant="h6" component="div" style={{ color: '#0093FF' }}>
-            Blog
-          </Typography>
-        </IconButton>
-        <Box sx={{ flexGrow: 1 }} />
-      </Toolbar>
-    </AppBar>
+          <Button color="inherit">Login</Button>
+        </Toolbar>
+      </AppBar>
   );
 }

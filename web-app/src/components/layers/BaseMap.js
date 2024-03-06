@@ -4,7 +4,7 @@ import { LayersControl, TileLayer } from "react-leaflet";
 const BaseMap = () => {
   return (
     <LayersControl position="topright">
-      <LayersControl.BaseLayer name="Open Street Map" checked>
+      <LayersControl.BaseLayer name="Open Street Map">
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
       </LayersControl.BaseLayer>
 
@@ -23,7 +23,18 @@ const BaseMap = () => {
         />
       </LayersControl.BaseLayer>
 
-
+      
+      <LayersControl.BaseLayer name="Stadia Maps Dark" checked>
+        <TileLayer
+          attribution='<a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          className="basemap"
+          // maxNativeZoom={19}
+          // maxZoom={19}
+          ext='png'
+          subdomains={["clarity"]}
+          url="https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.{ext}"
+        />
+      </LayersControl.BaseLayer>
      
     </LayersControl>
   );
