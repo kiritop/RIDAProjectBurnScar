@@ -8,7 +8,7 @@ const StyledFab = styled(Fab)({
   position: 'absolute',
   top: '20%',
   right: 16,
-  color: '#0093FF', // สีของไอคอน
+  color: '#ae1b1f', // สีของไอคอน
   backgroundColor: '#FFFFFF', // สีของปุ่ม
   '&:hover': {
     backgroundColor: '#e0e0e0', // สีของปุ่มเมื่อผู้ใช้เลื่อนเมาส์ไปวางบนปุ่ม
