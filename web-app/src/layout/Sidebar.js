@@ -41,12 +41,6 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
   };
 
   return (
-    // <Drawer 
-    //   anchor="right" 
-    //   open={isOpen} 
-    //   onClose={toggleDrawer}
-    //   size="sm"
-    // >
     <Drawer
     size="md"
     anchor="right"
@@ -212,18 +206,18 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
         </div>
 
         <Typography level="title-md" fontWeight="bold" sx={{ mt: 2 }}>
-          Booking options
+          Base Layer
         </Typography>
         <FormControl orientation="horizontal">
           <Box sx={{ flex: 1, pr: 1 }}>
             <FormLabel sx={{ typography: 'title-sm' }}>
-              Instant booking
+              Arc GIS
             </FormLabel>
             <FormHelperText sx={{ typography: 'body-sm' }}>
               Listings that you can book without waiting for host approval.
             </FormHelperText>
           </Box>
-          <Switch />
+          <Switch checked/>
         </FormControl>
 
         <FormControl orientation="horizontal">
