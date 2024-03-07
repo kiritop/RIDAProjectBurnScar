@@ -48,7 +48,7 @@ const MapBurnScar = () => {
 
   return (
     <>
-     {
+     {/* {
           // Iterate the borderData with .map():
           firmsData.map((data, index) => {
             // Get the layer data from geojson:
@@ -60,9 +60,9 @@ const MapBurnScar = () => {
               </>
             )
           })
-        }
+        } */}
     {/* <GeoJSON data={firmsData}  pointToLayer={pointToLayer}/> */}
-      {/* {firmsData.map((feature, index) => {
+      {firmsData.map((feature, index) => {
         
         // const { latitude, longitude } = feature.geometry.coordinates;
         const position = [feature.geometry.coordinates[1], feature.geometry.coordinates[0]];
@@ -77,7 +77,7 @@ const MapBurnScar = () => {
             >
           </CircleMarker>
         );
-      })} */}
+      })}
     </>
   );
 };

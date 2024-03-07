@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {Marker, Popup, CircleMarker  } from "react-leaflet";
+import {CircleMarker} from "react-leaflet";
 import Papa from 'papaparse';
 
 

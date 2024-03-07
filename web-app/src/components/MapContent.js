@@ -1,14 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import "leaflet/dist/leaflet.css";
 import BaseMap from "./layers/BaseMap";
 import MapLocation from "./MapLocation";
 import MapHotspot from "./MapHotspot";
 import MapBurnScar from "./MapBurnScar";
-import SideTabs from "./SideTabs";
-import FilterOptions from './FilterOptions';
 import { MapContainer } from "react-leaflet";
-import Sidebar from "../layout/Sidebar";
-import ToggleButton from './ToggleButton';
 
 
 const MapContent = () => {
@@ -23,12 +19,9 @@ const MapContent = () => {
         minZoom={5}
       >
         <BaseMap />
-        {/* <ToggleButton isOpen={isOpen} toggleDrawer={toggleDrawer} /> */}
         <MapBurnScar />
         {/* <MapHotspot /> */}
         {/* <MapLocation /> */}
-        {/* <SideTabs tabs={tabs} /> */}
-        {/* <Sidebar isOpen={isOpen} /> */}
       </MapContainer>
     
   );
