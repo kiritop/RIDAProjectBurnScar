@@ -54,7 +54,7 @@ server.get('/read-shapefile-half', async (req, res) => {
   await shapefile.open(shapefilePath)
     .then(source => source.read()
       .then(function log(result) {
-        if (result.done || featureCount >= totalFeatures / 2) return;
+        if (result.done || featureCount >= totalFeatures / 20) return;
         features.push(result.value);
         featureCount++;
         return source.read().then(log);

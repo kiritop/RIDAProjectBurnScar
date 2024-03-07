@@ -7,7 +7,7 @@ import IconButton from '@mui/material/IconButton';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
-import AdbIcon from '@mui/icons-material/Adb';
+import MapIcon from '@mui/icons-material/Map';
 
 const pages = ['Products', 'Pricing', 'Blog'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
@@ -29,7 +29,8 @@ export default function Header() {
   return (
     <AppBar position="static" sx={{ backgroundColor: '#ffffff', color: '#ae1b1f' }}>
       <Toolbar variant="dense">
-        <AdbIcon sx={{ mr: 1 }} />
+        <Box sx={{ flexGrow: 1 }} />
+        <MapIcon sx={{ mr: 1 }} />
         <Typography
           variant="h6"
           noWrap
@@ -45,7 +46,7 @@ export default function Header() {
             textDecoration: 'none',
           }}
         >
-          RIDA
+          RIDA - Burnt Scar
         </Typography>
         <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'flex-end' }}>
           <IconButton

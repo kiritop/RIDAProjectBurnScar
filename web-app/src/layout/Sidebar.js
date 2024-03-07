@@ -27,16 +27,16 @@ import ApartmentRoundedIcon from '@mui/icons-material/ApartmentRounded';
 import MeetingRoomRoundedIcon from '@mui/icons-material/MeetingRoomRounded';
 import HotelRoundedIcon from '@mui/icons-material/HotelRounded';
 import Done from '@mui/icons-material/Done';
-import TextField from "@mui/material/TextField";
+import { Paper } from '@mui/material';
 import Slider from "@mui/material/Slider";
 
 export default function Sidebar({ isOpen , toggleDrawer}) {
 
   const [year, setYear] = React.useState(2022);
-  const colors = ['lightorange', 'orange', 'darkorange', 'orangered', 'red', 'darkred'];
+  const colors = ['#feb9b9', '#f88', '#ff5757', '#ff2626', '#f40000', '#c30000', '#920000', '#610000', '#300000'];
   const [type, setType] = React.useState('Guesthouse');
   const [amenities, setAmenities] = React.useState([0, 6]);
-  const [yearRange, setYearRange] = React.useState([2010, 2015]);
+  const [yearRange, setYearRange] = React.useState([2019, 2024]);
 
   const handleSliderChange = (event, newValue) => {
     setYear(newValue);
@@ -80,7 +80,7 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
       <ModalClose />
       <Divider sx={{ mt: 'auto' }} />
       <DialogContent sx={{ gap: 2 }}>
-        <FormControl>
+        {/* <FormControl>
           <FormLabel sx={{ typography: 'title-md', fontWeight: 'bold' }}>
             Property type
           </FormLabel>
@@ -153,9 +153,11 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
               ))}
             </Box>
           </RadioGroup>
-        </FormControl>
+        </FormControl> */}
 
-        <Typography level="title-md" fontWeight="bold" sx={{ mt: 1 }}>
+       
+
+        {/* <Typography level="title-md" fontWeight="bold" sx={{ mt: 1 }}>
           Amenities
         </Typography>
         <div role="group" aria-labelledby="rank">
@@ -211,8 +213,28 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
               );
             })}
           </List>
-        </div>
+        </div> */}
 
+        <Typography level="title-md" fontWeight="bold" sx={{ mt: 1 }}>
+         Burnt frequency
+        </Typography>
+        <FormControl orientation="horizontal">
+          <Box display="flex" justifyContent="center" alignItems="center" padding={2}>
+            {colors.map((color, index) => (
+              <Box key={index} display="flex" flexDirection="column" alignItems="center" margin={1}>
+                <Paper
+                  sx={{
+                    width: '50px',
+                    height: '50px',
+                    backgroundColor: color,
+                    marginBottom: 1,
+                  }}
+                />
+                <Typography>{index + 1}</Typography>
+              </Box>
+            ))}
+          </Box>
+        </FormControl>
         <Typography level="title-md" fontWeight="bold" sx={{ mt: 2 }}>
           Year Range
         </Typography>
@@ -224,37 +246,48 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
                 value={yearRange}
                 onChange={handleYearChange}
                 valueLabelDisplay="on"
-                min={2000}
-                max={2020}
+                min={2015}
+                max={2030}
                 step={1}
+                sx={{color: '#ae1b1f' }}
               />
             </Stack>
           </Box>
         </FormControl>
 
         <Typography level="title-md" fontWeight="bold" sx={{ mt: 2 }}>
-          Base Layer
+          Map Layer
         </Typography>
         <FormControl orientation="horizontal">
           <Box sx={{ flex: 1, pr: 1 }}>
             <FormLabel sx={{ typography: 'title-sm' }}>
-              Arc GIS
+              Burnt Scar Layer
             </FormLabel>
             <FormHelperText sx={{ typography: 'body-sm' }}>
-              Listings that you can book without waiting for host approval.
+              Description for burn scar map
             </FormHelperText>
           </Box>
-          <Switch checked/>
+          <Switch color="warning" checked/>
         </FormControl>
 
         <FormControl orientation="horizontal">
           <Box sx={{ flex: 1, mt: 1, mr: 1 }}>
-            <FormLabel sx={{ typography: 'title-sm' }}>Self check-in</FormLabel>
+            <FormLabel sx={{ typography: 'title-sm' }}>Aqi Layer</FormLabel>
             <FormHelperText sx={{ typography: 'body-sm' }}>
-              Easy access to the property when you arrive.
+            Description for PM 2.5
             </FormHelperText>
           </Box>
-          <Switch />
+          <Switch color="warning" />
+        </FormControl>
+
+        <FormControl orientation="horizontal">
+          <Box sx={{ flex: 1, mt: 1, mr: 1 }}>
+            <FormLabel sx={{ typography: 'title-sm' }}>Hot spot layer</FormLabel>
+            <FormHelperText sx={{ typography: 'body-sm' }}>
+            Description for Hot spot
+            </FormHelperText>
+          </Box>
+          <Switch color="warning" />
         </FormControl>
       </DialogContent>
 
@@ -275,7 +308,7 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
         >
           Clear
         </Button>
-        <Button onClick={toggleDrawer}>Show 165 properties</Button>
+        <Button onClick={toggleDrawer}>Save</Button>
       </Stack>
     </Sheet>
   </Drawer>
