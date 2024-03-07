@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {CircleMarker, GeoJSON} from "react-leaflet";
-
+import L from "leaflet"; // import Leaflet library
 
 
 const MapBurnScar = () => {
@@ -14,7 +14,6 @@ const MapBurnScar = () => {
       const data = await response.json();
       
       // const geometries = data.map(item => item.geometry);
-      console.log(data)
       setFirmsData(data);
     };
     fetchData();
@@ -33,36 +32,35 @@ const MapBurnScar = () => {
     }
 }
 
-// const pointToLayer = (feature, latlng) => {
-//   console.log('feature', feature);
-//   return (
-//     <CircleMarker 
-//       center={latlng}
-//       radius={1}
-//       fillOpacity={1}
-//     />
-//   );
-// }
+  // define a custom pointToLayer function
+  const pointToLayer = (feature, latlng) => {
+    // get the color based on the fire type
+    const color = getColor(feature.properties.FIRE_TYPE_);
+    // create a circle marker with a fixed pixel radius of 1
+    return L.circleMarker(latlng, { radius: 0.5, color: color, fillOpacity: 1 });
+    // alternatively, you can create a marker with a custom icon
+    // return L.marker(latlng, { icon: L.icon({ iconUrl: "some-image-url", iconSize: [10, 10] }) });
+  };
 
 
 
   return (
     <>
-     {/* {
+     {
           // Iterate the borderData with .map():
           firmsData.map((data, index) => {
+            console.log("index", index)
             // Get the layer data from geojson:
-            const geojson = data.geometry
             return (
               // Pass data to layer via props:
               <>
-                <GeoJSON key={index} data={geojson} />
+                <GeoJSON key={index} data={data} pointToLayer={pointToLayer} />
               </>
             )
           })
-        } */}
-    {/* <GeoJSON data={firmsData}  pointToLayer={pointToLayer}/> */}
-      {firmsData.map((feature, index) => {
+      }
+    {/* <GeoJSON key="data" data={firmsData}  pointToLayer={pointToLayer}/> */}
+      {/* {firmsData.map((feature, index) => {
         
         // const { latitude, longitude } = feature.geometry.coordinates;
         const position = [feature.geometry.coordinates[1], feature.geometry.coordinates[0]];
@@ -77,7 +75,7 @@ const MapBurnScar = () => {
             >
           </CircleMarker>
         );
-      })}
+      })} */}
     </>
   );
 };

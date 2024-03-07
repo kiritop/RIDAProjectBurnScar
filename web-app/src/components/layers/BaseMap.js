@@ -7,10 +7,12 @@ const BaseMap = () => {
       <LayersControl.BaseLayer name="Open Street Map" checked>
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
       </LayersControl.BaseLayer>
-
-      {/* <LayersControl.BaseLayer name="Open Street Map (Cyclosm)">
-        <TileLayer url=" https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png" />
-      </LayersControl.BaseLayer> */}
+      
+      <LayersControl.BaseLayer name="Stadia_StamenTonerLite">
+        <TileLayer 
+          ext='png'
+          url=" https://tiles.stadiamaps.com/tiles/stamen_toner_lite/{z}/{x}/{y}{r}.png" />
+      </LayersControl.BaseLayer>
 
       <LayersControl.BaseLayer name="Arc GIS">
         <TileLayer

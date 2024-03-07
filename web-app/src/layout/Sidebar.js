@@ -27,6 +27,8 @@ import ApartmentRoundedIcon from '@mui/icons-material/ApartmentRounded';
 import MeetingRoomRoundedIcon from '@mui/icons-material/MeetingRoomRounded';
 import HotelRoundedIcon from '@mui/icons-material/HotelRounded';
 import Done from '@mui/icons-material/Done';
+import TextField from "@mui/material/TextField";
+import Slider from "@mui/material/Slider";
 
 export default function Sidebar({ isOpen , toggleDrawer}) {
 
@@ -34,10 +36,17 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
   const colors = ['lightorange', 'orange', 'darkorange', 'orangered', 'red', 'darkred'];
   const [type, setType] = React.useState('Guesthouse');
   const [amenities, setAmenities] = React.useState([0, 6]);
+  const [yearRange, setYearRange] = React.useState([2010, 2015]);
 
   const handleSliderChange = (event, newValue) => {
     setYear(newValue);
   };
+
+  //set year range 
+  const handleYearChange = (event, newValue) => {
+    setYearRange(newValue);
+  };
+
 
   return (
     <Drawer
@@ -203,6 +212,25 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
             })}
           </List>
         </div>
+
+        <Typography level="title-md" fontWeight="bold" sx={{ mt: 2 }}>
+          Year Range
+        </Typography>
+
+        <FormControl orientation="horizontal">
+          <Box sx={{ flex: 1, pr: 1 }}>
+            <Stack spacing={2} direction="row" alignItems="center">
+              <Slider
+                value={yearRange}
+                onChange={handleYearChange}
+                valueLabelDisplay="on"
+                min={2000}
+                max={2020}
+                step={1}
+              />
+            </Stack>
+          </Box>
+        </FormControl>
 
         <Typography level="title-md" fontWeight="bold" sx={{ mt: 2 }}>
           Base Layer
