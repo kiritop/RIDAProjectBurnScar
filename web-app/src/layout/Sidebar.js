@@ -22,7 +22,6 @@ import Radio from '@mui/joy/Radio';
 import Sheet from '@mui/joy/Sheet';
 import Switch from '@mui/joy/Switch';
 import Typography from '@mui/joy/Typography';
-import TuneIcon from '@mui/icons-material/TuneRounded';
 import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
 import ApartmentRoundedIcon from '@mui/icons-material/ApartmentRounded';
 import MeetingRoomRoundedIcon from '@mui/icons-material/MeetingRoomRounded';

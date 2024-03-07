@@ -15,23 +15,23 @@ function App() {
     setIsOpen(!isOpen);
   };
   return (
-    // <div className="App">
-    //   {/* <Header /> */}
-    //   {/* <Sidebar /> */}
-    //   <MapContent z/>
-    // </div>
-     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-      <Header />
+    <div className="App">
+      {/* <Header /> */}
+      {/* <Sidebar /> */}
+      <MapContent z/>
+    </div>
+    //  <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+    //   <Header />
         
-      <Box sx={{ display: 'flex', flexGrow: 1 }}>
-        {/* <Sidebar /> */}
-        {/* <ToggleButton toggleDrawer={toggleDrawer}/> */}
-        <ToggleButton isOpen={isOpen} toggleDrawer={toggleDrawer} />
-        <MapContent z/>
-        <Sidebar isOpen={isOpen}  toggleDrawer={toggleDrawer}/>
-      </Box>
+    //   <Box sx={{ display: 'flex', flexGrow: 1 }}>
+    //     {/* <Sidebar /> */}
+    //     {/* <ToggleButton toggleDrawer={toggleDrawer}/> */}
+    //     {/* <ToggleButton isOpen={isOpen} toggleDrawer={toggleDrawer} /> */}
+    //     <MapContent z/>
+    //     {/* <Sidebar isOpen={isOpen}  toggleDrawer={toggleDrawer}/> */}
+    //   </Box>
       
-    </Box>
+    // </Box>
   );
 }
 

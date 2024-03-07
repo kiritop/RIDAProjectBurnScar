@@ -10,19 +10,21 @@ import { MapContainer } from "react-leaflet";
 import Sidebar from "../layout/Sidebar";
 import ToggleButton from './ToggleButton';
 
+
 const MapContent = () => {
   return (
     
       <MapContainer
         style={{ width: "100%", height: 'calc(100vh - 48px)', pointerEvents: "auto"  }}
-        center={[13, 100]}
+        // center={[13, 100]}
+        center={[44, -89.5]}
         zoom={6}
         maxZoom={18}
         minZoom={5}
       >
         <BaseMap />
         {/* <ToggleButton isOpen={isOpen} toggleDrawer={toggleDrawer} /> */}
-        {/* <MapBurnScar /> */}
+        <MapBurnScar />
         {/* <MapHotspot /> */}
         {/* <MapLocation /> */}
         {/* <SideTabs tabs={tabs} /> */}
