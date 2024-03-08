@@ -50,7 +50,7 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
 
   return (
     <Drawer
-    size="md"
+    size="sm"
     anchor="right"
     variant="plain"
     open={isOpen}

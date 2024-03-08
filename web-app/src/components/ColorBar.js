@@ -7,7 +7,7 @@ const ColorBar = () => {
   
     return (
       <Box display="flex" flexDirection="column" alignItems="center" padding={1}>
-          <Typography fontWeight="bold" >Burnt Frequency</Typography> {/* เพิ่มระยะห่างระหว่างบาร์สีและตัวเลข */}
+          <Typography fontWeight="bold" >Burnt Frequency (times)</Typography> {/* เพิ่มระยะห่างระหว่างบาร์สีและตัวเลข */}
         {colors.map((color, index) => (
           <Box key={index} display="flex" alignItems="center">
             <Paper

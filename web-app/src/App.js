@@ -32,7 +32,7 @@ function App() {
         <ToggleButton isOpen={isOpen} toggleDrawer={toggleDrawer} />
         <MapContent z/>
         <Sidebar isOpen={isOpen}  toggleDrawer={toggleDrawer}/>
-        <Card sx={{ position: 'absolute', bottom: '20%', left: 16, maxWidth: '20%' , zIndex: 1050, backgroundColor: 'rgba(255, 255, 255, 0.2)'  }}>
+        <Card sx={{ position: 'absolute', bottom: '10%', left: 16, maxWidth: '20%' , zIndex: 1050, backgroundColor: 'rgba(255, 255, 255, 0.2)'  }}>
           <CardContent>
             <ColorBar /> {/* แสดงแถบสีใน Card */}
           </CardContent>
