@@ -2,8 +2,10 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const cors = require('cors');
-const AdmZip = require('adm-zip');
 const shapefile = require('shapefile');
+const fs = require('fs');
+const path = require('path');
+const unzipper = require('unzipper');
 
 let server = express();
 server.use(bodyParser.json());  // ให้ server(express) ใช้งานการ parse json
@@ -19,7 +21,8 @@ server.get('/read-shapefile', async (req, res) => {
   // zip.extractAllTo('./output', /*overwrite*/true);
 
   // Assuming the shapefile is named 'shapefile.shp'
-  const shapefilePath = './output/USA Fire Predicted GIS file/USA_Fire_Predicted.shp';
+  // const shapefilePath = './output/USA Fire Predicted GIS file/USA_Fire_Predicted.shp';
+  const shapefilePath = './output/layers/POINT.shp';
 
   let features = [];
   await shapefile.open(shapefilePath)
@@ -64,6 +67,67 @@ server.get('/read-shapefile-half', async (req, res) => {
   res.json(features);
 });
 
+
+server.get('/process-shapefiles', async (req, res) => {
+  let data = [];
+  const directoryPath = path.join(__dirname, './output/demo');
+  fs.readdir(directoryPath, function (err, files) {
+      if (err) {
+          return console.log('Unable to scan directory: ' + err);
+      } 
+      let promises = [];
+      files.forEach(function (file) {
+          if(path.extname(file) === '.zip'){
+              let promise = new Promise((resolve, reject) => {
+                  fs.createReadStream(directoryPath + '/' + file)
+                      .pipe(unzipper.Parse())
+                      .on('entry', function (entry) {
+                          const fileName = entry.path;
+                          const type = entry.type; // 'Directory' or 'File'
+                          if (type === 'File' && fileName.includes('layers') && fileName.endsWith('.shp')) {
+                              shapefile.read(entry)
+                                  .then(geojson => {
+                                      geojson.features.forEach(feature => {
+                                          const latlong = feature.geometry.coordinates.join(',');
+                                          const year = file.split('_')[1];
+                                          data.push({ type: feature.type, coordinates: latlong, properties: { ...feature.properties, count: 1, year: [year] }, geometry: feature.geometry});
+                                      });
+                                      resolve();
+                                  })
+                                  .catch(err => {
+                                      console.error(err);
+                                      reject(err);
+                                  });
+                          } else {
+                              entry.autodrain();
+                          }
+                      });
+              });
+              promises.push(promise);
+          }
+      });
+      Promise.all(promises)
+          .then(() => {
+              let finalData = [];
+              data.forEach(item => {
+                  let found = finalData.find(d => d.coordinates === item.coordinates);
+                  if (!found) {
+                      finalData.push(item);
+                  } else {
+                      found.properties.count++;
+                      if (!found.properties.year.includes(item.properties.year[0])) {
+                          found.properties.year.push(item.properties.year[0]);
+                      }
+                  }
+              });
+              res.json(finalData); // Send the data as JSON
+          })
+          .catch(err => {
+              console.log(err);
+              res.status(500).send('An error occurred while processing the shapefiles.');
+          });
+  });
+});
 
 
 

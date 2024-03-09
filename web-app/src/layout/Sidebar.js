@@ -1,12 +1,11 @@
 // Sidebar.js
 import * as React from 'react';
-import AspectRatio from '@mui/joy/AspectRatio';
+
 import Box from '@mui/joy/Box';
 import Drawer from '@mui/joy/Drawer';
 import Button from '@mui/joy/Button';
-import Card from '@mui/joy/Card';
-import CardContent from '@mui/joy/CardContent';
-import Checkbox from '@mui/joy/Checkbox';
+import Select from '@mui/joy/Select';
+import Option from '@mui/joy/Option';
 import DialogTitle from '@mui/joy/DialogTitle';
 import DialogContent from '@mui/joy/DialogContent';
 import ModalClose from '@mui/joy/ModalClose';
@@ -14,21 +13,14 @@ import Divider from '@mui/joy/Divider';
 import FormControl from '@mui/joy/FormControl';
 import FormLabel from '@mui/joy/FormLabel';
 import FormHelperText from '@mui/joy/FormHelperText';
-import List from '@mui/joy/List';
-import ListItem from '@mui/joy/ListItem';
 import Stack from '@mui/joy/Stack';
-import RadioGroup from '@mui/joy/RadioGroup';
-import Radio from '@mui/joy/Radio';
 import Sheet from '@mui/joy/Sheet';
 import Switch from '@mui/joy/Switch';
 import Typography from '@mui/joy/Typography';
-import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
-import ApartmentRoundedIcon from '@mui/icons-material/ApartmentRounded';
-import MeetingRoomRoundedIcon from '@mui/icons-material/MeetingRoomRounded';
-import HotelRoundedIcon from '@mui/icons-material/HotelRounded';
-import Done from '@mui/icons-material/Done';
-import { Paper } from '@mui/material';
 import Slider from "@mui/material/Slider";
+
+const countries = ['Thailand', 'Myanmar', 'Laos', 'Vietnam', 'Cambodia'];
+const provinces = ['Chiang Rai', 'Chiang Mai', 'Lampang', 'Lamphun', 'Mae Hong Son', 'Nan', 'Phayao', 'Phrae', 'Uttaradit'];
 
 export default function Sidebar({ isOpen , toggleDrawer}) {
 
@@ -36,10 +28,16 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
   const colors = ['#feb9b9', '#f88', '#ff5757', '#ff2626', '#f40000', '#c30000', '#920000', '#610000', '#300000'];
   const [type, setType] = React.useState('Guesthouse');
   const [amenities, setAmenities] = React.useState([0, 6]);
-  const [yearRange, setYearRange] = React.useState([2019, 2024]);
+  const [yearRange, setYearRange] = React.useState([2019, 2023]);
+  const [country, setCountry] = React.useState('Thailand');
+  const [province, setProvince] = React.useState('Chiang Rai');
 
-  const handleSliderChange = (event, newValue) => {
-    setYear(newValue);
+  const handleCountryChange = (event) => {
+    setCountry(event.target.value);
+  };
+
+  const handleProvinceChange = (event) => {
+    setProvince(event.target.value);
   };
 
   //set year range 
@@ -80,161 +78,7 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
       <ModalClose />
       <Divider sx={{ mt: 'auto' }} />
       <DialogContent sx={{ gap: 2 }}>
-        {/* <FormControl>
-          <FormLabel sx={{ typography: 'title-md', fontWeight: 'bold' }}>
-            Property type
-          </FormLabel>
-          <RadioGroup
-            value={type || ''}
-            onChange={(event) => {
-              setType(event.target.value);
-            }}
-          >
-            <Box
-              sx={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))',
-                gap: 1.5,
-              }}
-            >
-              {[
-                {
-                  name: 'House',
-                  icon: <HomeRoundedIcon />,
-                },
-                {
-                  name: 'Apartment',
-                  icon: <ApartmentRoundedIcon />,
-                },
-                {
-                  name: 'Guesthouse',
-                  icon: <MeetingRoomRoundedIcon />,
-                },
-                {
-                  name: 'Hotel',
-                  icon: <HotelRoundedIcon />,
-                },
-              ].map((item) => (
-                <Card
-                  key={item.name}
-                  sx={{
-                    boxShadow: 'none',
-                    '&:hover': { bgcolor: 'background.level1' },
-                  }}
-                >
-                  <CardContent>
-                    {item.icon}
-                    <Typography level="title-md">{item.name}</Typography>
-                  </CardContent>
-                  <Radio
-                    disableIcon
-                    overlay
-                    checked={type === item.name}
-                    variant="outlined"
-                    color="neutral"
-                    value={item.name}
-                    sx={{ mt: -2 }}
-                    slotProps={{
-                      action: {
-                        sx: {
-                          ...(type === item.name && {
-                            borderWidth: 2,
-                            borderColor:
-                              'var(--joy-palette-primary-outlinedBorder)',
-                          }),
-                          '&:hover': {
-                            bgcolor: 'transparent',
-                          },
-                        },
-                      },
-                    }}
-                  />
-                </Card>
-              ))}
-            </Box>
-          </RadioGroup>
-        </FormControl> */}
 
-       
-
-        {/* <Typography level="title-md" fontWeight="bold" sx={{ mt: 1 }}>
-          Amenities
-        </Typography>
-        <div role="group" aria-labelledby="rank">
-          <List
-            orientation="horizontal"
-            size="sm"
-            sx={{
-              '--List-gap': '12px',
-              '--ListItem-radius': '20px',
-            }}
-          >
-            {['Wi-fi', 'Washer', 'A/C', 'Kitchen'].map((item, index) => {
-              const selected = amenities.includes(index);
-              return (
-                <ListItem key={item}>
-                  <AspectRatio
-                    variant={selected ? 'solid' : 'outlined'}
-                    color={selected ? 'primary' : 'neutral'}
-                    ratio={1}
-                    sx={{ width: 20, borderRadius: 20, ml: -0.5, mr: 0.75 }}
-                  >
-                    <div>{selected && <Done fontSize="md" />}</div>
-                  </AspectRatio>
-                  <Checkbox
-                    size="sm"
-                    color="neutral"
-                    disableIcon
-                    overlay
-                    label={item}
-                    variant="outlined"
-                    checked={selected}
-                    onChange={(event) =>
-                      setAmenities((prev) => {
-                        const set = new Set([...prev, index]);
-                        if (!event.target.checked) {
-                          set.delete(index);
-                        }
-                        // @ts-ignore
-                        return [...set];
-                      })
-                    }
-                    slotProps={{
-                      action: {
-                        sx: {
-                          '&:hover': {
-                            bgcolor: 'transparent',
-                          },
-                        },
-                      },
-                    }}
-                  />
-                </ListItem>
-              );
-            })}
-          </List>
-        </div> */}
-
-        <Typography level="title-md" fontWeight="bold" sx={{ mt: 1 }}>
-         Burnt frequency
-        </Typography>
-        <FormControl orientation="horizontal">
-          <Box display="flex" justifyContent="center" alignItems="center" padding={2}>
-            {colors.map((color, index) => (
-              <Box key={index} display="flex" flexDirection="column" alignItems="center" margin={1}>
-                <Paper
-                  sx={{
-                    width: '50px',
-                    height: '50px',
-                    backgroundColor: color,
-                    marginBottom: 1,
-                  }}
-                />
-                <Typography>{index + 1}</Typography>
-              </Box>
-            ))}
-          </Box>
-        </FormControl>
         <Typography level="title-md" fontWeight="bold" sx={{ mt: 2 }}>
           Year Range
         </Typography>
@@ -246,11 +90,47 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
                 value={yearRange}
                 onChange={handleYearChange}
                 valueLabelDisplay="on"
-                min={2015}
-                max={2030}
+                min={2017}
+                max={2024}
                 step={1}
                 sx={{color: '#ae1b1f' }}
               />
+            </Stack>
+          </Box>
+        </FormControl>
+
+        <Typography level="title-md" fontWeight="bold" sx={{ mt: 2 }}>
+          Country
+        </Typography>
+        <FormControl orientation="horizontal">
+          <Box sx={{ flex: 1, pr: 1 }}>
+            <Stack spacing={2}>
+              <Select value={country} onChange={handleCountryChange}>
+                {countries.map((country) => (
+                  <Option key={country} value={country}>
+                    {country}
+                  </Option>
+                ))}
+              </Select>
+            </Stack>
+          </Box>
+        </FormControl>
+        
+        <Typography level="title-md" fontWeight="bold" sx={{ mt: 2 }}>
+          Province
+        </Typography>
+        <FormControl orientation="horizontal">
+          <Box sx={{ flex: 1, pr: 1 }}>
+            <Stack spacing={2}>
+              {country === 'Thailand' && (
+                  <Select value={province} onChange={handleProvinceChange}>
+                    {provinces.map((province) => (
+                      <Option key={province} value={province}>
+                        {province}
+                      </Option>
+                    ))}
+                  </Select>
+              )}
             </Stack>
           </Box>
         </FormControl>
