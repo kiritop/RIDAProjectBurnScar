@@ -120,6 +120,51 @@ server.get('/process-shapefiles', async (req, res) => {
                       }
                   }
               });
+
+              // Calculate the percentage of duplicates for each row
+              finalData.forEach(row => {
+                // Use the formula (count / files.length) * 100 and round to two decimals
+                let percentage = ((row.properties.count / files.length) * 100).toFixed(2);
+                // Add the percentage to the properties as frequency
+                row.properties.frequency = percentage;
+              });
+              console.log("files.length", files.length)
+              // Define an array of offsets for the four directions
+              // You can change the values as you wish
+              // The unit is degree
+              let offsets = [
+                { dx: 0, dy: 0.0005 }, // up
+                { dx: 0, dy: -0.0005 }, // down
+                { dx: -0.0005, dy: 0 }, // left
+                { dx: 0.0005, dy: 0 } // right
+              ];
+
+              // Loop through the final data array
+              finalData.forEach(row => {
+                // Loop through the offsets array
+                offsets.forEach(offset => {
+                  // Split the coordinates string into an array of numbers
+                  let coords = row.coordinates.split(',').map(Number);
+                  // Add the offset to the original coordinates
+                  let newCoords = [coords[0] + offset.dx, coords[1] + offset.dy];
+                  // Create a new geojson object for the new point
+                  let newPoint = {
+                    "type": "Feature",
+                    "properties": {
+                      // Copy the properties from the original point
+                      ...row.properties,
+                      // Add a new property to indicate that this is an artificial point
+                      "artificial": true
+                    },
+                    "geometry": {
+                      "type": "Point",
+                      "coordinates": newCoords
+                    }
+                  };
+                  // Add the new point to the final data array
+                  finalData.push(newPoint);
+                });
+              }); 
               res.json(finalData); // Send the data as JSON
           })
           .catch(err => {
