@@ -1,0 +1,16 @@
+.leaflet-popup.custom-popup .leaflet-popup-content-wrapper {
+    background: rgba(0, 0, 0, 0.5); /* semi-transparent black */
+    color: white; /* white text */
+  }
+  
+  .leaflet-popup.custom-popup .leaflet-popup-tip-container {
+    display: none; /* hide the popup tip */
+  }
+  
+  .leaflet-popup.custom-popup table {
+    width: 100%; /* make the table take up the full width of the popup */
+  }
+  
+  .leaflet-popup.custom-popup td {
+    padding: 5px; /* add some padding to the table cells */
+  }
