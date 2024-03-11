@@ -24,7 +24,7 @@ const Carddetail = [
   {
     img: "unit4.png",
     id: 4,
-    title: "Unit 4 Material Learning",
+    title: "Unit 4 Machine Learning",
     desc: "Lizards are a widespread group of squamate reptiles, with over 6,000 species, ranging across all",
   },
 ];
@@ -72,17 +72,17 @@ function Course({ e }) {
         <Grid container spacing={3}>
           {Carddetail.map((e, index) => (
             <Grid item xs={3} key={index}>
-              <Card sx={{ maxWidth: 400, height: 500 }}>
+              <Card sx={{ maxWidth: 400, height: '25vh' }}>
                 <CardActionArea onClick={() => handlePdfClick(e.id)}>
                   <CardMedia component="img" height="200" image={e.img} alt="unit1" />
                   <CardContent>
                     <Typography variant="body2" color="text.secondary">
                       <h4>{e.title}</h4>
                     </Typography>
-                    <Typography variant="body2" color="text.secondary">
+                    {/* <Typography variant="body2" color="text.secondary">
                       Lizards are a widespread group of squamate reptiles, with over 6,000 species, ranging across all
                       continents except Antarctica
-                    </Typography>
+                    </Typography> */}
                   </CardContent>
                 </CardActionArea>
               </Card>

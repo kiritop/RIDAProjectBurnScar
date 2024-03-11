@@ -61,19 +61,18 @@ function AboutUS() {
         <Grid container spacing={3}>
           {items.map((item, index) => (
             <Grid key={index} xs={12} sm={6} md={4} item>
-              <Card sx={{ maxWidth: 360, boxShadow: "none" }}>
+              <Card sx={{ maxWidth: 360, boxShadow: "none" , height: '35vh' }}>
                 {/* Card media for the image */}
 
                 <center>
                   <CardMedia
-                    sx={{ height: 100, width: 100, borderRadius: 10 }} // Set the height and width to make the image smaller
-                    image={item.imageUrl} // Use item's imageUrl
-                    title={item.name} // Use item's name as the title
+                    sx={{ height: 250, width: 100, borderRadius: 10 }} // Set the height and width to make the image smaller
+                    // image={item.imageUrl} // Use item's imageUrl
                   />
                 </center>
 
                 {/* Card content for text */}
-                <CardContent>
+                <CardContent sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                   <Typography gutterBottom variant="h6" component="div" align="center">
                     {item.name}
                   </Typography>
