@@ -93,7 +93,7 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
                 min={2017}
                 max={2024}
                 step={1}
-                sx={{color: '#ae1b1f' }}
+                // sx={{color: '#50C1DD' }}
               />
             </Stack>
           </Box>
@@ -147,7 +147,7 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
               Description for burn scar map
             </FormHelperText>
           </Box>
-          <Switch color="warning" checked/>
+          <Switch checked/>
         </FormControl>
 
         <FormControl orientation="horizontal">
@@ -157,7 +157,7 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
             Description for PM 2.5
             </FormHelperText>
           </Box>
-          <Switch color="warning" />
+          <Switch />
         </FormControl>
 
         <FormControl orientation="horizontal">
@@ -167,7 +167,7 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
             Description for Hot spot
             </FormHelperText>
           </Box>
-          <Switch color="warning" />
+          <Switch />
         </FormControl>
       </DialogContent>
 
@@ -188,7 +188,7 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
         >
           Clear
         </Button>
-        <Button onClick={toggleDrawer}>Save</Button>
+        <Button onClick={toggleDrawer} >Save</Button>
       </Stack>
     </Sheet>
   </Drawer>

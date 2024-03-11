@@ -11,7 +11,12 @@ import DeleteIcon from "@mui/icons-material/Delete";
 
 function API() {
   return (
-    <>
+    <div
+      style={{
+        backgroundColor: "#E0FBFF",
+        height: "100vh",
+      }}
+    >
       <Header />
       <Container maxWidth="lg">
         <Grid container direction="row" justifyContent="space-between" alignItems="center">
@@ -37,12 +42,11 @@ function API() {
               {/* Define specific sizes for grid items */}
               /read-shapefile
             </Grid>
-            <Grid item xs={2}>
-              {/* Define specific sizes for grid items */}
+            {/* <Grid item xs={2}>
               <IconButton aria-label="delete">
-                <DeleteIcon /> {/* Render the delete icon */}
+                <DeleteIcon /> 
               </IconButton>
-            </Grid>
+            </Grid> */}
           </Grid>
         </Box>
 
@@ -62,17 +66,16 @@ function API() {
               {/* Define specific sizes for grid items */}
               /read-shapefile-half
             </Grid>
-            <Grid item xs={2}>
-              {/* Define specific sizes for grid items */}
+            {/* <Grid item xs={2}>
               <IconButton aria-label="delete">
-                <DeleteIcon /> {/* Render the delete icon */}
+                <DeleteIcon /> 
               </IconButton>
-            </Grid>
+            </Grid> */}
           </Grid>
         </Box>
         {/* <SwaggerUI url="http://petstore.swagger.io/v2/swagger.json" /> */}
       </Container>
-    </>
+    </div>
   );
 }
 export default API;
