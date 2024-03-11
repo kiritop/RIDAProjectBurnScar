@@ -46,7 +46,12 @@ function AboutUS() {
     // Add more items as needed
   ];
   return (
-    <>
+    <div
+      style={{
+        backgroundColor: "#E0FBFF",
+        height: "100vh",
+      }}
+    >
       <Header />
       <Box height={20} />
       <Container maxWidth="lg">
@@ -83,7 +88,7 @@ function AboutUS() {
           ))}
         </Grid>
       </Container>
-    </>
+    </div>
   );
 }
 

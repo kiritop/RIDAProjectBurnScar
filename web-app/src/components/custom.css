@@ -1,5 +1,5 @@
 .leaflet-popup.custom-popup .leaflet-popup-content-wrapper {
-    background: rgba(0, 0, 0, 0.5); /* semi-transparent black */
+    background: rgba(0, 0, 0, 0.8); /* semi-transparent black */
     color: white; /* white text */
   }
   

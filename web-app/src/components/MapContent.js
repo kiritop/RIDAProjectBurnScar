@@ -11,7 +11,7 @@ const MapContent = () => {
   return (
     
       <MapContainer
-        style={{ width: "100%", height: 'calc(100vh - 48px)', pointerEvents: "auto"  }}
+        style={{ width: "100%", height: 'calc(100vh - 68.5px)', pointerEvents: "auto"  }}
         // center={[13, 100]}
         center={[19.9094, 99.8275]}
         // center={[44, -89.5]}
@@ -20,7 +20,7 @@ const MapContent = () => {
         // minZoom={5}
       >
         <BaseMap />
-        {/* <MapBurnScar /> */}
+        <MapBurnScar />
         {/* <MapHotspot /> */}
         {/* <MapLocation /> */}
       </MapContainer>
