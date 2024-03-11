@@ -1,6 +1,6 @@
 import * as React from "react";
-import Header from "../components/Header";
-import { Container, Card, CardContent, Grid, Typography, CardMedia, CardActionArea, Box } from "@mui/material";
+
+import { Container, Card, CardContent, Grid, Typography, CardMedia, CardActionArea,  } from "@mui/material";
 
 const Carddetail = [
   {
@@ -50,7 +50,7 @@ function Course({ e }) {
         height: "100vh",
       }}
     >
-      <Header />
+      
 
       <Container maxWidth="lg" sx={{}}>
         <Grid

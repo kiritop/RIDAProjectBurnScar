@@ -1,5 +1,5 @@
 import React from "react";
-import Header from "../components/Header";
+
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
@@ -17,7 +17,7 @@ function API() {
         height: "100vh",
       }}
     >
-      <Header />
+    
       <Container maxWidth="lg">
         <Grid container direction="row" justifyContent="space-between" alignItems="center">
           <h1> API</h1>
