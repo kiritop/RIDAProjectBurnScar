@@ -1,47 +1,25 @@
-import React, { useState } from 'react';
-import MapContent from './components/MapContent';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Map from './pages/Map';
+import Course from './pages/Course'
+import AboutUS from './pages/Aboutus';
+import API from './pages/API';
 import './App.css';
-import Header from './components/Header'
-import { Box, Card, CardContent } from '@mui/material'
-import ToggleButton from './components/ToggleButton';
-import Sidebar from "./layout/Sidebar";
-import ColorBar from './components/ColorBar';
-// import ToggleButton from '@mui/material/ToggleButton';
+import LoginPage from './pages/loginpage';
 
 
 function App() {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const toggleDrawer = () => {
-    setIsOpen(!isOpen);
-  };
   return (
-    // <div className="App">
-    //   {/* <Header /> */}
-    //   {/* <Sidebar /> */}
-    //   <MapContent z/>
-    // </div>
-     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-      <Header />
-     
-        
-      <Box sx={{ display: 'flex', flexGrow: 1 }}>
-       
-        {/* <Sidebar /> */}
-        {/* <ToggleButton toggleDrawer={toggleDrawer}/> */}
-        <ToggleButton isOpen={isOpen} toggleDrawer={toggleDrawer} />
-        <MapContent z/>
-        <Sidebar isOpen={isOpen}  toggleDrawer={toggleDrawer}/>
-        <Card sx={{ position: 'absolute', bottom: '10%', left: 16, maxWidth: '20%' , zIndex: 1050, backgroundColor: 'rgba(255, 255, 255, 0.2)'  }}>
-          <CardContent>
-            <ColorBar /> {/* แสดงแถบสีใน Card */}
-          </CardContent>
-        </Card>
-      </Box>
-      
-    </Box>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Map />} />
+        <Route path="/learning_material" element={<Course />} />       
+        <Route path="/api" element={<API />} />       
+        <Route path="/about_us" element={<AboutUS />} />       
+        <Route path="/login" element={<LoginPage />} />       
+      </Routes>
+    </Router>
   );
 }
 
 export default App;
-

@@ -1,0 +1,36 @@
+.App {
+    font-family: Arial, sans-serif;
+    text-align: center;
+  }
+  
+  .login-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    display: inline-block;
+  }
+  
+  h2 {
+    margin-bottom: 20px;
+  }
+  
+  .google-login-btn {
+    display: inline-block;
+    background-color: #DB4437;
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .google-login-btn:hover {
+    background-color: #c1351d;
+  }
+  
+  .google-login-btn img {
+    width: 20px;
+    vertical-align: middle;
+    margin-right: 10px;
+  }

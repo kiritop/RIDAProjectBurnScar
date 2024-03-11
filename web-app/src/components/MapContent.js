@@ -20,7 +20,7 @@ const MapContent = () => {
         // minZoom={5}
       >
         <BaseMap />
-        <MapBurnScar />
+        {/* <MapBurnScar /> */}
         {/* <MapHotspot /> */}
         {/* <MapLocation /> */}
       </MapContainer>

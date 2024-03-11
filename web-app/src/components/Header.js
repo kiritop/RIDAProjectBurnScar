@@ -1,22 +1,37 @@
-import * as React from 'react';
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
-import AccountCircle from '@mui/icons-material/AccountCircle';
-import MenuItem from '@mui/material/MenuItem';
-import Menu from '@mui/material/Menu';
-import MapIcon from '@mui/icons-material/Map';
+/* eslint-disable no-unused-vars */
+import * as React from "react";
+import AppBar from "@mui/material/AppBar";
+import Box from "@mui/material/Box";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import IconButton from "@mui/material/IconButton";
+import AccountCircle from "@mui/icons-material/AccountCircle";
+import MenuItem from "@mui/material/MenuItem";
+import Menu from "@mui/material/Menu";
+import MapIcon from "@mui/icons-material/Map";
+import Link from "@mui/material/Link";
+import { Button } from "@mui/material";
 
-const pages = ['Products', 'Pricing', 'Blog'];
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
-
+const pages = ["Map", "Learning Material", "API", "About US"];
+const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 export default function Header() {
-
   const [anchorEl, setAnchorEl] = React.useState(null);
 
+  function getPageUrl(page) {
+    switch (page) {
+      case "Map":
+        return "/";
+      case "Learning Material":
+        return "/learning_material";
+      case "API":
+        return "/api";
+      case "About US":
+        return "/about_us";
+      default:
+        return "/";
+    }
+  }
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -27,28 +42,39 @@ export default function Header() {
   };
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: '#ffffff', color: '#ae1b1f' }}>
+    <AppBar position="static" sx={{ backgroundColor: "#50C1DD", color: "#fff" }}>
       <Toolbar variant="dense">
-        <Box sx={{ flexGrow: 1 }} />
         <MapIcon sx={{ mr: 1 }} />
         <Typography
           variant="h6"
           noWrap
           component="a"
-          href="#app-bar-with-responsive-menu"
+          href="/"
           sx={{
             mr: 2,
-            display: 'flex',
-            fontFamily: 'monospace',
+            display: "flex",
+            fontFamily: "monospace",
             fontWeight: 700,
-            letterSpacing: '.3rem',
-            color: 'inherit',
-            textDecoration: 'none',
+            letterSpacing: ".3rem",
+            color: "inherit",
+            textDecoration: "none",
           }}
         >
           RIDA - Burnt Scar
         </Typography>
-        <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'flex-end' }}>
+        <Box sx={{ flexGrow: 12, display: { xs: "none", md: "flex" } }} />
+        {pages.map((page) => (
+          <Button
+            key={page}
+            underline="none"
+            href={getPageUrl(page)}
+            sx={{ my: 2, display: "block", color: "#fff", mx: 1, fontFamily: "monospace", fontWeight: 700 }}
+          >
+            <center> {page}</center>
+          </Button>
+        ))}
+
+        <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "flex-end" }}>
           <IconButton
             size="large"
             aria-label="account of current user"
@@ -63,19 +89,23 @@ export default function Header() {
             id="menu-appbar"
             anchorEl={anchorEl}
             anchorOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
+              vertical: "top",
+              horizontal: "right",
             }}
             keepMounted
             transformOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
+              vertical: "top",
+              horizontal: "right",
             }}
             open={Boolean(anchorEl)}
             onClose={handleClose}
           >
-            <MenuItem onClick={handleClose}>Profile</MenuItem>
-            <MenuItem onClick={handleClose}>My account</MenuItem>
+            <MenuItem onClick={handleClose}>
+              <Link href="/login" variant="body1" underline="hover">
+                <img src="google.png" alt="Google Icon" style={{ marginRight: "8px", width: "24px", height: "24px" }} />
+                Login with Google
+              </Link>
+            </MenuItem>
           </Menu>
         </Box>
       </Toolbar>
