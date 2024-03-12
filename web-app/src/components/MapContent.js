@@ -21,8 +21,8 @@ const MapContent = () => {
       >
         <BaseMap />
         {/* <MapBurnScar /> */}
-        {/* <MapHotspot /> */}
-        <MapLocation />
+        <MapHotspot />
+        {/* <MapLocation /> */}
       </MapContainer>
     
   );

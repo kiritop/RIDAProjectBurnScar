@@ -2,22 +2,20 @@ import React, { useState, useEffect } from "react";
 import {CircleMarker, GeoJSON, Popup} from "react-leaflet";
 import L from "leaflet"; // import Leaflet library
 import './custom.css';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchBurntScarData } from '../reducers/burntScarSlice';
 
 
 
 const MapBurnScar = () => {
-  const [firmsData, setFirmsData] = useState([]);
+  // const [firmsData, setFirmsData] = useState([]);
+  const dispatch = useDispatch();
+  const burntScarData = useSelector(state => state.burnScar.data);
+  const loading = useSelector(state => state.burnScar.loading); 
 
   useEffect(() => {
-    const fetchData = async () => {
-      const response = await fetch(
-        "http://localhost:3000/process-shapefiles"
-      );
-      const data = await response.json();
-      setFirmsData(data);
-    };
-    fetchData();
-  }, []);
+    dispatch(fetchBurntScarData());
+  }, [dispatch]);
 
 const percentToColor = (percent) => {
   const value = percent / 100;
@@ -74,12 +72,16 @@ const percentToColor = (percent) => {
     layer.bindPopup(popupContent, { className: 'custom-popup' }); // add a custom class name
   };
 
+  if (loading) {
+    return <div>Loading...</div>; // แสดง loader ถ้าข้อมูล AQI กำลังโหลด
+  }
+
 
   return (
     <>
      {
           // Iterate the borderData with .map():
-          firmsData.map((data, index) => {
+          burntScarData.map((data, index) => {
 
             return (
               // Pass data to layer via props:

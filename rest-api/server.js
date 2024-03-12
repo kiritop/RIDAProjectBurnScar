@@ -72,15 +72,15 @@ server.get('/process-shapefiles', async (req, res) => {
   let data = [];
   const directoryPath = path.join(__dirname, './output/demo');
   // Get the parameters from the request
-  let startYear = req.query.startYear;
-  let endYear = req.query.endYear;
-  let country = req.query.country;
-  let province = req.query.province;
+  // let startYear = req.query.startYear;
+  // let endYear = req.query.endYear;
+  // let country = req.query.country;
+  // let province = req.query.province;
 
-  // Validate the parameters
-  if (!startYear || !endYear || !country || !province) {
-      return res.status(400).send('Missing required parameters.');
-  }
+  // // Validate the parameters
+  // if (!startYear || !endYear || !country || !province) {
+  //     return res.status(400).send('Missing required parameters.');
+  // }
 
   fs.readdir(directoryPath, function (err, files) {
       if (err) {

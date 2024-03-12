@@ -1,42 +1,27 @@
 import React, { useState, useEffect } from "react";
 import {CircleMarker} from "react-leaflet";
 import Papa from 'papaparse';
-
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchHotSpotData } from '../reducers/hotSpotSlice';
 
 const MapHotspot = () => {
-  const [firmsData, setFirmsData] = useState([]);
-
-//   useEffect(() => {
-//     const fetchData = async () => {
-//       const response = await fetch(
-//         "https://firms.modaps.eosdis.nasa.gov/api/area/csv/579db9c41c852c1f75bc6b73f8b90262/MODIS_NRT/world/1/2024-02-23"
-//       );
-//       const data = await response.json();
-//       console.log(data)
-//       setFirmsData(data.features);
-//     };
-//     fetchData();
-//   }, []);
+  const hotSpotData = useSelector(state => state.hotSpot.data);
+  const loading = useSelector(state => state.hotSpot.loading); 
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    // Fetch the CSV data from the API URL
-    fetch('https://firms.modaps.eosdis.nasa.gov/api/area/csv/579db9c41c852c1f75bc6b73f8b90262/MODIS_NRT/world/1/2024-02-23')
-      .then((response) => response.text())
-      .then((csvData) => {
-        // Parse the CSV data
-        Papa.parse(csvData, {
-          header: true, // Assumes the first row contains column headers
-          complete: (result) => {
-            console.log(result)
-            setFirmsData(result.data); // Set the JSON data
-          },
-        });
-      });
-  }, []);
+    dispatch(fetchHotSpotData());
+  }, [dispatch]);
+
+  
+  if (loading) {
+    return <div>Loading...</div>; // แสดง loader ถ้าข้อมูล AQI กำลังโหลด
+  }
+
 
   return (
     <>
-      {firmsData.map((feature, index) => {
+      {hotSpotData.map((feature, index) => {
         
         // const { latitude, longitude } = feature.geometry.coordinates;
         return (

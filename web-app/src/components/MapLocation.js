@@ -7,22 +7,17 @@ import "leaflet/dist/leaflet.css";
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAqiData } from '../reducers/aqiSlice';
 
-// const APIkey = "bc78d591c5a1ca3db96b08f0a9e249dce8a3085e";
-
 const MapLocation = () => {
   const dispatch = useDispatch();
   const aqiData = useSelector(state => state.aqi.data);
   const loading = useSelector(state => state.aqi.loading); // นำเข้า loading state จาก Redux
 
-  // const [data, setData] = useState(null);
-  // const [airData, setAirData] = useState(null);
 
   useEffect(() => {
     dispatch(fetchAqiData());
   }, [dispatch]);
 
   const circleIcon = (index) => {
-    // const aqi = aqiData?.[index]?.aqi.pm25.v ?? null;
     const aqi = (aqiData && aqiData?.[index]?.aqi.pm25 ? aqiData?.[index]?.aqi.pm25.v : null)
     let backgroundColor;
 
@@ -63,40 +58,6 @@ const MapLocation = () => {
       iconAnchor: [15, 15],
     });
   };
-
-  // useEffect(() => {
-  //   const fetchJson = async () => {
-  //     axios
-  //       .get("json/geo.json")
-  //       .then((response) => {
-  //         setData(response.data);
-  //       })
-  //       .catch((err) => {});
-  //   };
-
-  //   fetchJson();
-  // }, []);
-
-  // useEffect(() => {
-  //   const fetchAirAPI = async () => {
-  //     if (data) {
-  //       const promises = data.map(async (location) => {
-  //         const url = `https://api.waqi.info/feed/geo:${location.lat};${location.long}/?token=${APIkey}`;
-  //         try {
-  //           const response = await axios.get(url);
-  //           return response.data;
-  //         } catch (error) {
-  //           console.error(error);
-  //           return null;
-  //         }
-  //       });
-  //       const apiData = await Promise.all(promises);
-  //       setAirData(apiData);
-  //     }
-  //   };
-
-  //   fetchAirAPI();
-  // }, [data]);
 
   if (loading) {
     return <div>Loading...</div>; // แสดง loader ถ้าข้อมูล AQI กำลังโหลด
