@@ -16,7 +16,7 @@ const ColorBar = () => {
   
     return (
       <Box display="flex" flexDirection="column" alignItems="center" padding={1}>
-          <Typography fontWeight="bold" >Burnt ratio</Typography> {/* เพิ่มระยะห่างระหว่างบาร์สีและตัวเลข */}
+          <Typography fontWeight="bold" >Burnt level ratio</Typography> {/* เพิ่มระยะห่างระหว่างบาร์สีและตัวเลข */}
           <GradientBar>
             {[1, 20, 40, 60, 80, 100].map((i) => (
               <Typography fontWeight="bold" variant="body2" key={i}>

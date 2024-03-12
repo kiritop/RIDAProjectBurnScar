@@ -1,11 +1,9 @@
 // Sidebar.js
-import * as React from 'react';
+import React, { useState } from 'react'
 
 import Box from '@mui/joy/Box';
 import Drawer from '@mui/joy/Drawer';
 import Button from '@mui/joy/Button';
-import Select from '@mui/joy/Select';
-import Option from '@mui/joy/Option';
 import DialogTitle from '@mui/joy/DialogTitle';
 import DialogContent from '@mui/joy/DialogContent';
 import ModalClose from '@mui/joy/ModalClose';
@@ -15,22 +13,21 @@ import FormLabel from '@mui/joy/FormLabel';
 import FormHelperText from '@mui/joy/FormHelperText';
 import Stack from '@mui/joy/Stack';
 import Sheet from '@mui/joy/Sheet';
-import Switch from '@mui/joy/Switch';
 import Typography from '@mui/joy/Typography';
 import Slider from "@mui/material/Slider";
+import { Select, Switch, MenuItem } from '@mui/material';
 
 const countries = ['Thailand', 'Myanmar', 'Laos', 'Vietnam', 'Cambodia'];
 const provinces = ['Chiang Rai', 'Chiang Mai', 'Lampang', 'Lamphun', 'Mae Hong Son', 'Nan', 'Phayao', 'Phrae', 'Uttaradit'];
 
 export default function Sidebar({ isOpen , toggleDrawer}) {
 
-  const [year, setYear] = React.useState(2022);
-  const colors = ['#feb9b9', '#f88', '#ff5757', '#ff2626', '#f40000', '#c30000', '#920000', '#610000', '#300000'];
-  const [type, setType] = React.useState('Guesthouse');
-  const [amenities, setAmenities] = React.useState([0, 6]);
   const [yearRange, setYearRange] = React.useState([2019, 2023]);
   const [country, setCountry] = React.useState('Thailand');
   const [province, setProvince] = React.useState('Chiang Rai');
+  const [burntScar, setBurntScar] = useState(true);
+  const [aqi, setAqi] = useState(false);
+  const [hotSpot, setHotSpot] = useState(false);
 
   const handleCountryChange = (event) => {
     setCountry(event.target.value);
@@ -43,6 +40,32 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
   //set year range 
   const handleYearChange = (event, newValue) => {
     setYearRange(newValue);
+  };
+
+
+
+  const handleChange = (event) => {
+    switch (event.target.name) {
+      case 'burntScar':
+        setBurntScar(event.target.checked);
+        setAqi(false);
+        setHotSpot(false);
+        break;
+      case 'aqi':
+        setAqi(event.target.checked);
+        setBurntScar(false);
+        setHotSpot(false);
+        break;
+      case 'hotSpot':
+        setHotSpot(event.target.checked);
+        setBurntScar(false);
+        setAqi(false);
+        break;
+      default:
+        break;
+    }
+    console.log("event.target.name", event.target.name);
+    console.log("event.target.checked", event.target.checked);
   };
 
 
@@ -107,27 +130,27 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
             <Stack spacing={2}>
               <Select value={country} onChange={handleCountryChange}>
                 {countries.map((country) => (
-                  <Option key={country} value={country}>
+                  <MenuItem key={country} value={country}>
                     {country}
-                  </Option>
+                  </MenuItem>
                 ))}
               </Select>
             </Stack>
           </Box>
         </FormControl>
-        
-        <Typography level="title-md" fontWeight="bold" sx={{ mt: 2 }}>
-          Province
-        </Typography>
+          
+        {country === 'Thailand' && (<Typography level="title-md" fontWeight="bold" sx={{ mt: 2 }}>
+          State
+        </Typography>)}
         <FormControl orientation="horizontal">
           <Box sx={{ flex: 1, pr: 1 }}>
             <Stack spacing={2}>
               {country === 'Thailand' && (
                   <Select value={province} onChange={handleProvinceChange}>
                     {provinces.map((province) => (
-                      <Option key={province} value={province}>
+                      <MenuItem key={province} value={province}>
                         {province}
-                      </Option>
+                      </MenuItem>
                     ))}
                   </Select>
               )}
@@ -139,35 +162,33 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
           Map Layer
         </Typography>
         <FormControl orientation="horizontal">
-          <Box sx={{ flex: 1, pr: 1 }}>
-            <FormLabel sx={{ typography: 'title-sm' }}>
-              Burnt Scar Layer
-            </FormLabel>
-            <FormHelperText sx={{ typography: 'body-sm' }}>
-              Description for burn scar map
-            </FormHelperText>
+          <Box sx={{ flex: 1, mt: 1, mr: 1  }}>
+            <FormLabel sx={{ typography: 'title-sm' }}>Burnt Level Layer</FormLabel>
+            {/* <FormHelperText sx={{ typography: 'body-sm' }}>
+              Description for burnt level map
+            </FormHelperText> */}
           </Box>
-          <Switch checked/>
+          <Switch checked={burntScar} onChange={handleChange} name="burntScar" />
         </FormControl>
 
         <FormControl orientation="horizontal">
           <Box sx={{ flex: 1, mt: 1, mr: 1 }}>
-            <FormLabel sx={{ typography: 'title-sm' }}>Aqi Layer</FormLabel>
-            <FormHelperText sx={{ typography: 'body-sm' }}>
-            Description for PM 2.5
-            </FormHelperText>
+            <FormLabel sx={{ typography: 'title-sm' }}>PM 2.5 Layer</FormLabel>
+            {/* <FormHelperText sx={{ typography: 'body-sm' }}>
+              Description for PM 2.5
+            </FormHelperText> */}
           </Box>
-          <Switch />
+          <Switch checked={aqi} onChange={handleChange} name="aqi" />
         </FormControl>
 
         <FormControl orientation="horizontal">
           <Box sx={{ flex: 1, mt: 1, mr: 1 }}>
-            <FormLabel sx={{ typography: 'title-sm' }}>Hot spot layer</FormLabel>
-            <FormHelperText sx={{ typography: 'body-sm' }}>
-            Description for Hot spot
-            </FormHelperText>
+            <FormLabel sx={{ typography: 'title-sm' }}>Hotspot layer</FormLabel>
+            {/* <FormHelperText sx={{ typography: 'body-sm' }}>
+              Description for Hot spot
+            </FormHelperText> */}
           </Box>
-          <Switch />
+          <Switch checked={hotSpot} onChange={handleChange} name="hotSpot" />
         </FormControl>
       </DialogContent>
 
@@ -182,8 +203,7 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
           variant="outlined"
           color="neutral"
           onClick={() => {
-            setType('');
-            setAmenities([]);
+
           }}
         >
           Clear
