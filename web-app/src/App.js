@@ -9,8 +9,8 @@ import LoginPage from "./pages/loginpage";
 import Layout from "./components/layout";
 
 function App() {
+
   return (
-    <Router>
       <Layout>
         <Routes>
           <Route path="/" element={<Map />} />
@@ -20,8 +20,10 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
         </Routes>
       </Layout>
-    </Router>
   );
 }
 
 export default App;
+
+
+

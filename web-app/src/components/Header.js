@@ -60,7 +60,7 @@ export default function Header() {
             textDecoration: "none",
           }}
         >
-          RIDA - Burnt Scar
+          RIDA - BURNT SCAR MAP PROJECT
         </Typography>
         <Box sx={{ flexGrow: 12, display: { xs: "none", md: "flex" } }} />
         {pages.map((page) => (

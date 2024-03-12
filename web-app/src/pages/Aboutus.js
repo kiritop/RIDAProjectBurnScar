@@ -18,27 +18,27 @@ function AboutUS() {
       imageUrl: "user.png",
     },
     {
-      name: "Dr.Tossapon Boongoen ",
-      role: "Researcher",
-      imageUrl: "user.png",
-    },
-    {
-      name: "Dr. surapol worapattratorn",
+      name: "Asst.Prof.Surapol Vorapatratorn, PhD",
       role: "Project Leader",
       imageUrl: "user.png",
     },
     {
-      name: "Dr. surapol worapattratorn",
+      name: "Asst.Prof.Surapol Vorapatratorn, PhD",
       role: "Project Leader",
       imageUrl: "user.png",
     },
     {
-      name: "Dr. surapol worapattratorn",
+      name: "Asst.Prof.Surapol Vorapatratorn, PhD",
       role: "Project Leader",
       imageUrl: "user.png",
     },
     {
-      name: "Dr. surapol worapattratorn",
+      name: "Asst.Prof.Surapol Vorapatratorn, PhD",
+      role: "Project Leader",
+      imageUrl: "user.png",
+    },
+    {
+      name: "Asst.Prof.Surapol Vorapatratorn, PhD",
       role: "Project Leader",
       imageUrl: "user.png",
     },

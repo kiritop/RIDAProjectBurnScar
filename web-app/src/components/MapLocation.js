@@ -4,16 +4,26 @@ import { Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "../index.css";
 import "leaflet/dist/leaflet.css";
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchAqiData } from '../reducers/aqiSlice';
 
-const APIkey = "bc78d591c5a1ca3db96b08f0a9e249dce8a3085e";
+// const APIkey = "bc78d591c5a1ca3db96b08f0a9e249dce8a3085e";
 
 const MapLocation = () => {
-  const [data, setData] = useState(null);
-  const [airData, setAirData] = useState(null);
+  const dispatch = useDispatch();
+  const aqiData = useSelector(state => state.aqi.data);
+  const loading = useSelector(state => state.aqi.loading); // นำเข้า loading state จาก Redux
+
+  // const [data, setData] = useState(null);
+  // const [airData, setAirData] = useState(null);
+
+  useEffect(() => {
+    dispatch(fetchAqiData());
+  }, [dispatch]);
 
   const circleIcon = (index) => {
-    const aqi = airData?.[index]?.data?.aqi ?? null;
-
+    // const aqi = aqiData?.[index]?.aqi.pm25.v ?? null;
+    const aqi = (aqiData && aqiData?.[index]?.aqi.pm25 ? aqiData?.[index]?.aqi.pm25.v : null)
     let backgroundColor;
 
     if (aqi >= 0 && aqi <= 50) {
@@ -26,6 +36,8 @@ const MapLocation = () => {
       backgroundColor = "#F89836";
     } else if (aqi >= 301 && aqi <= 500) {
       backgroundColor = "#EC363A";
+    } else if (aqi == null){
+      backgroundColor = "#50C9F4";
     }
     const div = document.createElement("div");
     div.innerHTML = `
@@ -41,7 +53,7 @@ const MapLocation = () => {
         align-items: center;
         justify-content: center;
       ">
-        ${aqi}
+        ${(aqi==null)? 'N/A' : aqi}
       </div>
     `;
     return L.divIcon({
@@ -52,59 +64,63 @@ const MapLocation = () => {
     });
   };
 
-  useEffect(() => {
-    const fetchJson = async () => {
-      axios
-        .get("json/geo.json")
-        .then((response) => {
-          setData(response.data);
-        })
-        .catch((err) => {});
-    };
+  // useEffect(() => {
+  //   const fetchJson = async () => {
+  //     axios
+  //       .get("json/geo.json")
+  //       .then((response) => {
+  //         setData(response.data);
+  //       })
+  //       .catch((err) => {});
+  //   };
 
-    fetchJson();
-  }, []);
+  //   fetchJson();
+  // }, []);
 
-  useEffect(() => {
-    const fetchAirAPI = async () => {
-      if (data) {
-        const promises = data.map(async (location) => {
-          const url = `https://api.waqi.info/feed/geo:${location.lat};${location.long}/?token=${APIkey}`;
-          try {
-            const response = await axios.get(url);
-            return response.data;
-          } catch (error) {
-            console.error(error);
-            return null;
-          }
-        });
-        const apiData = await Promise.all(promises);
-        setAirData(apiData);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchAirAPI = async () => {
+  //     if (data) {
+  //       const promises = data.map(async (location) => {
+  //         const url = `https://api.waqi.info/feed/geo:${location.lat};${location.long}/?token=${APIkey}`;
+  //         try {
+  //           const response = await axios.get(url);
+  //           return response.data;
+  //         } catch (error) {
+  //           console.error(error);
+  //           return null;
+  //         }
+  //       });
+  //       const apiData = await Promise.all(promises);
+  //       setAirData(apiData);
+  //     }
+  //   };
 
-    fetchAirAPI();
-  }, [data]);
+  //   fetchAirAPI();
+  // }, [data]);
+
+  if (loading) {
+    return <div>Loading...</div>; // แสดง loader ถ้าข้อมูล AQI กำลังโหลด
+  }
 
   return (
     <>
-      {data?.map((item, index) => (
+      {aqiData?.map((item, index) => (
         <Marker
           key={index}
-          position={[item?.lat, item?.long]}
+          position={[item.lat, item.long]}
           icon={circleIcon(index)}
         >
           <Popup>
             <div className="mx-auto w-full">
               <h2 className="font-semibold capitalize text-lg">
-                {item?.city} 
+                {item.city} 
               </h2>
               <h3 className="font-semibold">
-                {"AQI: " + airData?.[index]?.data?.aqi ?? null}
+                {"AQI: " + (item.aqi && item.aqi.pm25 ? item.aqi.pm25.v : 'N/A')}
               </h3>
               <div className="mt-3 flex space-x-2">
-                <h3>{item?.admin_name}</h3>
-                <h3>{item?.country}</h3>
+                <h3>{item.admin_name}</h3>
+                <h3>{item.country}</h3>
               </div>
             </div>
           </Popup>
