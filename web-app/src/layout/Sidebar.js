@@ -16,6 +16,8 @@ import Sheet from '@mui/joy/Sheet';
 import Typography from '@mui/joy/Typography';
 import Slider from "@mui/material/Slider";
 import { Select, Switch, MenuItem } from '@mui/material';
+import { useDispatch, useSelector } from 'react-redux';
+import { saveLayerSettings } from '../reducers/uiSlice';
 
 const countries = ['Select all','Thailand', 'Myanmar', 'Laos', 'Vietnam'];
 const provinces = ['Chiang Rai', 'Chiang Mai', 'Lampang', 'Lamphun', 'Mae Hong Son', 'Nan', 'Phayao', 'Phrae', 'Uttaradit'];
@@ -28,6 +30,7 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
   const [burntScar, setBurntScar] = useState(true);
   const [aqi, setAqi] = useState(false);
   const [hotSpot, setHotSpot] = useState(false);
+  const dispatch = useDispatch();
 
   const handleCountryChange = (event) => {
     setCountry(event.target.value);
@@ -67,6 +70,13 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
     console.log("event.target.name", event.target.name);
     console.log("event.target.checked", event.target.checked);
   };
+
+  const handleSave = () => {
+    // Dispatch the save action with the current state
+    dispatch(saveLayerSettings({ burntScar, aqi, hotSpot }));
+    toggleDrawer(); 
+  };
+
 
 
   return (
@@ -208,7 +218,7 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
         >
           Clear
         </Button>
-        <Button onClick={toggleDrawer} >Save</Button>
+        <Button onClick={handleSave} >Save</Button>
       </Stack>
     </Sheet>
   </Drawer>

@@ -4,11 +4,11 @@ import { Box, Card, CardContent } from "@mui/material";
 import ToggleButton from "../components/ToggleButton";
 import Sidebar from "../layout/Sidebar";
 import ColorBar from "../components/ColorBar";
-// import ToggleButton from '@mui/material/ToggleButton';
+import { useSelector } from 'react-redux';
 
 function Map() {
   const [isOpen, setIsOpen] = useState(false);
-
+  const { burntScar } = useSelector(state => state.ui);
   const toggleDrawer = () => {
     setIsOpen(!isOpen);
   };
@@ -25,7 +25,7 @@ function Map() {
         <ToggleButton isOpen={isOpen} toggleDrawer={toggleDrawer} />
         <MapContent z />
         <Sidebar isOpen={isOpen} toggleDrawer={toggleDrawer} />
-        <Card
+        {burntScar && <Card
           sx={{
             position: "absolute",
             bottom: "10%",
@@ -38,7 +38,7 @@ function Map() {
           <CardContent>
             <ColorBar /> {/* แสดงแถบสีใน Card */}
           </CardContent>
-        </Card>
+        </Card> }
       </Box>
     </Box>
   );

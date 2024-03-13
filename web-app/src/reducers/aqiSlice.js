@@ -1,16 +1,15 @@
 // src/reducers/aqiSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import data from './json/geo.json';
 
 const APIkey = "bc78d591c5a1ca3db96b08f0a9e249dce8a3085e";
 
 export const fetchAqiData = createAsyncThunk('aqi/fetchAqiData', async () => {
     // โหลดข้อมูลจาก geo.json
-    const geoResponse = await axios.get('./json/geo.json');
-    const geoData = geoResponse.data;
-
+    // const geoResponse = await axios.get('./json/geo.json');
     // สร้าง array ของ promises สำหรับดึงข้อมูล AQI สำหรับแต่ละพิกัด
-    const promises = geoData.map(async (location) => {
+    const promises = data.map(async (location) => {
         const url = `https://api.waqi.info/feed/geo:${location.lat};${location.long}/?token=${APIkey}`;
         try {
             const response = await axios.get(url);
