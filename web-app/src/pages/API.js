@@ -9,11 +9,12 @@ import DataTable from "./tableShapefile";
 const spec = {
   openapi: "3.0.0",
   info: {
-    title: "APIS",
+    title: "API DOCUMENT",
   },
   paths: {
     "/read-shapefile": {
       get: {
+        tags: ["API LIST"],
         summary: "Reads a shapefile",
         description: "This endpoint reads a shapefile.",
         responses: {
@@ -25,6 +26,7 @@ const spec = {
     },
     "/read-shapefile-half": {
       get: {
+        tags: ["API LIST"],
         summary: "Reads half of a shapefile",
         description: "This endpoint reads half of a shapefile.",
         responses: {
