@@ -17,7 +17,7 @@ import Typography from '@mui/joy/Typography';
 import Slider from "@mui/material/Slider";
 import { Select, Switch, MenuItem } from '@mui/material';
 
-const countries = ['Thailand', 'Myanmar', 'Laos', 'Vietnam', 'Cambodia'];
+const countries = ['Select all','Thailand', 'Myanmar', 'Laos', 'Vietnam'];
 const provinces = ['Chiang Rai', 'Chiang Mai', 'Lampang', 'Lamphun', 'Mae Hong Son', 'Nan', 'Phayao', 'Phrae', 'Uttaradit'];
 
 export default function Sidebar({ isOpen , toggleDrawer}) {
@@ -102,14 +102,14 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
       <Divider sx={{ mt: 'auto' }} />
       <DialogContent sx={{ gap: 2 }}>
 
-        <Typography level="title-md" fontWeight="bold" sx={{ mt: 2 }}>
+      {burntScar === true && (<Typography level="title-md" fontWeight="bold" sx={{ mt: 2 }}>
           Year Range
-        </Typography>
+        </Typography>)}
 
         <FormControl orientation="horizontal">
           <Box sx={{ flex: 1, pr: 1 }}>
             <Stack spacing={2} direction="row" alignItems="center">
-              <Slider
+            {burntScar === true && (<Slider
                 value={yearRange}
                 onChange={handleYearChange}
                 valueLabelDisplay="on"
@@ -117,35 +117,35 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
                 max={2024}
                 step={1}
                 // sx={{color: '#50C1DD' }}
-              />
+              />)}
             </Stack>
           </Box>
         </FormControl>
 
-        <Typography level="title-md" fontWeight="bold" sx={{ mt: 2 }}>
+        {burntScar === true && (<Typography level="title-md" fontWeight="bold" sx={{ mt: 2 }}>
           Country
-        </Typography>
+        </Typography>)}
         <FormControl orientation="horizontal">
           <Box sx={{ flex: 1, pr: 1 }}>
             <Stack spacing={2}>
-              <Select value={country} onChange={handleCountryChange}>
+            {burntScar === true && (<Select value={country} onChange={handleCountryChange}>
                 {countries.map((country) => (
                   <MenuItem key={country} value={country}>
                     {country}
                   </MenuItem>
                 ))}
-              </Select>
+              </Select>)}
             </Stack>
           </Box>
         </FormControl>
           
-        {country === 'Thailand' && (<Typography level="title-md" fontWeight="bold" sx={{ mt: 2 }}>
+        {country === 'Thailand' && burntScar === true && (<Typography level="title-md" fontWeight="bold" sx={{ mt: 2 }}>
           State
         </Typography>)}
         <FormControl orientation="horizontal">
           <Box sx={{ flex: 1, pr: 1 }}>
             <Stack spacing={2}>
-              {country === 'Thailand' && (
+              {country === 'Thailand' && burntScar === true && (
                   <Select value={province} onChange={handleProvinceChange}>
                     {provinces.map((province) => (
                       <MenuItem key={province} value={province}>
