@@ -53,7 +53,7 @@ function AboutUS() {
           alignContent="center"
           wrap="wrap"
           my={5}
-          sx={{ backgroundColor: "#2AB3D5", padding: 1, borderRadius: 3, boxShadow: 1 }}
+          sx={{ backgroundColor: "#023e8a", padding: 1, borderRadius: 3, boxShadow: 1 }}
         >
           <Typography variant="h3" color="#fff" sx={{ fontFamily: "monospace" }}>
             Project
@@ -74,7 +74,7 @@ function AboutUS() {
           alignContent="center"
           wrap="wrap"
           my={5}
-          sx={{ backgroundColor: "#2AB3D5",  padding: 1, borderRadius: 3, boxShadow: 1 }}
+          sx={{ backgroundColor: "#023e8a", padding: 1, borderRadius: 3, boxShadow: 1 }}
         >
           <Typography variant="h3" color="#fff" sx={{ fontFamily: "monospace" }}>
             Purpose
@@ -106,7 +106,7 @@ function AboutUS() {
           alignContent="center"
           wrap="wrap"
           my={5}
-          sx={{ backgroundColor: "#2AB3D5",  padding: 1, borderRadius: 3, boxShadow: 1 }}
+          sx={{ backgroundColor: "#023e8a", padding: 1, borderRadius: 3, boxShadow: 1 }}
         >
           <Typography variant="h3" color="#fff" sx={{ fontFamily: "monospace" }}>
             About US
@@ -143,21 +143,21 @@ function AboutUS() {
         </Grid>
 
         <Box>
-        <Grid
-          container
-          spacing={1}
-          direction="row"
-          justifyContent="center"
-          alignItems="center"
-          alignContent="center"
-          wrap="wrap"
-          my={5}
-          sx={{ backgroundColor: "#2AB3D5",  padding: 1, borderRadius: 3, boxShadow: 1 }}
-        >
-          <Typography variant="h3" color="#fff" sx={{ fontFamily: "monospace" }}>
-            Contact US
-          </Typography>
-        </Grid>
+          <Grid
+            container
+            spacing={1}
+            direction="row"
+            justifyContent="center"
+            alignItems="center"
+            alignContent="center"
+            wrap="wrap"
+            my={5}
+            sx={{ backgroundColor: "#023e8a", padding: 1, borderRadius: 3, boxShadow: 1 }}
+          >
+            <Typography variant="h3" color="#fff" sx={{ fontFamily: "monospace" }}>
+              Contact US
+            </Typography>
+          </Grid>
           <Grid spacing={0} my={5}>
             <Container maxWidth="lg">
               <center>
@@ -178,7 +178,7 @@ function AboutUS() {
                   Asst.Prof.Surapol Vorapatratorn, PhD
                 </Typography>
                 <Typography variant="body1" mt={4}>
-                  Address : 333 m 1 Tha sud , mueng , chiang rai 57100
+                  Address : 333 m 1 Thah sud , mueng , chiang rai 57100
                 </Typography>
               </center>
             </Container>

@@ -39,7 +39,7 @@ const options = {
 };
 
 const DataTable = () => {
-  return <StyledTable title={"SHAPEFILE LIST"} data={data} columns={columns} options={options} />;
+  return <StyledTable title={<h1>SHAPEFILE LIST</h1>} data={data} columns={columns} options={options} />;
 };
 
 export default DataTable;

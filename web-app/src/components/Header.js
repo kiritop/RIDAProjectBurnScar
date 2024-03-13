@@ -42,7 +42,7 @@ export default function Header() {
   };
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: "#50C1DD", color: "#fff" }}>
+    <AppBar position="static" sx={{ backgroundColor: "#0077b6", color: "#fff" }}>
       <Toolbar variant="dense">
         <MapIcon sx={{ mr: 1 }} />
         <Typography

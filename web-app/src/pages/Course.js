@@ -6,9 +6,9 @@ const Carddetail = [
   {
     img: "unit1.png",
     id: 1,
-    title: "Types and properties of satellites",
+    title: "Types and Characteristics of Satellites ",
     links: [
-      { EP: "EP 01 ", yt: "https://www.youtube.com/watch?v=unTeFqxys7w" },
+      { EP: "EP 01", yt: "https://www.youtube.com/watch?v=unTeFqxys7w" },
       { EP: "EP 02 ", yt: "https://www.youtube.com/watch?v=NocgY3d7Ngo" },
       { EP: "EP 03 ", yt: "https://www.youtube.com/watch?v=SIKS17tIcy0" },
       { EP: "EP 04 ", yt: "https://www.youtube.com/watch?v=kdiO_fnSE2Y" },
@@ -25,7 +25,7 @@ const Carddetail = [
   {
     img: "unit2.png",
     id: 2,
-    title: "Translating and analyzing satellite data",
+    title: "Interpretation and Analysis of Satellite Data",
     links: [
       { EP: "EP 01", yt: "https://www.youtube.com/watch?v=_u_E3XCxUrQ" },
       { EP: "EP 02", yt: "https://www.youtube.com/watch?v=KkaXCU2QqC0" },
@@ -35,7 +35,7 @@ const Carddetail = [
   {
     img: "unit3.png",
     id: 3,
-    title: "Application of satellite data",
+    title: "Application of Satellite Data",
     links: [
       { EP: "EP 01", yt: "https://www.youtube.com/watch?v=SF3xTIOFMYk" },
       { EP: "EP 02", yt: "https://www.youtube.com/watch?v=0YTgEarG_Eo  " },
@@ -72,7 +72,7 @@ function Course() {
   };
   return (
     <>
-      <Container maxWidth="lg">
+      <Container maxWidth="xl">
         <Grid
           container
           spacing={1}
@@ -82,7 +82,7 @@ function Course() {
           alignContent="center"
           wrap="wrap"
           my={5}
-          sx={{ backgroundColor: "#2AB3D5", padding: 3, borderRadius: 3, boxShadow: 1 }}
+          sx={{ backgroundColor: "#023e8a", padding: 3, borderRadius: 3, boxShadow: 1 }}
         >
           <Typography variant="h3" color="#fff" sx={{ fontFamily: "monospace" }}>
             Learning Material
@@ -92,7 +92,7 @@ function Course() {
         <Grid container spacing={3}>
           {Carddetail.map((e, index) => (
             <Grid item xs={3} key={index}>
-              <Card sx={{ maxWidth: 500, padding: "8px", borderRadius: 5, paddingBottom: 3 }}>
+              <Card sx={{ maxWidth: 500, padding: "6px", borderRadius: 5, paddingBottom: 3 }}>
                 <CardActionArea>
                   <CardMedia
                     component="img"
@@ -111,7 +111,12 @@ function Course() {
                   <CardContent>
                     {e.links.map((link, index) => (
                       <div key={index}>
-                        <Button variant="text" href={link.yt} startIcon={<PlayCircleOutlineIcon />}>
+                        <Button
+                          variant="text"
+                          href={link.yt}
+                          sx={{ fontSize: "12px" }}
+                          startIcon={<PlayCircleOutlineIcon />}
+                        >
                           {link.EP}
                         </Button>
                       </div>
