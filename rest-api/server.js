@@ -138,6 +138,7 @@ server.get('/process-shapefiles', async (req, res) => {
                 let percentage = ((row.properties.count / files.length) * 100).toFixed(2);
                 // Add the percentage to the properties as frequency
                 row.properties.frequency = percentage;
+                row.properties.total_shapefile = files.length;
               });
               console.log("files.length", files.length)
               

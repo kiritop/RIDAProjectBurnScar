@@ -20,7 +20,7 @@ export default function Header() {
 
   function getPageUrl(page) {
     switch (page) {
-      case "Burnt Scar Map":
+      case "Map":
         return "/";
       case "Learning Material":
         return "/learning_material";

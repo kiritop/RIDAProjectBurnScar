@@ -5,9 +5,11 @@ import BaseMap from "./layers/BaseMap";
 // import MapHotspot from "./MapHotspot";
 // import MapBurnScar from "./MapBurnScar";
 import { MapContainer } from "react-leaflet";
+import { useSelector } from 'react-redux';
 
 
 const MapContent = () => {
+  const { burntScar, aqi, hotSpot } = useSelector(state => state.ui);
   return (
     
       <MapContainer
@@ -20,9 +22,9 @@ const MapContent = () => {
         // minZoom={5}
       >
         <BaseMap />
-        {/* <MapBurnScar /> */}
-        {/* <MapHotspot /> */}
-        {/* <MapLocation /> */}
+        {burntScar && <MapBurnScar />}
+        {aqi && <MapLocation />} 
+        {hotSpot && <MapHotspot />} 
       </MapContainer>
     
   );
