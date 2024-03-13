@@ -119,13 +119,13 @@ function AboutUS() {
                 sx={{
                   maxWidth: 500,
                   boxShadow: "none",
-                  height: "35vh",
+                  
                   backgroundColor: "transparent",
                   marginInline: "auto",
                 }}
               >
                 <div style={{ display: "flex", justifyContent: "center" }}>
-                  <div style={{ borderRadius: "50%", overflow: "hidden", width: 200, height: 200 }}>
+                  <div style={{ borderRadius: "50%", overflow: "hidden", width: 200 }}>
                     <CardMedia component="img" sx={{ height: 200 }} image={item.imageUrl} />
                   </div>
                 </div>
