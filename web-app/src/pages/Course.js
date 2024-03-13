@@ -111,14 +111,15 @@ function Course() {
                   <CardContent>
                     {e.links.map((link, index) => (
                       <div key={index}>
-                        <Button
-                          variant="text"
-                          href={link.yt}
-                          sx={{ fontSize: "12px" }}
-                          startIcon={<PlayCircleOutlineIcon />}
-                        >
-                          {link.EP}
-                        </Button>
+                          <Button
+                            variant="text"
+                            href={link.yt}
+                            target="_blank"
+                            sx={{ fontSize: "12px" }}
+                            startIcon={<PlayCircleOutlineIcon />}
+                          >
+                            {link.EP}
+                          </Button>
                       </div>
                     ))}
                   </CardContent>

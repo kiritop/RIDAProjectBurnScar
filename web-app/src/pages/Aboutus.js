@@ -24,7 +24,7 @@ function AboutUS() {
     },
     {
       name: "Assoc.Prof.Natthakan Iam-on, PhD.",
-      role: "Project Leader",
+      role: "Researcher",
       imageUrl: "oil.png",
     },
     {
@@ -42,7 +42,7 @@ function AboutUS() {
   ];
   return (
     <>
-      <Box height={20} />
+      <Box height={5} />
       <Container maxWidth="lg">
         <Grid
           container
