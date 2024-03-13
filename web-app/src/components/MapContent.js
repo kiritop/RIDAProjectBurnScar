@@ -1,9 +1,9 @@
 import React from 'react';
 import "leaflet/dist/leaflet.css";
 import BaseMap from "./layers/BaseMap";
-import MapLocation from "./MapLocation";
-import MapHotspot from "./MapHotspot";
-import MapBurnScar from "./MapBurnScar";
+// import MapLocation from "./MapLocation";
+// import MapHotspot from "./MapHotspot";
+// import MapBurnScar from "./MapBurnScar";
 import { MapContainer } from "react-leaflet";
 
 
@@ -21,7 +21,7 @@ const MapContent = () => {
       >
         <BaseMap />
         {/* <MapBurnScar /> */}
-        <MapHotspot />
+        {/* <MapHotspot /> */}
         {/* <MapLocation /> */}
       </MapContainer>
     
