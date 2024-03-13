@@ -1,35 +1,62 @@
 import * as React from "react";
-
-import { Container, Card, CardContent, Grid, Typography, CardMedia, CardActionArea,  } from "@mui/material";
+import { Container, Card, CardContent, Grid, Typography, CardMedia, CardActionArea, Button } from "@mui/material";
+import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
 
 const Carddetail = [
   {
     img: "unit1.png",
     id: 1,
-    title: "Unit 1 Types and properties of satellites",
-    desc: "Lizards are a widespread group of squamate reptiles, with over 6,000 species, ranging across all",
+    title: "Types and properties of satellites",
+    links: [
+      { EP: "EP 01 ", yt: "https://www.youtube.com/watch?v=unTeFqxys7w" },
+      { EP: "EP 02 ", yt: "https://www.youtube.com/watch?v=NocgY3d7Ngo" },
+      { EP: "EP 03 ", yt: "https://www.youtube.com/watch?v=SIKS17tIcy0" },
+      { EP: "EP 04 ", yt: "https://www.youtube.com/watch?v=kdiO_fnSE2Y" },
+      {
+        EP: "EP 05 ",
+        yt: "https://www.youtube.com/watch?v=6W4_L0RueLY",
+      },
+      {
+        EP: "EP 06 ",
+        yt: "https://www.youtube.com/watch?v=DhWIf1vDh9Y",
+      },
+    ],
   },
   {
     img: "unit2.png",
     id: 2,
-    title: "Unit 2 Translating and analyzing satellite data",
-    desc: "Lizards are a widespread group of squamate reptiles, with over 6,000 species, ranging across all",
+    title: "Translating and analyzing satellite data",
+    links: [
+      { EP: "EP 01", yt: "https://www.youtube.com/watch?v=_u_E3XCxUrQ" },
+      { EP: "EP 02", yt: "https://www.youtube.com/watch?v=KkaXCU2QqC0" },
+      { EP: "EP 03", yt: "https://www.youtube.com/watch?v=97vVaI1qV1A" },
+    ],
   },
   {
     img: "unit3.png",
     id: 3,
-    title: "Unit 3 Application of satellite data",
-    desc: "Lizards are a widespread group of squamate reptiles, with over 6,000 species, ranging across all",
+    title: "Application of satellite data",
+    links: [
+      { EP: "EP 01", yt: "https://www.youtube.com/watch?v=SF3xTIOFMYk" },
+      { EP: "EP 02", yt: "https://www.youtube.com/watch?v=0YTgEarG_Eo  " },
+      { EP: "EP 03", yt: "https://www.youtube.com/watch?v=2wsc97KvH40" },
+    ],
   },
   {
     img: "unit4.png",
     id: 4,
-    title: "Unit 4 Machine Learning",
-    desc: "Lizards are a widespread group of squamate reptiles, with over 6,000 species, ranging across all",
+    title: "Machine Learning",
+    links: [
+      { EP: "EP 01", yt: "https://www.youtube.com/watch?v=grHroUVZwgQ" },
+      { EP: "EP 02", yt: "https://www.youtube.com/watch?v=l8r-VWJJL3g" },
+      { EP: "EP 03", yt: "https://www.youtube.com/watch?v=e4SW5T8o58g" },
+      { EP: "EP 04", yt: "https://www.youtube.com/watch?v=4hqhGBntsqA" },
+      { EP: "EP 05", yt: "https://www.youtube.com/watch?v=Y4afzOWGDic" },
+    ],
   },
 ];
 
-function Course({ e }) {
+function Course() {
   const handlePdfClick = (id) => {
     // This function will open the PDF file when the card is clicked
     // You can replace 'your-pdf-file.pdf' with the actual path to your PDF file
@@ -44,15 +71,8 @@ function Course({ e }) {
     }
   };
   return (
-    <div
-      style={{
-        backgroundColor: "#E0FBFF",
-        height: "100vh",
-      }}
-    >
-      
-
-      <Container maxWidth="lg" sx={{}}>
+    <>
+      <Container maxWidth="lg">
         <Grid
           container
           spacing={1}
@@ -62,9 +82,9 @@ function Course({ e }) {
           alignContent="center"
           wrap="wrap"
           my={5}
-          sx={{ backgroundColor: "#0B259C", padding: 3 }}
+          sx={{ backgroundColor: "#2AB3D5", padding: 3, borderRadius: 3, boxShadow: 1 }}
         >
-          <Typography variant="h2" color="#fff" sx={{ fontFamily: "monospace" }}>
+          <Typography variant="h3" color="#fff" sx={{ fontFamily: "monospace" }}>
             Learning Material
           </Typography>
         </Grid>
@@ -72,17 +92,30 @@ function Course({ e }) {
         <Grid container spacing={3}>
           {Carddetail.map((e, index) => (
             <Grid item xs={3} key={index}>
-              <Card sx={{ maxWidth: 400, height: '25vh' }}>
-                <CardActionArea onClick={() => handlePdfClick(e.id)}>
-                  <CardMedia component="img" height="200" image={e.img} alt="unit1" />
-                  <CardContent>
-                    <Typography variant="body2" color="text.secondary">
-                      <h4>{e.title}</h4>
+              <Card sx={{ maxWidth: 500, padding: "8px", borderRadius: 5, paddingBottom: 3 }}>
+                <CardActionArea>
+                  <CardMedia
+                    component="img"
+                    height="200"
+                    image={e.img}
+                    alt="unit1"
+                    sx={{ borderRadius: 5 }}
+                    onClick={() => handlePdfClick(e.id)}
+                  />
+                  <CardContent sx={{ height: "5vh" }}>
+                    <Typography variant="h6">Unit {index + 1}</Typography>
+                    <Typography variant="body2" color={"text.secondary"}>
+                      {e.title}
                     </Typography>
-                    {/* <Typography variant="body2" color="text.secondary">
-                      Lizards are a widespread group of squamate reptiles, with over 6,000 species, ranging across all
-                      continents except Antarctica
-                    </Typography> */}
+                  </CardContent>
+                  <CardContent>
+                    {e.links.map((link, index) => (
+                      <div key={index}>
+                        <Button variant="text" href={link.yt} startIcon={<PlayCircleOutlineIcon />}>
+                          {link.EP}
+                        </Button>
+                      </div>
+                    ))}
                   </CardContent>
                 </CardActionArea>
               </Card>
@@ -90,7 +123,7 @@ function Course({ e }) {
           ))}
         </Grid>
       </Container>
-    </div>
+    </>
   );
 }
 

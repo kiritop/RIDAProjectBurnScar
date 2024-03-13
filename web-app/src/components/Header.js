@@ -12,7 +12,7 @@ import MapIcon from "@mui/icons-material/Map";
 import Link from "@mui/material/Link";
 import { Button } from "@mui/material";
 
-const pages = ["Burnt Scar Map", "Learning Material", "API", "About US"];
+const pages = ["Map", "Learning Material", "APIs", "About US"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 export default function Header() {
@@ -24,7 +24,7 @@ export default function Header() {
         return "/";
       case "Learning Material":
         return "/learning_material";
-      case "API":
+      case "APIs":
         return "/api";
       case "About US":
         return "/about_us";
@@ -102,8 +102,8 @@ export default function Header() {
           >
             <MenuItem onClick={handleClose}>
               {/* <Link href="/login" variant="body1" underline="hover"> */}
-                <img src="google.png" alt="Google Icon" style={{ marginRight: "8px", width: "24px", height: "24px" }} />
-                Login with Google
+              <img src="google.png" alt="Google Icon" style={{ marginRight: "8px", width: "24px", height: "24px" }} />
+              Login with Google
               {/* </Link> */}
             </MenuItem>
           </Menu>
