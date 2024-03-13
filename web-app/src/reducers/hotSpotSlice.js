@@ -3,7 +3,7 @@ import { LocalConvenienceStoreOutlined } from '@mui/icons-material';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import Papa from 'papaparse';
 
-const APIkey = "579db9c41c852c1f75bc6b73f8b90262";
+const APIkey = "_YOUR_API_KEY_";
 
 export const fetchHotSpotData = createAsyncThunk('hotSpot/fetchHotSpotData', async () => {
     // รับวันที่ปัจจุบัน
