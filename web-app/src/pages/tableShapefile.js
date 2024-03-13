@@ -1,6 +1,10 @@
 import React from "react";
 import MUIDataTable from "mui-datatables";
-import { Button, TableCell } from "@mui/material";
+import { Button, styled } from "@mui/material";
+
+const StyledTable = styled(MUIDataTable)({
+  borderRadius: "15px",
+});
 
 const columns = [
   "Name",
@@ -35,7 +39,7 @@ const options = {
 };
 
 const DataTable = () => {
-  return <MUIDataTable title={"SHAPEFILE LIST"} data={data} columns={columns} options={options} />;
+  return <StyledTable title={"SHAPEFILE LIST"} data={data} columns={columns} options={options} />;
 };
 
 export default DataTable;
