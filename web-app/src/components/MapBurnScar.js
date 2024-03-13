@@ -64,7 +64,7 @@ const percentToColor = (percent) => {
         <tr><td><strong>Latitude:</strong></td><td style="text-align:right">${feature.geometry.coordinates[1]}</td></tr>
         <tr><td><strong>Longitude:</strong></td><td style="text-align:right">${feature.geometry.coordinates[0]}</td></tr>
         <tr><td><strong>Burnt ratio :</strong></td><td style="background-color:${percentToColor(feature.properties.frequency)};text-align:right;color:#000000;">${feature.properties.frequency} % </td></tr>
-        <tr><td><strong>Burnt frequency (times) :</strong></td><td style="text-align:right">${feature.properties.count}</td></tr>
+        <tr><td><strong>Burnt frequency (times / total) :</strong></td><td style="text-align:right">${feature.properties.count}/${feature.properties.total_shapefile}</td></tr>
         <tr><td><strong>Burnt year :</strong></td><td style="text-align:right">${feature.properties.year}</td></tr>
       </table>
     </div>`;

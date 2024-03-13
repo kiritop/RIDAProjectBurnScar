@@ -209,7 +209,7 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
         useFlexGap
         spacing={1}
       >
-        <Button
+        {/* <Button
           variant="outlined"
           color="neutral"
           onClick={() => {
@@ -217,7 +217,8 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
           }}
         >
           Clear
-        </Button>
+        </Button> */}
+        <Box sx={{ flex: 1, mt: 1, mr: 1 }}/>
         <Button onClick={handleSave} >Save</Button>
       </Stack>
     </Sheet>
