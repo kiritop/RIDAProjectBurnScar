@@ -3,7 +3,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import data from './json/geo.json';
 
-const APIkey = "bc78d591c5a1ca3db96b08f0a9e249dce8a3085e";
+const APIkey = "_YOUR_API_KEY_";
 
 export const fetchAqiData = createAsyncThunk('aqi/fetchAqiData', async () => {
     // โหลดข้อมูลจาก geo.json
