@@ -13,13 +13,13 @@ function AboutUS() {
   // Define your array of items
   const items = [
     {
-      name: "Asst.Prof.Dr. Surapol Vorapatratorn",
+      name: "Asst.Prof.Dr.Surapol Vorapatratorn",
       role: "Project Leader (TH)",
       institution: "Mae Fah Luang University",
       imageUrl: "surapong.png",
     },
     {
-      name: "Prof. Tossapon Boongoen",
+      name: "Prof.Tossapon Boongoen",
       role: "Project Leader (UK)",
       institution: "Aberystwyth University",
       imageUrl: "tob45.jpg",
@@ -31,7 +31,7 @@ function AboutUS() {
       imageUrl: "nai7.jpg",
     },
     {
-      name: "Dr. Khwunta Kirimasthong",
+      name: "Dr.Khwunta Kirimasthong",
       role: "Researcher",
       institution: "Mae Fah Luang University",
       imageUrl: "patt.png",
@@ -43,19 +43,19 @@ function AboutUS() {
       imageUrl: "ball.png",
     },
     {
-      name: "Prof. Qiang Shen",
+      name: "Prof.Qiang Shen",
       role: "Researcher",
       institution: "Aberystwyth University",
       imageUrl: "user.png",
     },
     {
-      name: "Prof. Reyer Zwiggelaar",
+      name: "Prof.Reyer Zwiggelaar",
       role: "Researcher",
       institution: "Aberystwyth University",
       imageUrl: "user.png",
     },
     {
-      name: "Dr. Changjing Shang",
+      name: "Dr.Changjing Shang",
       role: "Researcher",
       institution: "Aberystwyth University",
       imageUrl: "user.png",
@@ -64,7 +64,7 @@ function AboutUS() {
       name: "Tunyavee Saokomket",
       role: "Research Assistant",
       institution: "Mae Fah Luang University",
-      imageUrl: "user.png",
+      imageUrl: "dew.jpg",
     },
     {
       name: "Siripoom Suwanmanee",
@@ -85,7 +85,7 @@ function AboutUS() {
       imageUrl: "top.jpg",
     },
     {
-      name: "Dr. Kampanat Deeudomchan",
+      name: "Dr.Kampanat Deeudomchan",
       role: "Specialist",
       institution: "Chief of Division, Geo-Informatics Management and Solutions Office, GISTDA",
       imageUrl: "user.png",
