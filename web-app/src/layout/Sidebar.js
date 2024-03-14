@@ -32,6 +32,11 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
   const [hotSpot, setHotSpot] = useState(false);
   const dispatch = useDispatch();
 
+  const currentDate = new Date();
+  const year = currentDate.getFullYear();
+  const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // เดือนเริ่มต้นที่ 0
+  const day = String(currentDate.getDate()).padStart(2, '0');
+
   const handleCountryChange = (event) => {
     setCountry(event.target.value);
   };
@@ -183,10 +188,10 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
 
         <FormControl orientation="horizontal">
           <Box sx={{ flex: 1, mt: 1, mr: 1 }}>
-            <FormLabel sx={{ typography: 'title-sm' }}>PM 2.5 Layer</FormLabel>
-            {/* <FormHelperText sx={{ typography: 'body-sm' }}>
-              Description for PM 2.5
-            </FormHelperText> */}
+            <FormLabel sx={{ typography: 'title-sm' }}>PM 2.5 layer</FormLabel>
+            <FormHelperText sx={{ typography: 'body-sm' }}>
+              On {month}/{day}/{year}
+            </FormHelperText>
           </Box>
           <Switch checked={aqi} onChange={handleChange} name="aqi" />
         </FormControl>
@@ -194,9 +199,9 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
         <FormControl orientation="horizontal">
           <Box sx={{ flex: 1, mt: 1, mr: 1 }}>
             <FormLabel sx={{ typography: 'title-sm' }}>Hotspot layer</FormLabel>
-            {/* <FormHelperText sx={{ typography: 'body-sm' }}>
-              Description for Hot spot
-            </FormHelperText> */}
+            <FormHelperText sx={{ typography: 'body-sm' }}>
+              On {month}/{day}/{year}
+            </FormHelperText>
           </Box>
           <Switch checked={hotSpot} onChange={handleChange} name="hotSpot" />
         </FormControl>

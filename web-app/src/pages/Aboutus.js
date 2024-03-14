@@ -13,29 +13,88 @@ function AboutUS() {
   // Define your array of items
   const items = [
     {
-      name: "Asst.Prof.Surapol Vorapatratorn, PhD",
-      role: "Project Leader",
+      name: "Asst.Prof.Dr. Surapol Vorapatratorn",
+      role: "Project Leader (TH)",
+      institution: "Mae Fah Luang University",
       imageUrl: "surapong.png",
     },
     {
-      name: "Assoc.Prof.Wg.Cdr.Tossapon Boongoen, PhD.",
-      role: "Researcher",
-      imageUrl: "toss.png",
+      name: "Prof. Tossapon Boongoen",
+      role: "Project Leader (UK)",
+      institution: "Aberystwyth University",
+      imageUrl: "tob45.jpg",
     },
     {
-      name: "Assoc.Prof.Natthakan Iam-on, PhD.",
+      name: "Assoc.Prof.Dr. Natthakan Iam-on",
       role: "Researcher",
-      imageUrl: "oil.png",
+      institution: "Aberystwyth University",
+      imageUrl: "nai7.jpg",
     },
     {
-      name: "Khwunta Kirimasthong, PhD",
+      name: "Dr. Khwunta Kirimasthong",
       role: "Researcher",
+      institution: "Mae Fah Luang University",
       imageUrl: "patt.png",
     },
     {
-      name: "Aj.Nontawat Thongsibsong",
+      name: "Nontawat Thongsibsong",
       role: "Researcher",
+      institution: "Mae Fah Luang University",
       imageUrl: "ball.png",
+    },
+    {
+      name: "Prof. Qiang Shen",
+      role: "Researcher",
+      institution: "Aberystwyth University",
+      imageUrl: "user.png",
+    },
+    {
+      name: "Prof. Reyer Zwiggelaar",
+      role: "Researcher",
+      institution: "Aberystwyth University",
+      imageUrl: "user.png",
+    },
+    {
+      name: "Dr. Changjing Shang",
+      role: "Researcher",
+      institution: "Aberystwyth University",
+      imageUrl: "user.png",
+    },
+    {
+      name: "Tunyavee Saokomket",
+      role: "Research Assistant",
+      institution: "Mae Fah Luang University",
+      imageUrl: "user.png",
+    },
+    {
+      name: "Siripoom Suwanmanee",
+      role: "Research Assistant",
+      institution: "Mae Fah Luang University",
+      imageUrl: "poom.jpg",
+    },
+    {
+      name: "Rutathorn Woraphatthada",
+      role: "Research Assistant",
+      institution: "Mae Fah Luang University",
+      imageUrl: "best.jpg",
+    },
+    {
+      name: "Chutipon Pimsarn",
+      role: "Research Assistant",
+      institution: "Mae Fah Luang University",
+      imageUrl: "top.jpg",
+    },
+    {
+      name: "Dr. Kampanat Deeudomchan",
+      role: "Specialist",
+      institution: "Chief of Division, Geo-Informatics Management and Solutions Office, GISTDA",
+      imageUrl: "user.png",
+    },
+    {
+      name: "Jittisak Yodcum",
+      role: "Specialist",
+      institution: "Forest Fire Control Division, Forest Protection and Fire Control Bureau, Department of Forestry",
+      imageUrl: "user.png",
     },
 
     // Add more items as needed
@@ -136,6 +195,9 @@ function AboutUS() {
                   <Typography variant="body2" color="text.secondary" align="center">
                     {item.role}
                   </Typography>
+                  <Typography variant="body2" color="text.secondary" align="center">
+                    {item.institution}
+                  </Typography>
                 </CardContent>
               </Card>
             </Grid>
@@ -161,24 +223,27 @@ function AboutUS() {
           <Grid spacing={0} my={5}>
             <Container maxWidth="lg">
               <center>
+              <Typography variant="h5" align="center">
+                Center of Excellence in AI and Emerging Technology
+                </Typography>
                 <Typography variant="h5" align="center">
-                  Information Technology Mae Fah Luang University (E3 Building)
+               School of Information Technology, Mae Fah Luang University
                 </Typography>
                 <Box
                   my={3}
                   sx={{
                     width: 300,
                     height: 300,
-                    backgroundImage: "url('surapong.png')",
+                    backgroundImage: "url('LOGO-AIE _New.png')",
                     borderRadius: "50%",
                     overflow: "hidden",
                   }}
                 />
-                <Typography variant="h5" align="center">
-                  Asst.Prof.Surapol Vorapatratorn, PhD
+                <Typography variant="body1" mt={4}>
+                  Email: ce.itschool@mfu.ac.th
                 </Typography>
                 <Typography variant="body1" mt={4}>
-                  Address : 333 m 1 Thah sud , mueng , chiang rai 57100
+                  Address : 333 m 1 Thah sud , mueng , chiang rai 57100 
                 </Typography>
               </center>
             </Container>
