@@ -8,7 +8,7 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn import metrics
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 
-def preprocess(data_path, random_state, drop_columns = [9, 10, 11, 12]):
+def preprocess(data_path, drop_columns = [9, 10, 11, 12]):
     """
     Preprocess the data for classification tasks.
 
@@ -25,17 +25,9 @@ def preprocess(data_path, random_state, drop_columns = [9, 10, 11, 12]):
     """
     df = pd.read_csv(data_path)
 
-    # Down Sampling
-    df_class_1 = df.query("Label == 1")
-    df_class_0 = df.query("Label == 0").sample(n=len(df_class_1), replace=False, random_state=random_state)
-    df_set = pd.concat([df_class_0, df_class_1])
-    df_set = df_set.sample(len(df_class_0) + len(df_class_1))
-    df_set = df_set.reset_index(drop=True)
-
-
     # Drop Label Column from Dataset
-    label = df_set[['Label']]
-    df = df_set.drop(columns=['Label'])
+    label = df[['Label']]
+    df = df.drop(columns=['Label'])
 
     # Normalize data
     df_nor = MinMaxScaler().fit_transform(df)  # MinMax Scaler
@@ -189,10 +181,9 @@ def main():
 
     # Using default values for random_state and drop_columns
     data_path = 'CSV\Mae Ai\MaeAI_T47QNC_20230419T034531_part_195.csv'
-    random_state = 42
 
     # drop_columns = [5, 8, 11]
-    df_rename, label = preprocess(data_path, random_state)
+    df_rename, label = preprocess(data_path)
     y_true = label # Ground Truth
     print(y_true)
 
