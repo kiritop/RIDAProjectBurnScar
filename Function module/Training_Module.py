@@ -33,15 +33,16 @@ def preprocess(data_path, random_state, drop_columns = [9, 10, 11, 12]):
     df = pd.read_csv(data_path)
 
     # Down Sampling
-    DF_CLASS_1 = df.query("Label == 1")
-    DF_CLASS_0 = df.query("Label == 0").sample(n=len(DF_CLASS_1), replace=False, random_state=random_state)
-    DF_SET = pd.concat([DF_CLASS_0, DF_CLASS_1])
-    DF_SET = DF_SET.sample(len(DF_CLASS_0) + len(DF_CLASS_1))
-    DF_SET = DF_SET.reset_index(drop=True)
+    df_class_1 = df.query("Label == 1")
+    df_class_0 = df.query("Label == 0").sample(n=len(df_class_1), replace=False, random_state=random_state)
+    df_set = pd.concat([df_class_0, df_class_1])
+    df_set = df_set.sample(len(df_class_0) + len(df_class_1))
+    df_set = df_set.reset_index(drop=True)
 
     # Drop Label Column from Dataset
-    LABEL = DF_SET[['Label']]
-    df = DF_SET.drop(columns=['Label'])
+    label = df_set[['Label']]
+    df = df_set.drop(columns=['Label'])
+
 
     # Normalize data
     df_nor = MinMaxScaler().fit_transform(df)  # MinMax Scaler
@@ -69,10 +70,10 @@ def preprocess(data_path, random_state, drop_columns = [9, 10, 11, 12]):
         #drop_columns = [9, 10, 11, 12]  # Default columns to drop
         
     df_rename.drop(df_rename.columns[drop_columns], axis=1, inplace=True)
-    df_rename = pd.concat([df_rename, LABEL], axis=1, sort=False)
+    df_rename = pd.concat([df_rename, label], axis=1, sort=False)
     print(df_rename)
 
-    return df_rename, LABEL
+    return df_rename
 
 def knn(X, Y, cv, cv_test_scores, std_test_scores):
     """
@@ -644,7 +645,7 @@ def main():
     # Using default values for random_state and drop_columns
     data_path = 'CSV\Forest Fire Dataframe.csv'
     random_state = 42
-    df_rename, LABEL = preprocess(data_path, random_state)
+    df_rename = preprocess(data_path, random_state)
     
     # Seperate Label from Dataframe
     X = df_rename.iloc[:, 0:len(df_rename.columns)-1].values ## Training Data
