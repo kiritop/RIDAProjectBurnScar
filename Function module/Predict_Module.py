@@ -8,7 +8,7 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn import metrics
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 
-def preprocess(data_path, drop_columns = [9, 10, 11, 12]):
+def preprocess(data_path, drop_columns=[9, 10, 11, 12]):
     """
     Preprocess the data for classification tasks.
 
@@ -26,8 +26,10 @@ def preprocess(data_path, drop_columns = [9, 10, 11, 12]):
     df = pd.read_csv(data_path)
 
     # Drop Label Column from Dataset
-    label = df[['Label']]
-    df = df.drop(columns=['Label'])
+    label = df[['Label']] # Ground Truth
+    lat = df[['Latitude_WGS84']] # Latitude
+    long = df[['Longitude_WGS84']] # Longtitude
+    df = df.drop(columns=['Latitude_WGS84', 'Longitude_WGS84', 'Label'])
 
     # Normalize data
     df_nor = MinMaxScaler().fit_transform(df)  # MinMax Scaler
@@ -43,7 +45,7 @@ def preprocess(data_path, drop_columns = [9, 10, 11, 12]):
                           'Band_8A_Post',
                           'Band_9_Post',
                           'Band_12_Post',
-                          'PostNBR_data',
+                          'PostNBR',
                           'NDVI',
                           'NDWI',
                           'dNBR']
@@ -53,7 +55,7 @@ def preprocess(data_path, drop_columns = [9, 10, 11, 12]):
     df_rename.drop(df_rename.columns[drop_columns], axis=1, inplace=True)
     print(df_rename)
 
-    return df_rename, label
+    return df_rename, label, lat, long
 
 def load_models(models_to_load):
     """
@@ -137,6 +139,7 @@ def classification_reports(model_defs, y_preds, y_true):
         })
 
     results_df = pd.DataFrame(results)
+    #results_df.to_csv('Doi Chang Classification Report 2023', index=False)
     print(results_df)
 
 def confusion_matrix(model_defs, y_preds, y_true):
@@ -155,7 +158,7 @@ def confusion_matrix(model_defs, y_preds, y_true):
         plt.ylabel('True')
         plt.show()
 
-def export_predictions_as_csv(df_rename, y_preds, models_to_load, filename):
+def export_predictions_as_csv(df_rename, y_preds, models_to_load, lat, long, label, filename):
     """
     Concatenate the predicted results with the original dataframe and export it as a CSV file.
 
@@ -163,6 +166,9 @@ def export_predictions_as_csv(df_rename, y_preds, models_to_load, filename):
         df_rename (pandas.DataFrame): The original dataframe.
         y_preds (list): The list of predicted results.
         models_to_load (list): List of file names for the pre-trained models.
+        lat (pandas.DataFrame): Latitude data.
+        long (pandas.DataFrame): Longitude data.
+        label (pandas.DataFrame): True labels.
         filename (str): The name of the CSV file to export.
     """
     # Concatenate the predicted results with the original dataframe
@@ -174,18 +180,27 @@ def export_predictions_as_csv(df_rename, y_preds, models_to_load, filename):
         column_name = f"{model_type}_Label"
         df_with_predictions[column_name] = y_pred
 
+    # Rename the label column and append it to the dataframe
+    label.rename(columns={'Label': 'True_Label'}, inplace=True)
+    df_with_predictions = pd.concat([df_with_predictions, label], axis=1)
+
+    # Concatenate latitude and longitude data
+    lat.rename(columns={'Latitude_WGS84': 'Latitude'}, inplace=True) # Rename Latitude Column
+    long.rename(columns={'Longitude_WGS84': 'Longitude'}, inplace=True) # Rename Longitude Column
+    df_with_predictions = pd.concat([df_with_predictions, lat, long], axis=1)
+
     # Export the dataframe as a CSV file
     df_with_predictions.to_csv(filename, index=False)
 
 def main():
 
     # Using default values for random_state and drop_columns
-    data_path = 'CSV\Mae Ai\MaeAI_T47QNC_20230419T034531_part_195.csv'
-
-    # drop_columns = [5, 8, 11]
-    df_rename, label = preprocess(data_path)
+    data_path = (r'D:\Work\Code งาน\Lab-docker\RIDA\RIDA_CSV\.csv')
+    df_rename, label, lat, long = preprocess(data_path)
     y_true = label # Ground Truth
     print(y_true)
+    print(lat)
+    print(long)
 
     # Loaded models and Make Prediction
     models_to_load = [
@@ -205,7 +220,7 @@ def main():
     confusion_matrix(model_defs, y_preds, y_true) ## Confusion matrix
 
     # Export Predict result as CSV and SHAPE File
-    export_predictions_as_csv(df_rename, y_preds, models_to_load, 'Burn_Area_Predictions.csv')
+    export_predictions_as_csv(df_rename, y_preds, models_to_load,lat, long, label, 'Burn_Area_Predictions.csv')
 
 # For running in a script mode
 if __name__ == "__main__":
