@@ -68,7 +68,7 @@ const MapLocation = () => {
       {aqiData?.map((item, index) => (
         <Marker
           key={index}
-          position={[item.lat, item.long]}
+          position={[item.lat, item.lng]}
           icon={circleIcon(index)}
         >
           <Popup>

@@ -9,7 +9,6 @@ import AccountCircle from "@mui/icons-material/AccountCircle";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import MapIcon from "@mui/icons-material/Map";
-import Link from "@mui/material/Link";
 import { Button } from "@mui/material";
 
 const pages = ["Map", "Learning Material", "APIs", "About US"];
