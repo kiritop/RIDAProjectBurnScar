@@ -10,6 +10,24 @@ import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 
 function AboutUS() {
+
+  const partners = [
+    {
+      imageUrl : "logo1.png"
+    },
+    {
+      imageUrl : "logo2.png"
+    },
+    {
+      imageUrl : "logo3.png"
+    },
+    {
+      imageUrl : "logo4.png"
+    },
+    {
+      imageUrl : "logo5.png"
+    },
+  ]
   // Define your array of items
   const items = [
     {
@@ -25,7 +43,7 @@ function AboutUS() {
       imageUrl: "tob45.jpg",
     },
     {
-      name: "Assoc.Prof.Dr. Natthakan Iam-on",
+      name: "Assoc.Prof.Dr.Natthakan Iam-on",
       role: "Researcher",
       institution: "Aberystwyth University",
       imageUrl: "nai7.jpg",
@@ -46,19 +64,19 @@ function AboutUS() {
       name: "Prof.Qiang Shen",
       role: "Researcher",
       institution: "Aberystwyth University",
-      imageUrl: "user.png",
+      imageUrl: "",
     },
     {
       name: "Prof.Reyer Zwiggelaar",
       role: "Researcher",
       institution: "Aberystwyth University",
-      imageUrl: "user.png",
+      imageUrl: "",
     },
     {
       name: "Dr.Changjing Shang",
       role: "Researcher",
       institution: "Aberystwyth University",
-      imageUrl: "user.png",
+      imageUrl: "",
     },
     {
       name: "Tunyavee Saokomket",
@@ -88,13 +106,13 @@ function AboutUS() {
       name: "Dr.Kampanat Deeudomchan",
       role: "Specialist",
       institution: "Chief of Division, Geo-Informatics Management and Solutions Office, GISTDA",
-      imageUrl: "user.png",
+      imageUrl: "",
     },
     {
       name: "Jittisak Yodcum",
       role: "Specialist",
       institution: "Forest Fire Control Division, Forest Protection and Fire Control Bureau, Department of Forestry",
-      imageUrl: "user.png",
+      imageUrl: "",
     },
 
     // Add more items as needed
@@ -185,9 +203,9 @@ function AboutUS() {
               >
                 <div style={{ display: "flex", justifyContent: "center" }}>
                   <div style={{ borderRadius: "50%", overflow: "hidden", width: 200 }}>
-                    <CardMedia component="img" sx={{ height: 200 }} image={item.imageUrl} />
+                    <CardMedia sx={{ height: 200 }} image={item.imageUrl} />
                   </div>
-                </div>
+                </div> 
                 <CardContent sx={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
                   <Typography gutterBottom variant="h6" component="div" align="center">
                     {item.name}
@@ -199,6 +217,44 @@ function AboutUS() {
                     {item.institution}
                   </Typography>
                 </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+
+        <Grid
+          container
+          spacing={1}
+          direction="row"
+          justifyContent="center"
+          alignItems="center"
+          alignContent="center"
+          wrap="wrap"
+          my={5}
+          sx={{ backgroundColor: "#023e8a", padding: 1, borderRadius: 3, boxShadow: 1 }}
+        >
+          <Typography variant="h3" color="#fff" sx={{ fontFamily: "monospace" }}>
+            Our Partners
+          </Typography>
+        </Grid>
+        <Grid container spacing={3} mt={4}>
+          {partners.map((item, index) => (
+            <Grid key={index} xs={12} sm={6} md={4} mx={"auto"} item>
+              <Card
+                sx={{
+                  maxWidth: 500,
+                  boxShadow: "none",
+                  
+                  backgroundColor: "transparent",
+                  marginInline: "auto",
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "center" }}>
+                  <div style={{ overflow: "hidden", width: '100%' }}>
+                    <CardMedia component="img" sx={{ height: 200, objectFit: 'contain' }} image={item.imageUrl} />
+                  </div>
+                </div> 
+                
               </Card>
             </Grid>
           ))}
