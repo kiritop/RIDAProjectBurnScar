@@ -18,21 +18,23 @@ from lightgbm import LGBMClassifier
 
 pd.set_option('display.max_columns', None)
 
-def preprocess(data_paths, random_state, drop_columns = [0, 1, 11, 12, 13, 14, 15, 16, 17, 18]):
+def preprocess(data_paths, random_state, drop_columns=None):
     """
     Preprocess the data for classification tasks.
 
     Args:
-        data_path (str): Path to the CSV file containing the data.
+        data_paths (list): List of paths to the CSV files containing the data.
         random_state (int, optional): Random state for reproducibility. Default is 1.
         drop_columns (list, optional): List of column indices to drop from the feature data.
-            If not provided, the function will drop columns with indices 9, 10, 11, and 12.
+            Default is [0, 1, 11, 12, 13, 14, 15, 16, 17, 18].
 
     Returns:
         tuple: A tuple containing:
             - df_nor (pandas.DataFrame): Normalized feature data.
             - LABEL (pandas.DataFrame): Target variable.
     """
+    if drop_columns is None:
+        drop_columns = [0, 1, 11, 12, 13, 14, 15, 16, 17, 18]
 
     dfs = []
     for data_path in data_paths:
@@ -47,7 +49,6 @@ def preprocess(data_paths, random_state, drop_columns = [0, 1, 11, 12, 13, 14, 1
     df_class_0_all = df.query("Label == 0")
     df_class_0 = df.query("Label == 0").sample(n=len(df_class_1), replace=False, random_state=random_state)
     df_set = pd.concat([df_class_0, df_class_1])
-    df_set = df_set.sample(len(df_class_0) + len(df_class_1))
     df_set = df_set.reset_index(drop=True)
 
     # Drop Label Column from Dataset
