@@ -13,11 +13,18 @@ export const saveLayerSettings = createAsyncThunk(
   }
 );
 
+const currentDate = new Date();
+const year = currentDate.getFullYear();
+
 const uiSlice = createSlice({
   name: 'ui',
   initialState: { 
     isSidebarOpen: false,
-    sidebarForm: {},
+    sidebarForm :{
+      yearRange : [year, year],
+      country : '',
+      province : ''
+    },
     burntScar: true,
     aqi: false,
     hotSpot: false,
@@ -50,6 +57,7 @@ const uiSlice = createSlice({
         state.status = 'succeeded';
         console.log("action.payload", action.payload)
         // Add any fetched data to the state
+        state.sidebarForm = {...action.payload.sidebarForm}
         state.burntScar = action.payload.burntScar;
         state.aqi = action.payload.aqi;
         state.hotSpot = action.payload.hotSpot;

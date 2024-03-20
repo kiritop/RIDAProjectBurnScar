@@ -77,8 +77,13 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
   };
 
   const handleSave = () => {
+    const sidebarForm = {
+      yearRange : yearRange,
+      country : country,
+      province : province
+    }
     // Dispatch the save action with the current state
-    dispatch(saveLayerSettings({ burntScar, aqi, hotSpot }));
+    dispatch(saveLayerSettings({ sidebarForm, burntScar, aqi, hotSpot }));
     toggleDrawer(); 
   };
 

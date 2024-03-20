@@ -1,7 +1,8 @@
 // src/reducers/burntScarSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-export const fetchBurntScarData = createAsyncThunk('burntScar/fetchBurntScarData', async () => {
+export const fetchBurntScarData = createAsyncThunk('burntScar/fetchBurntScarData', async (filter) => {
+    console.log("filter", filter)
     const response = await fetch("http://localhost:3000/process-shapefiles-demo");
     const data = await response.json();
     return data;
@@ -10,7 +11,6 @@ export const fetchBurntScarData = createAsyncThunk('burntScar/fetchBurntScarData
 const burntScarSlice = createSlice({
   name: 'burntScar',
   initialState: { data: [], loading: false },
-  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchBurntScarData.pending, (state) => {

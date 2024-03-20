@@ -11,20 +11,17 @@ import { setLoadingMap } from '../reducers/uiSlice';
 const MapBurnScar = () => {
   const dispatch = useDispatch();
   const burntScarData = useSelector(state => state.burnScar.data);
-  const loadingMap = useSelector(state => state.ui.loadingMap);
   const loading = useSelector(state => state.burnScar.loading); 
+  const filter = useSelector(state => state.ui.sidebarForm);
 
   useEffect(() => {
     dispatch(setLoadingMap(true));
-
-    if (!loading) {
-      dispatch(fetchBurntScarData())
-      .finally(() => {
-        dispatch(setLoadingMap(false));
-      });
-    }
+    dispatch(fetchBurntScarData(filter))
+    .finally(() => {
+      dispatch(setLoadingMap(false));
+    });
     
-  }, [dispatch, loading]);
+  }, [dispatch]);
 
 const percentToColor = (percent) => {
   const value = percent / 100;
@@ -46,7 +43,7 @@ const percentToColor = (percent) => {
     // get the color based on the fire type
     const color = percentToColor(feature.properties.frequency);
     // create a circle marker with a fixed pixel radius of 1
-    let marker = L.circleMarker(latlng, { radius: 1, color: color, fillOpacity: 1 });
+    let marker = L.circleMarker(latlng, { radius: 0.1, color: color, fillOpacity: 1 });
 
     
     
