@@ -4,18 +4,27 @@ import L from "leaflet"; // import Leaflet library
 import './custom.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchBurntScarData } from '../reducers/burntScarSlice';
+import { setLoadingMap } from '../reducers/uiSlice';
 
 
 
 const MapBurnScar = () => {
-  // const [firmsData, setFirmsData] = useState([]);
   const dispatch = useDispatch();
   const burntScarData = useSelector(state => state.burnScar.data);
+  const loadingMap = useSelector(state => state.ui.loadingMap);
   const loading = useSelector(state => state.burnScar.loading); 
 
   useEffect(() => {
-    dispatch(fetchBurntScarData());
-  }, [dispatch]);
+    dispatch(setLoadingMap(true));
+
+    if (!loading) {
+      dispatch(fetchBurntScarData())
+      .finally(() => {
+        dispatch(setLoadingMap(false));
+      });
+    }
+    
+  }, [dispatch, loading]);
 
 const percentToColor = (percent) => {
   const value = percent / 100;
@@ -71,10 +80,6 @@ const percentToColor = (percent) => {
     // ${feature.properties.year.map(item => `<tr><td><strong>Burnt year :</strong></td> <td style="text-align:right">${item}</td></tr>`).join('')}
     layer.bindPopup(popupContent, { className: 'custom-popup' }); // add a custom class name
   };
-
-  if (loading) {
-    return <div>Loading...</div>; // แสดง loader ถ้าข้อมูล AQI กำลังโหลด
-  }
 
 
   return (

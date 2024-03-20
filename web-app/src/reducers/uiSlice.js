@@ -22,6 +22,8 @@ const uiSlice = createSlice({
     aqi: false,
     hotSpot: false,
     status: 'idle',
+    loadingMap: false,
+    loadingSidebar: false,
     error: null // สร้าง state สำหรับข้อมูล form control ของ Sidebar
   },
   reducers: {
@@ -31,6 +33,12 @@ const uiSlice = createSlice({
     updateSidebarForm: (state, action) => {
       console.lop("action.payload", action.payload)
       state.sidebarForm = action.payload; // อัปเดตข้อมูล form control ของ Sidebar
+    },
+    setLoadingMap: (state, action) => {
+      state.loadingMap = action.payload;
+    },
+    setLoadingSidebar: (state, action) => {
+      state.loadingSidebar = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -53,6 +61,6 @@ const uiSlice = createSlice({
   }
 });
 
-export const { toggleSidebar, updateSidebarForm } = uiSlice.actions;
+export const { toggleSidebar, updateSidebarForm, setLoadingMap, setLoadingSidebar } = uiSlice.actions;
 
 export default uiSlice.reducer;
