@@ -24,12 +24,14 @@ const provinces = ['Chiang Rai', 'Chiang Mai', 'Lampang', 'Lamphun', 'Mae Hong S
 
 export default function Sidebar({ isOpen , toggleDrawer}) {
 
-  const [yearRange, setYearRange] = React.useState([2019, 2023]);
-  const [country, setCountry] = React.useState('Thailand');
-  const [province, setProvince] = React.useState('Chiang Rai');
-  const [burntScar, setBurntScar] = useState(true);
-  const [aqi, setAqi] = useState(false);
-  const [hotSpot, setHotSpot] = useState(false);
+  const ui = useSelector(state => state.ui);
+
+  const [yearRange, setYearRange] = React.useState(ui.sidebarForm.yearRange);
+  const [country, setCountry] = React.useState(ui.sidebarForm.country);
+  const [province, setProvince] = React.useState(ui.sidebarForm.province);
+  const [burntScar, setBurntScar] = useState(ui.burntScar);
+  const [aqi, setAqi] = useState(ui.aqi);
+  const [hotSpot, setHotSpot] = useState(ui.hotSpot);
   const dispatch = useDispatch();
 
   const currentDate = new Date();
@@ -133,8 +135,8 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
                 value={yearRange}
                 onChange={handleYearChange}
                 valueLabelDisplay="on"
-                min={2017}
-                max={2024}
+                min={year-5}
+                max={year+5}
                 step={1}
                 // sx={{color: '#50C1DD' }}
               />)}
