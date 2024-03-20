@@ -136,9 +136,8 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
                 onChange={handleYearChange}
                 valueLabelDisplay="on"
                 min={year-5}
-                max={year+5}
+                max={year}
                 step={1}
-                // sx={{color: '#50C1DD' }}
               />)}
             </Stack>
           </Box>
