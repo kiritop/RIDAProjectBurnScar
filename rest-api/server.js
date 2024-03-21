@@ -164,12 +164,17 @@ server.get('/process-shapefiles-demo', async (req, res) => {
     // For example, you might want to use them to filter the data you're processing
 
     const directoryPath = path.join(__dirname, './output/Burn');
-    let totalShpFile = 0; // keep total of shapefile
+    let filteredShpFile = 0; // keep total of filtered shapefile
     fs.readdir(directoryPath, function (err, folders) {
         if (err) {
             return console.log('Unable to scan directory: ' + err);
         } 
-        let promises = folders.map(function (folder) {
+        let promises = folders
+        .filter(folder => {
+            const year = parseInt(folder);
+            return year >= yearfrom && year <= yearto;
+        })
+        .map(function (folder) {
             const folderPath = path.join(directoryPath, folder);
             return fs.promises.readdir(folderPath)
                 .then(files => {
@@ -177,21 +182,34 @@ server.get('/process-shapefiles-demo', async (req, res) => {
                         if(path.extname(file) === '.shp'){
                             return promiseChain.then(() => shapefile.read(path.join(folderPath, file))
                                 .then(geojson => {
-                                    totalShpFile++
-                                    return geojson.features.map(feature => {
-                                        const latlong = feature.geometry.coordinates.join(',');
-                                        const year = folder;
-                                        return { type: feature.type, coordinates: latlong, properties: { ...feature.properties, count: 1, year: [year] }, geometry: feature.geometry};
-                                    });
+                                    let filteredFeatures = geojson.features
+                                        .filter(feature => {
+                                            //filter location by country and state
+                                            const location = feature.properties.location;
+                                            return location.includes(country) && location.includes(state);
+                                        })
+                                        .map(feature => {
+                                            const latlong = feature.geometry.coordinates.join(',');
+                                            return { type: feature.type, coordinates: latlong, properties: { ...feature.properties, count: 1, year: [folder] }, geometry: feature.geometry};
+                                        });
+                                    return filteredFeatures;
                                 }));
                         } else {
                             return promiseChain;
                         }
-                    }, Promise.resolve([]));
+                    }, Promise.resolve([]))
+                    .then(filteredFeaturesPerFile => {
+                        console.log("filteredFeaturesPerFile", filteredFeaturesPerFile)
+                        if (filteredFeaturesPerFile.length > 0) {
+                            filteredShpFile++; // increment the count of filtered shapefiles
+                        }
+                        return filteredFeaturesPerFile;
+                    });
                 });
         });
         Promise.all(promises)
             .then(dataArrays => {
+                // console.log("dataArrays", dataArrays)
                 let data = [].concat(...dataArrays);
                 let finalData = [];
                 data.forEach(item => {
@@ -208,15 +226,15 @@ server.get('/process-shapefiles-demo', async (req, res) => {
   
                 // Calculate the percentage of duplicates for each row
                 finalData.forEach(row => {
-                  // Use the formula (count / totalShpFile) * 100 and round to two decimals
-                  let percentage = ((row.properties.count / totalShpFile) * 100).toFixed(2);
-                  // Add the percentage to the properties as frequency
-                  row.properties.frequency = percentage;
-                  row.properties.total_shapefile = totalShpFile;
+                    // Use the formula (count / filteredShpFile) * 100 and round to two decimals
+                    let percentage = ((row.properties.count / filteredShpFile) * 100).toFixed(2);
+                    // Add the percentage to the properties as frequency
+                    row.properties.frequency = percentage;
+                    row.properties.total_shapefile = filteredShpFile;
                 });
-                console.log("totalShpFile", totalShpFile)
-                
-                res.json(finalData); // Send the data as JSON
+                console.log("filteredShpFile", filteredShpFile)
+                            
+                res.json(finalData);
             })
             .catch(err => {
                 console.log(err);
