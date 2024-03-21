@@ -155,10 +155,12 @@ server.get('/process-shapefiles', async (req, res) => {
 
 server.get('/process-shapefiles-demo', async (req, res) => {
     const { yearfrom, yearto, country, state } = req.query; // Extract the parameters from the request query
-    console.log("yearfrom =", yearfrom)
-    console.log("yearto =", yearto)
-    console.log("country =", country)
-    console.log("state =", state)
+    // const yearfrom = decodeURIComponent(req.query.yearfrom);
+    // const yearto = decodeURIComponent(req.query.yearto);
+    // const country = decodeURIComponent(req.query.country);
+    // const state = decodeURIComponent(req.query.state);
+    // console.log("country", country)
+    // console.log("state", state)
 
     // You can now use these parameters in your function
     // For example, you might want to use them to filter the data you're processing
@@ -186,7 +188,15 @@ server.get('/process-shapefiles-demo', async (req, res) => {
                                         .filter(feature => {
                                             //filter location by country and state
                                             const location = feature.properties.location;
-                                            return location.includes(country) && location.includes(state);
+                                            let countryCondition = true;
+                                            let stateCondition = true;
+                                            if (country) {
+                                                countryCondition = location.includes(country);
+                                            }
+                                            if (state) {
+                                                stateCondition = location.includes(state);
+                                            }
+                                            return countryCondition && stateCondition;
                                         })
                                         .map(feature => {
                                             const latlong = feature.geometry.coordinates.join(',');
@@ -199,7 +209,6 @@ server.get('/process-shapefiles-demo', async (req, res) => {
                         }
                     }, Promise.resolve([]))
                     .then(filteredFeaturesPerFile => {
-                        console.log("filteredFeaturesPerFile", filteredFeaturesPerFile)
                         if (filteredFeaturesPerFile.length > 0) {
                             filteredShpFile++; // increment the count of filtered shapefiles
                         }
