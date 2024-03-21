@@ -154,6 +154,15 @@ server.get('/process-shapefiles', async (req, res) => {
 
 
 server.get('/process-shapefiles-demo', async (req, res) => {
+    const { yearfrom, yearto, country, state } = req.query; // Extract the parameters from the request query
+    console.log("yearfrom =", yearfrom)
+    console.log("yearto =", yearto)
+    console.log("country =", country)
+    console.log("state =", state)
+
+    // You can now use these parameters in your function
+    // For example, you might want to use them to filter the data you're processing
+
     const directoryPath = path.join(__dirname, './output/Burn');
     let totalShpFile = 0; // keep total of shapefile
     fs.readdir(directoryPath, function (err, folders) {
