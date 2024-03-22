@@ -24,14 +24,14 @@ const countries = [
                     { 
                       name:'Select all',
                       value: 'All',
-                      lat:'13.736717',
-                      lng:'100.523186'
+                      lat:'19.9094',
+                      lng:'99.8275'
                     },
                     { 
                       name:'Thailand',
                       value: 'Thailand',
-                      lat:'13.736717',
-                      lng:'100.523186'
+                      lat:'19.9094',
+                      lng:'99.8275'
                     },
                     { 
                       name:'Myanmar',
@@ -56,8 +56,8 @@ const provinces = [
                     { 
                       name:'Select all',
                       value: 'All',
-                      lat:'13.736717',
-                      lng:'100.523186'
+                      lat:'19.9094',
+                      lng:'99.8275'
                     },
                     { 
                       name:'Chiang Mai',
@@ -176,7 +176,7 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
       province : province
     }
     
-    if(province == "All"){
+    if(province == "All" || country!=="Thailand" ){
       let valueToFilter = country
       let filteredCountries = countries.filter(country => country.value === valueToFilter);
       let current_lat = filteredCountries[0].lat
