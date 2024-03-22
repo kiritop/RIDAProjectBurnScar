@@ -1,14 +1,10 @@
 // src/reducers/uiSlice.js
-import { ContactSupportOutlined } from '@mui/icons-material';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 // Async action using createAsyncThunk
 export const saveLayerSettings = createAsyncThunk(
   'layer/saveLayerSettings',
   async (settings) => {
-    console.log("settings", settings)
-    // const response = await axios.post('/api/save', settings);
-    // return response.data;
     return settings
   }
 );
@@ -61,6 +57,7 @@ const uiSlice = createSlice({
         state.sidebarForm = {...action.payload.sidebarForm}
         state.burntScar = action.payload.burntScar;
         state.aqi = action.payload.aqi;
+        state.hotSpot = action.payload.hotSpot;
         state.current_lat = action.payload.current_lat;
         state.current_lng = action.payload.current_lng;
       })

@@ -176,7 +176,7 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
       province : province
     }
     
-    if(province == "All" || country!=="Thailand" ){
+    if(province === "All" || country!=="Thailand" ){
       let valueToFilter = country
       let filteredCountries = countries.filter(country => country.value === valueToFilter);
       let current_lat = filteredCountries[0].lat
@@ -258,19 +258,19 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
           </Box>
         </FormControl>
 
-        {burntScar === true && (<Typography level="title-md" fontWeight="bold" sx={{ mt: 2 }}>
+        <Typography level="title-md" fontWeight="bold" sx={{ mt: 2 }}>
           Country
-        </Typography>)}
+        </Typography>
         <FormControl orientation="horizontal">
           <Box sx={{ flex: 1, pr: 1 }}>
             <Stack spacing={2}>
-            {burntScar === true && (<Select value={country} onChange={handleCountryChange}>
+            <Select value={country} onChange={handleCountryChange}>
                 {countries.map((country) => (
                   <MenuItem key={country.value} value={country.value}>
                     {country.name}
                   </MenuItem>
                 ))}
-              </Select>)}
+              </Select>
             </Stack>
           </Box>
         </FormControl>

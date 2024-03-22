@@ -8,10 +8,10 @@ const StyledFab = styled(Fab)({
   position: 'absolute',
   top: '20%',
   right: 16,
-  color: '#50C1DD', // สีของไอคอน
-  backgroundColor: '#FFFFFF', // สีของปุ่ม
+  color: '#FFFFFF', // สีของไอคอน
+  backgroundColor: '#0077b6', // สีของปุ่ม
   '&:hover': {
-    backgroundColor: '#e0e0e0', // สีของปุ่มเมื่อผู้ใช้เลื่อนเมาส์ไปวางบนปุ่ม
+    backgroundColor: '#005994', // สีของปุ่มเมื่อผู้ใช้เลื่อนเมาส์ไปวางบนปุ่ม
   },
 });
 
