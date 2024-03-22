@@ -1,23 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import {CircleMarker} from "react-leaflet";
-import Papa from 'papaparse';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchHotSpotData } from '../reducers/hotSpotSlice';
+import { setLoadingMap } from '../reducers/uiSlice';
 
 const MapHotspot = () => {
   const hotSpotData = useSelector(state => state.hotSpot.data);
-  const loading = useSelector(state => state.hotSpot.loading); 
   const dispatch = useDispatch();
 
+
   useEffect(() => {
-    dispatch(fetchHotSpotData());
+    dispatch(setLoadingMap(true));
+    dispatch(fetchHotSpotData())
+    .finally(() => {
+      dispatch(setLoadingMap(false));
+    });
+    
   }, [dispatch]);
-
-  
-  if (loading) {
-    return <div>Loading...</div>; // แสดง loader ถ้าข้อมูล AQI กำลังโหลด
-  }
-
 
   return (
     <>

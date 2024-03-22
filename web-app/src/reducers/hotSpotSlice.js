@@ -1,5 +1,4 @@
 // src/reducers/hotSpotSlice.js
-import { LocalConvenienceStoreOutlined } from '@mui/icons-material';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import Papa from 'papaparse';
 

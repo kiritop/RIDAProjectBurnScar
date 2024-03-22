@@ -17,10 +17,103 @@ import Typography from '@mui/joy/Typography';
 import Slider from "@mui/material/Slider";
 import { Select, Switch, MenuItem } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { saveLayerSettings } from '../reducers/uiSlice';
+import { saveLayerSettings, setLoadingMap } from '../reducers/uiSlice';
+import { fetchBurntScarData } from '../reducers/burntScarSlice';
 
-const countries = ['Select all','Thailand', 'Myanmar', 'Laos', 'Vietnam'];
-const provinces = ['Chiang Rai', 'Chiang Mai', 'Lampang', 'Lamphun', 'Mae Hong Son', 'Nan', 'Phayao', 'Phrae', 'Uttaradit'];
+const countries = [
+                    { 
+                      name:'Select all',
+                      value: 'All',
+                      lat:'19.9094',
+                      lng:'99.8275'
+                    },
+                    { 
+                      name:'Thailand',
+                      value: 'Thailand',
+                      lat:'19.9094',
+                      lng:'99.8275'
+                    },
+                    { 
+                      name:'Myanmar',
+                      value: 'Myanmar',
+                      lat:'16.871311',
+                      lng:'96.199379'
+                    },
+                    { 
+                      name:'Laos',
+                      value: 'Laos',
+                      lat:'19.889271',
+                      lng:'102.133453'
+                    },
+                    { 
+                      name:'Vietnam',
+                      value: 'Vietnam',
+                      lat:'21.028511',
+                      lng:'105.804817'
+                    }
+                  ];
+const provinces = [
+                    { 
+                      name:'Select all',
+                      value: 'All',
+                      lat:'19.9094',
+                      lng:'99.8275'
+                    },
+                    { 
+                      name:'Chiang Mai',
+                      value: 'Chiang Mai',
+                      lat: "18.7889", 
+                      lng: "98.9833", 
+                    },
+                    { 
+                      name:'Chiang Rai',
+                      value: 'Chiang Rai',
+                      lat: "19.9094", 
+                      lng: "99.8275", 
+                    },
+                    { 
+                      name:'Lampang',
+                      value: 'Lampang',
+                      lat: "18.3000", 
+                      lng: "99.5000", 
+                    },
+                    { 
+                      name:'Lamphun',
+                      value: 'Lamphun',
+                      lat: "18.5865", 
+                      lng: "99.0121", 
+                    },
+                    { 
+                      name:'Mae Hong Son',
+                      value: 'Mae Hong Son',
+                      lat: "19.3011", 
+                      lng: "97.9700", 
+                    },
+                    { 
+                      name:'Nan',
+                      value: 'Nan',
+                      lat: "18.7893", 
+                      lng: "100.7766", 
+                    },
+                    { 
+                      name:'Phayao',
+                      value: 'Phayao',
+                      lat: "19.1652", 
+                      lng: "99.9036",
+                    },
+                    { 
+                      name:'Phrae',
+                      value: 'Phrae',
+                      lat: "18.1436", 
+                      lng: "100.1417", 
+                    },
+                    { 
+                      name:'Uttaradit',
+                      value: 'Uttaradit',
+                      lat: "17.6256", 
+                      lng: "100.0942", 
+                    },
+                  ];
 
 export default function Sidebar({ isOpen , toggleDrawer}) {
 
@@ -74,8 +167,6 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
       default:
         break;
     }
-    console.log("event.target.name", event.target.name);
-    console.log("event.target.checked", event.target.checked);
   };
 
   const handleSave = () => {
@@ -84,8 +175,32 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
       country : country,
       province : province
     }
-    // Dispatch the save action with the current state
-    dispatch(saveLayerSettings({ sidebarForm, burntScar, aqi, hotSpot }));
+    
+    if(province === "All" || country!=="Thailand" ){
+      let valueToFilter = country
+      let filteredCountries = countries.filter(country => country.value === valueToFilter);
+      let current_lat = filteredCountries[0].lat
+      let current_lng = filteredCountries[0].lng
+      // Dispatch the save action with the current state
+      dispatch(saveLayerSettings({ sidebarForm, burntScar, aqi, hotSpot, current_lat, current_lng }));
+    }else{
+      let valueToFilter = province
+      let filteredCountries = provinces.filter(state => state.value === valueToFilter);
+      let current_lat = filteredCountries[0].lat
+      let current_lng = filteredCountries[0].lng
+      // Dispatch the save action with the current state
+      dispatch(saveLayerSettings({ sidebarForm, burntScar, aqi, hotSpot, current_lat, current_lng }));
+    }
+
+
+    
+    if(burntScar){
+      dispatch(setLoadingMap(true));
+      dispatch(fetchBurntScarData(sidebarForm))
+      .finally(() => {
+        dispatch(setLoadingMap(false));
+      });
+    }
     toggleDrawer(); 
   };
 
@@ -143,19 +258,19 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
           </Box>
         </FormControl>
 
-        {burntScar === true && (<Typography level="title-md" fontWeight="bold" sx={{ mt: 2 }}>
+        <Typography level="title-md" fontWeight="bold" sx={{ mt: 2 }}>
           Country
-        </Typography>)}
+        </Typography>
         <FormControl orientation="horizontal">
           <Box sx={{ flex: 1, pr: 1 }}>
             <Stack spacing={2}>
-            {burntScar === true && (<Select value={country} onChange={handleCountryChange}>
+            <Select value={country} onChange={handleCountryChange}>
                 {countries.map((country) => (
-                  <MenuItem key={country} value={country}>
-                    {country}
+                  <MenuItem key={country.value} value={country.value}>
+                    {country.name}
                   </MenuItem>
                 ))}
-              </Select>)}
+              </Select>
             </Stack>
           </Box>
         </FormControl>
@@ -169,8 +284,8 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
               {country === 'Thailand' && burntScar === true && (
                   <Select value={province} onChange={handleProvinceChange}>
                     {provinces.map((province) => (
-                      <MenuItem key={province} value={province}>
-                        {province}
+                      <MenuItem key={province.value} value={province.value}>
+                        {province.name}
                       </MenuItem>
                     ))}
                   </Select>

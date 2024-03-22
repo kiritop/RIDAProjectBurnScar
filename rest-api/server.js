@@ -22,7 +22,7 @@ server.get('/read-shapefile', async (req, res) => {
 
   // Assuming the shapefile is named 'shapefile.shp'
   // const shapefilePath = './output/USA Fire Predicted GIS file/USA_Fire_Predicted.shp';
-  const shapefilePath = './output/layers/POINT.shp';
+  const shapefilePath = './output/N_Vi1_20240321/N_Vi1_20240321.shp';
 
   let features = [];
   await shapefile.open(shapefilePath)
@@ -155,10 +155,6 @@ server.get('/process-shapefiles', async (req, res) => {
 
 server.get('/process-shapefiles-demo', async (req, res) => {
     const { yearfrom, yearto, country, state } = req.query; // Extract the parameters from the request query
-    console.log("yearfrom =", yearfrom)
-    console.log("yearto =", yearto)
-    console.log("country =", country)
-    console.log("state =", state)
 
     // You can now use these parameters in your function
     // For example, you might want to use them to filter the data you're processing
@@ -185,8 +181,16 @@ server.get('/process-shapefiles-demo', async (req, res) => {
                                     let filteredFeatures = geojson.features
                                         .filter(feature => {
                                             //filter location by country and state
-                                            const location = feature.properties.location;
-                                            return location.includes(country) && location.includes(state);
+                                            const location = feature.properties.properties;
+                                            let countryCondition = true;
+                                            let stateCondition = true;
+                                            if (country) {
+                                                countryCondition = location.includes(country);
+                                            }
+                                            if (state) {
+                                                stateCondition = location.includes(state);
+                                            }
+                                            return countryCondition && stateCondition;
                                         })
                                         .map(feature => {
                                             const latlong = feature.geometry.coordinates.join(',');
@@ -199,7 +203,6 @@ server.get('/process-shapefiles-demo', async (req, res) => {
                         }
                     }, Promise.resolve([]))
                     .then(filteredFeaturesPerFile => {
-                        console.log("filteredFeaturesPerFile", filteredFeaturesPerFile)
                         if (filteredFeaturesPerFile.length > 0) {
                             filteredShpFile++; // increment the count of filtered shapefiles
                         }
@@ -232,7 +235,6 @@ server.get('/process-shapefiles-demo', async (req, res) => {
                     row.properties.frequency = percentage;
                     row.properties.total_shapefile = filteredShpFile;
                 });
-                console.log("filteredShpFile", filteredShpFile)
                             
                 res.json(finalData);
             })

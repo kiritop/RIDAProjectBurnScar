@@ -1,14 +1,10 @@
 // src/reducers/uiSlice.js
-import { ContactSupportOutlined } from '@mui/icons-material';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 // Async action using createAsyncThunk
 export const saveLayerSettings = createAsyncThunk(
   'layer/saveLayerSettings',
   async (settings) => {
-    console.log("settings", settings)
-    // const response = await axios.post('/api/save', settings);
-    // return response.data;
     return settings
   }
 );
@@ -22,9 +18,11 @@ const uiSlice = createSlice({
     isSidebarOpen: false,
     sidebarForm :{
       yearRange : [year, year],
-      country : '',
-      province : ''
+      country : 'All',
+      province : 'All'
     },
+    current_lat: "18.7889", 
+    current_lng: "98.9833", 
     burntScar: true,
     aqi: false,
     hotSpot: false,
@@ -55,12 +53,13 @@ const uiSlice = createSlice({
       })
       .addCase(saveLayerSettings.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        console.log("action.payload", action.payload)
         // Add any fetched data to the state
         state.sidebarForm = {...action.payload.sidebarForm}
         state.burntScar = action.payload.burntScar;
         state.aqi = action.payload.aqi;
         state.hotSpot = action.payload.hotSpot;
+        state.current_lat = action.payload.current_lat;
+        state.current_lng = action.payload.current_lng;
       })
       .addCase(saveLayerSettings.rejected, (state, action) => {
         state.status = 'failed';

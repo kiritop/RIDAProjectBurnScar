@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import {CircleMarker, GeoJSON, Popup} from "react-leaflet";
+import React, { useEffect } from "react";
+import {GeoJSON} from "react-leaflet";
 import L from "leaflet"; // import Leaflet library
 import './custom.css';
 import { useDispatch, useSelector } from 'react-redux';
@@ -11,12 +11,12 @@ import { setLoadingMap } from '../reducers/uiSlice';
 const MapBurnScar = () => {
   const dispatch = useDispatch();
   const burntScarData = useSelector(state => state.burnScar.data);
-  const loading = useSelector(state => state.burnScar.loading); 
-  const filter = useSelector(state => state.ui.sidebarForm);
+  // const loading = useSelector(state => state.burnScar.loading); 
+  const sidebarForm = useSelector(state => state.ui.sidebarForm);
 
   useEffect(() => {
     dispatch(setLoadingMap(true));
-    dispatch(fetchBurntScarData(filter))
+    dispatch(fetchBurntScarData(sidebarForm))
     .finally(() => {
       dispatch(setLoadingMap(false));
     });
