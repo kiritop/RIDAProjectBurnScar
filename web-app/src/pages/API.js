@@ -15,7 +15,7 @@ const spec = {
     title: "BURNT SCAR API DOCUMENT",
   },
   paths: {
-    "/get-burnt-scar-geojson": {
+    "/api/get-burnt-scar-geojson": {
       get: {
         tags: ["API LIST"],
         summary: "Get burnt scar GeoJSON data",
