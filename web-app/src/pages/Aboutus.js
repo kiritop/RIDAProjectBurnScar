@@ -27,6 +27,9 @@ function AboutUS() {
     {
       imageUrl : "logo5.png"
     },
+    {
+      imageUrl : "logo6.png"
+    },
   ]
   // Define your array of items
   const items = [
@@ -61,24 +64,6 @@ function AboutUS() {
       imageUrl: "ball.png",
     },
     {
-      name: "Prof.Qiang Shen",
-      role: "Researcher",
-      institution: "Aberystwyth University",
-      imageUrl: "",
-    },
-    {
-      name: "Prof.Reyer Zwiggelaar",
-      role: "Researcher",
-      institution: "Aberystwyth University",
-      imageUrl: "",
-    },
-    {
-      name: "Dr.Changjing Shang",
-      role: "Researcher",
-      institution: "Aberystwyth University",
-      imageUrl: "",
-    },
-    {
       name: "Tunyavee Saokomket",
       role: "Research Assistant",
       institution: "Mae Fah Luang University",
@@ -101,6 +86,24 @@ function AboutUS() {
       role: "Research Assistant",
       institution: "Mae Fah Luang University",
       imageUrl: "top.jpg",
+    },
+    {
+      name: "Prof.Qiang Shen",
+      role: "Researcher",
+      institution: "Aberystwyth University",
+      imageUrl: "",
+    },
+    {
+      name: "Prof.Reyer Zwiggelaar",
+      role: "Researcher",
+      institution: "Aberystwyth University",
+      imageUrl: "",
+    },
+    {
+      name: "Dr.Changjing Shang",
+      role: "Researcher",
+      institution: "Aberystwyth University",
+      imageUrl: "",
     },
     {
       name: "Dr.Kampanat Deeudomchan",

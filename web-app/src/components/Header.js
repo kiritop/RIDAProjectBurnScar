@@ -133,7 +133,7 @@ export default function Header() {
                       const decoded = jwtDecode(credentialResponse?.credential);
                       const name = decoded.given_name;
                       const email = decoded.email;
-                      setUserInfo(email);
+                      setUserInfo(name);
                       loginApi(name, email);
                       window.location.reload();
                     }}
