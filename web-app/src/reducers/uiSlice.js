@@ -13,8 +13,8 @@ const currentDate = new Date();
 const year = currentDate.getFullYear();
 
 const uiSlice = createSlice({
-  name: 'ui',
-  initialState: { 
+  name: "ui",
+  initialState: {
     isSidebarOpen: false,
     sidebarForm :{
       yearRange : [year, year],
@@ -26,17 +26,17 @@ const uiSlice = createSlice({
     burntScar: true,
     aqi: false,
     hotSpot: false,
-    status: 'idle',
+    status: "idle",
     loadingMap: false,
     loadingSidebar: false,
-    error: null // สร้าง state สำหรับข้อมูล form control ของ Sidebar
+    error: null, // สร้าง state สำหรับข้อมูล form control ของ Sidebar
   },
   reducers: {
     toggleSidebar: (state) => {
       state.isSidebarOpen = !state.isSidebarOpen;
     },
     updateSidebarForm: (state, action) => {
-      console.lop("action.payload", action.payload)
+      console.lop("action.payload", action.payload);
       state.sidebarForm = action.payload; // อัปเดตข้อมูล form control ของ Sidebar
     },
     setLoadingMap: (state, action) => {
@@ -49,7 +49,7 @@ const uiSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(saveLayerSettings.pending, (state) => {
-        state.status = 'loading';
+        state.status = "loading";
       })
       .addCase(saveLayerSettings.fulfilled, (state, action) => {
         state.status = 'succeeded';
@@ -62,10 +62,10 @@ const uiSlice = createSlice({
         state.current_lng = action.payload.current_lng;
       })
       .addCase(saveLayerSettings.rejected, (state, action) => {
-        state.status = 'failed';
+        state.status = "failed";
         state.error = action.error.message;
       });
-  }
+  },
 });
 
 export const { toggleSidebar, updateSidebarForm, setLoadingMap, setLoadingSidebar } = uiSlice.actions;

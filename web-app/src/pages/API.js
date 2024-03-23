@@ -1,10 +1,14 @@
 import React from "react";
-
+import axios from "axios";
 import Container from "@mui/material/Container";
-import { Box, Grid, Button } from "@mui/material";
+import { Box, Grid, Button, TextField } from "@mui/material";
 import SwaggerUI from "swagger-ui-react";
 import "swagger-ui-react/swagger-ui.css";
 import DataTable from "./tableShapefile";
+import Swal from "sweetalert2";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchUsers } from "../reducers/userSlice";
+
 
 const spec = {
   openapi: "3.0.0",
@@ -12,26 +16,14 @@ const spec = {
     title: "API DOCUMENT",
   },
   paths: {
-    "/read-shapefile": {
+    "/get-users": {
       get: {
         tags: ["API LIST"],
-        summary: "Reads a shapefile",
-        description: "This endpoint reads a shapefile.",
+        summary: "user info",
+        description: "user list.",
         responses: {
           200: {
-            description: "Successfully read the shapefile.",
-          },
-        },
-      },
-    },
-    "/read-shapefile-half": {
-      get: {
-        tags: ["API LIST"],
-        summary: "Reads half of a shapefile",
-        description: "This endpoint reads half of a shapefile.",
-        responses: {
-          200: {
-            description: "Successfully read half of the shapefile.",
+            description: "Successfully read the user info.",
           },
         },
       },
@@ -40,11 +32,80 @@ const spec = {
 };
 
 function API() {
+  const email = JSON.parse(localStorage.getItem("myData"));
+  const dispatch = useDispatch();
+  const users = useSelector((state) => state.users.data ?? []);
+  const getfile = useSelector((state) => state.getfile);
+  const apikey = users[0]?.api_key ?? [];
+  console.log(getfile);
+
+  React.useEffect(() => {
+    dispatch(fetchUsers());   
+  }, [dispatch]);
+
+  const apiGen = async () => {
+    if (!email) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Please login first!",
+      });
+      return;
+    }
+
+    if (apikey.length > 0) {
+      Swal.fire({
+        icon: "info",
+        title: "Notice",
+        text: "You already have an API key!",
+      });
+      return;
+    }
+
+    const payload = {
+      email: email,
+    };
+
+    try {
+      const response = await axios.post("http://localhost:3000/api/generate", payload);
+      console.log(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+    Swal.fire({
+      icon: "success",
+      title: "Success",
+      text: "Generate API KEY done",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.reload();
+      }
+    });
+  };
+
   return (
     <>
       <Container maxWidth="lg">
-        <Grid container direction="row" justifyContent="end" alignItems="center" mt={5}>
-          <Button variant="contained">Generate KEY</Button>
+        <Grid container direction="row" justifyContent="space-between" alignItems="center" mt={5}>
+          {console.log(users)}
+
+          <>
+            {/* <Box>{users?.data[0]?.api_key ?? []}</Box> */}
+            <Grid spacing={0}>
+              <TextField
+                sx={{ width: "200%" }}
+                id=""
+                label=""
+                placeholder="If not have API KEY click Generate KEY button"
+                value={apikey}
+                onChange={""}
+              />
+            </Grid>
+          </>
+
+          <Button variant="contained" onClick={apiGen}>
+            Generate KEY
+          </Button>
         </Grid>
         <Box height={"5vh"} />
 
@@ -59,4 +120,5 @@ function API() {
     </>
   );
 }
+
 export default API;
