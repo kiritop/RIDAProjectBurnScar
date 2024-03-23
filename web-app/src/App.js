@@ -12,15 +12,16 @@ import Layout from "./components/layout";
 function App() {
   return (
     <div className="background">
-    <Layout>
-      <Routes>
-        <Route path="/" element={<Map />} />
-        <Route path="/learning_material" element={<Course />} />
-        <Route path="/api" element={<API />} />
-        <Route path="/about_us" element={<AboutUS />} />
-        <Route path="/login" element={<LoginPage />} />
-      </Routes>
-    </Layout></div>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Map />} />
+          <Route path="/learning_material" element={<Course />} />
+          <Route path="/api" element={<API />} />
+          <Route path="/about_us" element={<AboutUS />} />
+          <Route path="/login" element={<LoginPage />} />
+        </Routes>
+      </Layout>
+    </div>
   );
 }
 
