@@ -261,38 +261,6 @@ server.get('/process-shapefiles-demo', async (req, res) => {
                 res.status(500).send('An error occurred while processing the shapefiles.');
             });
     });
-    Promise.all(promises)
-      .then((dataArrays) => {
-        let data = [].concat(...dataArrays);
-        let finalData = [];
-        data.forEach((item) => {
-          let found = finalData.find((d) => d.coordinates === item.coordinates);
-          if (!found) {
-            finalData.push(item);
-          } else {
-            found.properties.count++;
-            if (!found.properties.year.includes(item.properties.year[0])) {
-              found.properties.year.push(item.properties.year[0]);
-            }
-          }
-        });
-
-        // Calculate the percentage of duplicates for each row
-        finalData.forEach((row) => {
-          // Use the formula (count / totalShpFile) * 100 and round to two decimals
-          let percentage = ((row.properties.count / totalShpFile) * 100).toFixed(2);
-          // Add the percentage to the properties as frequency
-          row.properties.frequency = percentage;
-          row.properties.total_shapefile = totalShpFile;
-        });
-        console.log("totalShpFile", totalShpFile);
-
-        res.json(finalData); // Send the data as JSON
-      })
-      .catch((err) => {
-        console.log(err);
-        res.status(500).send("An error occurred while processing the shapefiles.");
-      });
 });
 
 server.get("/get-users", (req, res) => {
