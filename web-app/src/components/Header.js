@@ -54,6 +54,7 @@ export default function Header() {
 
   const loginApi = async (name, email) => {
     const payload = {
+      google_id: email,
       name: name,
       email: email,
     };

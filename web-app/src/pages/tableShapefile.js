@@ -4,6 +4,7 @@ import { Button, styled } from "@mui/material";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchGetFile } from "../reducers/getfilepath";
 import axios from "axios";
+import './table.css';
 
 const StyledTable = styled(MUIDataTable)({
   borderRadius: "15px",
@@ -38,17 +39,43 @@ const DataTable = () => {
     dispatch(fetchGetFile());
   }, [dispatch]);
 
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  }
+
   const data = dataTable.map((obj) => [
     obj.file_name ?? "",
-    obj.acqire_date ?? "",
-    obj.process_date ?? "",
+    formatDate(obj.acqire_date) ?? "",
+    formatDate(obj.process_date) ?? "",
     obj.file_path ?? "",
   ]);
 
   const columns = [
-    "Name",
-    "Date Acquired",
-    "Process Date",
+    {
+      name: "Name",
+      options: {
+        // setCellProps: () => ({
+        //   align: "center",
+        // }),
+      },
+    },
+    {
+      name: "Date Acquired",
+      options: {
+        // setCellProps: () => ({
+        //   align: "center",
+        // }),
+      },
+    },
+    {
+      name: "Process Date",
+      options: {
+        // setCellProps: () => ({
+        //   align: "center",
+        // }),
+      },
+    },
     {
       name: "Download",
       options: {
@@ -77,6 +104,14 @@ const DataTable = () => {
     print: false,
     viewColumns: false,
     search: false,
+    selectableRows: 'none', 
+    setTableProps: () => {
+      return {
+        style: {
+          textAlign: 'center',
+        },
+      };
+    },
   };
 
   return <StyledTable title={<h1>SHAPEFILE LIST</h1>} data={data} columns={columns} options={options} />;

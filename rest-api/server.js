@@ -13,9 +13,9 @@ const crypto = require("crypto");
 // Create connection to MySQL
 const db = mysql.createConnection({
   host: "localhost",
-  user: "rida",
-  password: "password",
-  database: "rida",
+  user: "root",
+  password: "root1234",
+  database: "ridadb",
 });
 
 // Connect to MySQL
