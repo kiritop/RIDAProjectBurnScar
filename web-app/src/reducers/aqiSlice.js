@@ -2,15 +2,14 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import data from './json/asean.json';
-
-const APIkey = "_YOUR_API_KEY_";
+import CONFIG from '../config';
 
 export const fetchAqiData = createAsyncThunk('aqi/fetchAqiData', async () => {
     // โหลดข้อมูลจาก geo.json
     // const geoResponse = await axios.get('./json/geo.json');
     // สร้าง array ของ promises สำหรับดึงข้อมูล AQI สำหรับแต่ละพิกัด
     const promises = data.map(async (location) => {
-        const url = `https://api.waqi.info/feed/geo:${location.lat};${location.lng}/?token=${APIkey}`;
+        const url = `https://api.waqi.info/feed/geo:${location.lat};${location.lng}/?token=${CONFIG.AQI_API_KEY}`;
         try {
             const response = await axios.get(url);
             return { ...location, aqi: response.data.data.iaqi };

@@ -30,14 +30,7 @@ server.use(morgan("dev")); // ให้ server(express) ใช้งานกา
 server.use(cors()); // ให้ server(express) ใช้งานการ cors module
 
 server.get("/read-shapefile", async (req, res) => {
-  // Assuming the zipfile is in the same directory as your script
-  // const zip = new AdmZip('./data/USA Fire Predicted GIS file-20240228T171559Z-001.zip');
 
-  // Extract all files to /output directory
-  // zip.extractAllTo('./output', /*overwrite*/true);
-
-  // Assuming the shapefile is named 'shapefile.shp'
-  // const shapefilePath = './output/USA Fire Predicted GIS file/USA_Fire_Predicted.shp';
   const shapefilePath = "./output/N_Vi1_20240321/N_Vi1_20240321.shp";
 
   let features = [];
@@ -52,47 +45,37 @@ server.get("/read-shapefile", async (req, res) => {
   res.json(features);
 });
 
-server.get("/read-shapefile-half", async (req, res) => {
-  const shapefilePath = "./output/2023/2023.shp";
+// server.get("/read-shapefile-half", async (req, res) => {
+//   const shapefilePath = "./output/2023/2023.shp";
 
-  // First, count the total number of features
-  let totalFeatures = 0;
-  await shapefile.open(shapefilePath).then((source) =>
-    source.read().then(function count(result) {
-      if (result.done) return;
-      totalFeatures++;
-      return source.read().then(count);
-    })
-  );
+//   // First, count the total number of features
+//   let totalFeatures = 0;
+//   await shapefile.open(shapefilePath).then((source) =>
+//     source.read().then(function count(result) {
+//       if (result.done) return;
+//       totalFeatures++;
+//       return source.read().then(count);
+//     })
+//   );
 
-  // Then, read only 10% of the features
-  let features = [];
-  let featureCount = 0;
-  await shapefile.open(shapefilePath).then((source) =>
-    source.read().then(function log(result) {
-      if (result.done || featureCount >= totalFeatures / 20) return;
-      features.push(result.value);
-      featureCount++;
-      return source.read().then(log);
-    })
-  );
+//   // Then, read only 10% of the features
+//   let features = [];
+//   let featureCount = 0;
+//   await shapefile.open(shapefilePath).then((source) =>
+//     source.read().then(function log(result) {
+//       if (result.done || featureCount >= totalFeatures / 20) return;
+//       features.push(result.value);
+//       featureCount++;
+//       return source.read().then(log);
+//     })
+//   );
 
-  res.json(features);
-});
+//   res.json(features);
+// });
 
-server.get("/process-shapefiles", async (req, res) => {
+server.get("api/process-shapefiles", async (req, res) => {
   let data = [];
   const directoryPath = path.join(__dirname, "./output/demo");
-  // Get the parameters from the request
-  // let startYear = req.query.startYear;
-  // let endYear = req.query.endYear;
-  // let country = req.query.country;
-  // let province = req.query.province;
-
-  // // Validate the parameters
-  // if (!startYear || !endYear || !country || !province) {
-  //     return res.status(400).send('Missing required parameters.');
-  // }
 
   fs.readdir(directoryPath, function (err, files) {
     if (err) {
@@ -170,7 +153,7 @@ server.get("/process-shapefiles", async (req, res) => {
   });
 });
 
-server.get("/process-shapefiles-demo", async (req, res) => {
+server.get("api/process-shapefiles-demo", async (req, res) => {
   const { yearfrom, yearto, country, state } = req.query; // Extract the parameters from the request query
 
   // You can now use these parameters in your function
@@ -268,7 +251,7 @@ server.get("/process-shapefiles-demo", async (req, res) => {
   });
 });
 
-server.get("/get-burnt-scar-geojson", async (req, res) => {
+server.get("api/get-burnt-scar-geojson", async (req, res) => {
   const { yearfrom, yearto, country, state, api_key } = req.query;
   let sql = "SELECT * FROM users WHERE api_key = ?";
   db.query(sql, [api_key], (err, results) => {
@@ -337,7 +320,6 @@ server.get("/get-burnt-scar-geojson", async (req, res) => {
             });
           Promise.all(promises)
             .then((dataArrays) => {
-              // console.log("dataArrays", dataArrays)
               let data = [].concat(...dataArrays);
               let finalData = [];
               data.forEach((item) => {
@@ -354,9 +336,7 @@ server.get("/get-burnt-scar-geojson", async (req, res) => {
       
               // Calculate the percentage of duplicates for each row
               finalData.forEach((row) => {
-                // Use the formula (count / filteredShpFile) * 100 and round to two decimals
                 let percentage = ((row.properties.count / filteredShpFile) * 100).toFixed(2);
-                // Add the percentage to the properties as frequency
                 row.properties.frequency = percentage;
                 row.properties.total_shapefile = filteredShpFile;
               });
@@ -372,7 +352,7 @@ server.get("/get-burnt-scar-geojson", async (req, res) => {
   });
 });
 
-server.get("/get-users", (req, res) => {
+server.get("api/get-users", (req, res) => {
   const { email } = req.query;
   let sql = "SELECT * FROM users WHERE email = ?";
   db.query(sql, [email], (err, results) => {
@@ -381,7 +361,7 @@ server.get("/get-users", (req, res) => {
   });
 });
 
-server.post("/login", (req, res) => {
+server.post("api/login", (req, res) => {
   const { google_id, name, email, picture_url, api_key } = req.body;
 
   let sql = "SELECT * FROM users WHERE email = ?";
@@ -410,7 +390,7 @@ server.post("/login", (req, res) => {
 });
 
 // Generate API Key
-server.post("/api/generate", (req, res) => {
+server.post("api/generate", (req, res) => {
   const { email } = req.body;
   const apiKey = crypto.randomBytes(20).toString("hex");
   let sql = "SELECT api_key FROM users WHERE email = ?";
@@ -437,7 +417,7 @@ server.post("/api/generate", (req, res) => {
   });
 });
 
-server.get("/files", (req, res) => {
+server.get("api/files", (req, res) => {
   const directoryPath = path.join(__dirname, "/output/burnt");
   let id = 1;
   let filesData = [];
@@ -466,7 +446,7 @@ server.get("/files", (req, res) => {
   res.json(filesData);
 });
 
-server.post("/getZipFile", function (req, res) {
+server.post("api/getZipFile", function (req, res) {
   const { filepath } = req.body;
   console.log(filepath);
   const directoryPath = path.join(__dirname, filepath);

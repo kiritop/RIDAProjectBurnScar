@@ -5,7 +5,7 @@ import burntScarReducer from "./burntScarSlice";
 import hotSpotReducer from "./hotSpotSlice";
 import uiReducer from "./uiSlice";
 import usersReducer from "./userSlice";
-import getfilepath from "./getfilepath";
+import tableReducer from "./tableSlice";
 
 
 const rootReducer = combineReducers({
@@ -14,7 +14,7 @@ const rootReducer = combineReducers({
   hotSpot: hotSpotReducer,
   ui: uiReducer,
   users: usersReducer,
-  getFile : getfilepath
+  table: tableReducer
  
   // คุณสามารถเพิ่ม reducers อื่น ๆ ที่นี่
 });

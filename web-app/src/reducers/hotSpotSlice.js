@@ -1,8 +1,7 @@
 // src/reducers/hotSpotSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import Papa from 'papaparse';
-
-const APIkey = "_YOUR_API_KEY_";
+import CONFIG from '../config';
 
 export const fetchHotSpotData = createAsyncThunk('hotSpot/fetchHotSpotData', async () => {
     // รับวันที่ปัจจุบัน
@@ -12,7 +11,7 @@ export const fetchHotSpotData = createAsyncThunk('hotSpot/fetchHotSpotData', asy
     const day = String(currentDate.getDate()).padStart(2, '0');
 
     // Fetch the CSV data from the API URL
-    const response = await fetch(`https://firms.modaps.eosdis.nasa.gov/api/area/csv/${APIkey}/MODIS_NRT/world/1/${year}-${month}-${day}`);
+    const response = await fetch(`https://firms.modaps.eosdis.nasa.gov/api/area/csv/${CONFIG.HOT_SPOT_API_KEY}/MODIS_NRT/world/1/${year}-${month}-${day}`);
     const csvData = await response.text();
     // Parse the CSV data
     let data;

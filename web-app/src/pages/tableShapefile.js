@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import MUIDataTable from "mui-datatables";
 import { Button, styled } from "@mui/material";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchGetFile } from "../reducers/getfilepath";
+import { fetchGetFile } from '../reducers/tableSlice';
 import axios from "axios";
 import './table.css';
+import CONFIG from '../config';
 
 const StyledTable = styled(MUIDataTable)({
   borderRadius: "15px",
@@ -12,7 +13,7 @@ const StyledTable = styled(MUIDataTable)({
 
 const DataTable = () => {
   const dispatch = useDispatch();
-  const getFile = useSelector((state) => state.getFile.data ?? []);
+  const getFile = useSelector((state) => state.table.data);
   // YOUR FILE LOCATION
 
   const dataTable = getFile.map((entry) => entry);
@@ -21,9 +22,8 @@ const DataTable = () => {
     const payload = {
       filepath: filepath,
     };
-
     try {
-      const response = await axios.post("http://localhost:3000/getZipFile", payload, { responseType: "blob" });
+      const response = await axios.post(CONFIG.API_URL+"/getZipFile", payload, { responseType: "blob" });
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
       link.href = url;
@@ -35,7 +35,7 @@ const DataTable = () => {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(fetchGetFile());
   }, [dispatch]);
 

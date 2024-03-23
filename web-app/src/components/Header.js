@@ -10,16 +10,14 @@ import GoogleIcon from "@mui/icons-material/Google";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import MapIcon from "@mui/icons-material/Map";
-import Link from "@mui/material/Link";
 import { Button } from "@mui/material";
 import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
-import { useDispatch, useSelector } from "react-redux";
-
 import axios from "axios";
+import CONFIG from '../config';
 
 const pages = ["Map", "Learning Material", "APIs", "About US"];
-const settings = ["Profile", "Account", "Dashboard", "Logout"];
+// const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 export default function Header() {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -60,7 +58,7 @@ export default function Header() {
     };
 
     try {
-      const response = await axios.post("http://localhost:3000/login", payload);
+      const response = await axios.post(CONFIG.API_URL+"/login", payload);
       return response.data; // return the response data
     } catch (error) {
       console.error(error); // log the error message
@@ -133,7 +131,7 @@ export default function Header() {
                       const decoded = jwtDecode(credentialResponse?.credential);
                       const name = decoded.given_name;
                       const email = decoded.email;
-                      setUserInfo(name);
+                      setUserInfo(email);
                       loginApi(name, email);
                       window.location.reload();
                     }}

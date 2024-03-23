@@ -1,37 +1,113 @@
-import React from "react";
-import axios from "axios";
+import React, { useEffect } from "react";
 import Container from "@mui/material/Container";
-import { Box, Grid, Button, TextField } from "@mui/material";
+import { Box, Button, TextField } from "@mui/material";
 import SwaggerUI from "swagger-ui-react";
 import "swagger-ui-react/swagger-ui.css";
 import DataTable from "./tableShapefile";
 import Swal from "sweetalert2";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchUsers } from "../reducers/userSlice";
+import { fetchUsers, generateApiKey } from "../reducers/userSlice";
 
 
 const spec = {
   openapi: "3.0.0",
   info: {
-    title: "API DOCUMENT",
+    title: "BURNT SCAR API DOCUMENT",
   },
   paths: {
-    "/get-users": {
+    "/get-burnt-scar-geojson": {
       get: {
         tags: ["API LIST"],
-        summary: "user info",
-        description: "user list.",
-        responses: {
-          200: {
-            description: "Successfully read the user info.",
+        summary: "Get burnt scar GeoJSON data",
+        description: "This API endpoint returns GeoJSON data for burnt scars based on the provided query parameters.",
+        parameters: [
+          {
+            in: "query",
+            name: "yearfrom",
+            schema: {
+              type: "integer"
+            },
+            description: "The starting year for the data."
           },
-        },
-      },
-    },
-  },
+          {
+            in: "query",
+            name: "yearto",
+            schema: {
+              type: "integer"
+            },
+            description: "The ending year for the data."
+          },
+          {
+            in: "query",
+            name: "country",
+            schema: {
+              type: "string"
+            },
+            description: "The country to filter the data."
+          },
+          {
+            in: "query",
+            name: "state",
+            schema: {
+              type: "string"
+            },
+            description: "The state to filter the data."
+          },
+          {
+            in: "query",
+            name: "api_key",
+            schema: {
+              type: "string"
+            },
+            description: "The API key for the user."
+          }
+        ],
+        responses: {
+          '200': {
+            description: "Successful operation",
+            content: {
+              'application/json': {
+                schema: {
+                  type: "object",
+                  properties: {
+                    type: {
+                      type: "string"
+                    },
+                    coordinates: {
+                      type: "string"
+                    },
+                    properties: {
+                      type: "object",
+                      properties: {
+                        count: {
+                          type: "integer"
+                        },
+                        year: {
+                          type: "array",
+                          items: {
+                            type: "string"
+                          }
+                        }
+                      }
+                    },
+                    geometry: {
+                      type: "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          '404': {
+            description: "Invalid API key"
+          }
+        }
+      }
+    }
+  }
 };
 
-function API() {
+const API = () => {
   const email = JSON.parse(localStorage.getItem("myData"));
   const dispatch = useDispatch();
   const users = useSelector((state) => state.users.data ?? []);
@@ -39,7 +115,7 @@ function API() {
   const apikey = users[0]?.api_key ?? [];
   console.log(getfile);
 
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(fetchUsers());   
   }, [dispatch]);
 
@@ -52,7 +128,7 @@ function API() {
       });
       return;
     }
-
+  
     if (apikey.length > 0) {
       Swal.fire({
         icon: "info",
@@ -61,52 +137,48 @@ function API() {
       });
       return;
     }
-
-    const payload = {
-      email: email,
-    };
-
-    try {
-      const response = await axios.post("http://localhost:3000/api/generate", payload);
-      console.log(response.data);
-    } catch (error) {
-      console.error(error);
-    }
-    Swal.fire({
-      icon: "success",
-      title: "Success",
-      text: "Generate API KEY done",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        window.location.reload();
+  
+    dispatch(generateApiKey(email)).then((result) => {
+      if (result.type === generateApiKey.fulfilled.type) {
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "Generate API KEY done",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.reload();
+          }
+        });
+      } else if (result.type === generateApiKey.rejected.type) {
+        console.error(result.payload.error);
       }
     });
   };
-
   return (
     <>
       <Container maxWidth="lg">
-        <Grid container direction="row" justifyContent="space-between" alignItems="center" mt={5}>
-          {console.log(users)}
+      <Box
+        display="flex"
+        flexDirection="row"
+        justifyContent="space-between"
+        alignItems="center"
+        mt={5}
+        sx={{ backgroundColor: "#fff", borderRadius: 5, padding: "1rem", boxShadow: 3 }}
+      >
+        <Box display="flex" justifyContent="center" flexGrow={1}>
+          <TextField
+            sx={{ width: "200%", mr: 1 }} // Add margin-right here
+            id="api_key"
+            label=""
+            placeholder="If not have API KEY click Generate KEY button"
+            value={apikey}
+          />
+        </Box>
 
-          <>
-            {/* <Box>{users?.data[0]?.api_key ?? []}</Box> */}
-            <Grid spacing={0}>
-              <TextField
-                sx={{ width: "200%" }}
-                id=""
-                label=""
-                placeholder="If not have API KEY click Generate KEY button"
-                value={apikey}
-                onChange={""}
-              />
-            </Grid>
-          </>
-
-          <Button variant="contained" onClick={apiGen}>
-            Generate KEY
-          </Button>
-        </Grid>
+        <Button variant="contained" onClick={apiGen}>
+          Generate KEY
+        </Button>
+      </Box>
         <Box height={"5vh"} />
 
         <Box sx={{ backgroundColor: "#fff", borderRadius: 5, padding: "1rem", boxShadow: 3 }}>
