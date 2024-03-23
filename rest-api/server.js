@@ -45,113 +45,116 @@ server.get("/api/read-shapefile", async (req, res) => {
   res.json(features);
 });
 
-// server.get("/read-shapefile-half", async (req, res) => {
-//   const shapefilePath = "./output/2023/2023.shp";
 
-//   // First, count the total number of features
-//   let totalFeatures = 0;
-//   await shapefile.open(shapefilePath).then((source) =>
-//     source.read().then(function count(result) {
-//       if (result.done) return;
-//       totalFeatures++;
-//       return source.read().then(count);
-//     })
-//   );
 
-//   // Then, read only 10% of the features
-//   let features = [];
-//   let featureCount = 0;
-//   await shapefile.open(shapefilePath).then((source) =>
-//     source.read().then(function log(result) {
-//       if (result.done || featureCount >= totalFeatures / 20) return;
-//       features.push(result.value);
-//       featureCount++;
-//       return source.read().then(log);
-//     })
-//   );
+//read data from burnt folder
+// server.get("/api/process-shapefiles-demo", async (req, res) => {
+//     const { yearfrom, yearto, country, state } = req.query; // Extract the parameters from the request query
+  
+//     // You can now use these parameters in your function
+//     // For example, you might want to use them to filter the data you're processing
+  
+//       const directoryPath = path.join(__dirname, "./output/burnt");
+//       let filteredShpFile = 0; // keep total of filtered shapefile
+//       fs.readdir(directoryPath, function (err, years) {
+//       if (err) {
+//           return console.log("Unable to scan directory: " + err);
+//       }
+//       let promises = years
+//           .filter((year) => {
+//           const yearInt = parseInt(year);
+//           return yearInt >= yearfrom && yearInt <= yearto;
+//           })
+//           .map(function (year) {
+//           const yearPath = path.join(directoryPath, year);
+//           return fs.promises.readdir(yearPath).then((locations) => {
+//               return locations.map(function (location) {
+//               const locationPath = path.join(yearPath, location);
+//               return fs.promises.readdir(locationPath).then((files) => {
+//                   return files
+//                   .reduce((promiseChain, file) => {
+//                       if (path.extname(file) === ".shp") {
+//                       return promiseChain.then(() =>
+//                           shapefile.read(path.join(locationPath, file)).then((geojson) => {
+//                           let filteredFeatures = geojson.features
+//                               .filter((feature) => {
+//                               //filter location by country and state
+//                               const location = feature.properties.location;
+//                               let countryCondition = true;
+//                               let stateCondition = true;
+//                               if (country) {
+//                                   countryCondition = location.includes(country);
+//                               }
+//                               if (state) {
+//                                   stateCondition = location.includes(state);
+//                               }
+//                               return countryCondition && stateCondition;
+//                               })
+//                               .map((feature) => {
+//                               const latlong = feature.geometry.coordinates.join(",");
+//                               console.log("latlong", latlong)
+//                               return {
+//                                   type: feature.type,
+//                                   coordinates: latlong,
+//                                   properties: { ...feature.properties, count: 1, year: [year] },
+//                                   geometry: feature.geometry,
+//                               };
+//                               });
+//                           return filteredFeatures;
+//                           })
+//                       );
+//                       } else {
+//                       return promiseChain;
+//                       }
+//                   }, Promise.resolve([]))
+//                   .then((filteredFeaturesPerFile) => {
+//                       if (filteredFeaturesPerFile.length > 0) {
+//                           console.log("filteredFeaturesPerFile.length", filteredFeaturesPerFile.length)
+//                           filteredShpFile++; // increment the count of filtered shapefiles
+//                       }
+//                       return filteredFeaturesPerFile;
+//                   });
+//               });
+//               });
+//           });
+//       });
+  
+  
+//       Promise.all(promises)
+//         .then((dataArrays) => {
+//           let data = [].concat(...dataArrays);
+//           let finalData = [];
+//           data = data.filter(item => item !== undefined);
+//           data.forEach((item) => {
+//             let found = finalData.find((d) => d.coordinates === item.coordinates);
+//             if (!found) {
+//               finalData.push(item);
+//             } else {
+//               found.properties.count++;
+//               if (!found.properties.year.includes(item.properties.year[0])) {
+//                 found.properties.year.push(item.properties.year[0]);
+//               }
+//             }
+//           });
+  
+//           // Calculate the percentage of duplicates for each row
+//           finalData.forEach((row) => {
+//             // Use the formula (count / filteredShpFile) * 100 and round to two decimals
+//             let percentage = ((row.properties.count / filteredShpFile) * 100).toFixed(2);
+//             // Add the percentage to the properties as frequency
+//             row.properties.frequency = percentage;
+//             row.properties.total_shapefile = filteredShpFile;
+//           });
+  
+//           res.json(finalData);
+//         })
+//         .catch((err) => {
+//           console.log(err);
+//           res.status(500).send("An error occurred while processing the shapefiles.");
+//         });
+//     });
+//   });
 
-//   res.json(features);
-// });
-
-server.get("/api/process-shapefiles", async (req, res) => {
-  let data = [];
-  const directoryPath = path.join(__dirname, "./output/demo");
-
-  fs.readdir(directoryPath, function (err, files) {
-    if (err) {
-      return console.log("Unable to scan directory: " + err);
-    }
-    let promises = [];
-    files.forEach(function (file) {
-      if (path.extname(file) === ".zip") {
-        let promise = new Promise((resolve, reject) => {
-          fs.createReadStream(directoryPath + "/" + file)
-            .pipe(unzipper.Parse())
-            .on("entry", function (entry) {
-              const fileName = entry.path;
-              const type = entry.type; // 'Directory' or 'File'
-              if (type === "File" && fileName.includes("layers") && fileName.endsWith(".shp")) {
-                shapefile
-                  .read(entry)
-                  .then((geojson) => {
-                    geojson.features.forEach((feature) => {
-                      const latlong = feature.geometry.coordinates.join(",");
-                      const year = file.split("_")[1];
-                      data.push({
-                        type: feature.type,
-                        coordinates: latlong,
-                        properties: { ...feature.properties, count: 1, year: [year] },
-                        geometry: feature.geometry,
-                      });
-                    });
-                    resolve();
-                    console.log("1");
-                  })
-                  .catch((err) => {
-                    console.error(err);
-                    reject(err);
-                  });
-              } else {
-                entry.autodrain();
-              }
-            });
-        });
-        promises.push(promise);
-      }
-    });
-    Promise.all(promises)
-      .then(() => {
-        let finalData = [];
-        data.forEach((item) => {
-          let found = finalData.find((d) => d.coordinates === item.coordinates);
-          if (!found) {
-            finalData.push(item);
-          } else {
-            found.properties.count++;
-            if (!found.properties.year.includes(item.properties.year[0])) {
-              found.properties.year.push(item.properties.year[0]);
-            }
-          }
-        });
-
-        // Calculate the percentage of duplicates for each row
-        finalData.forEach((row) => {
-          // Use the formula (count / files.length) * 100 and round to two decimals
-          let percentage = ((row.properties.count / files.length) * 100).toFixed(2);
-          // Add the percentage to the properties as frequency
-          row.properties.frequency = percentage;
-          row.properties.total_shapefile = files.length;
-        });
-        console.log("files.length", files.length);
-
-        res.json(finalData); // Send the data as JSON
-      })
-      .catch((err) => {
-        console.log(err);
-        res.status(500).send("An error occurred while processing the shapefiles.");
-      });
-  });
-});
 
 server.get("/api/process-shapefiles-demo", async (req, res) => {
   const { yearfrom, yearto, country, state } = req.query; // Extract the parameters from the request query
@@ -165,60 +168,55 @@ server.get("/api/process-shapefiles-demo", async (req, res) => {
     if (err) {
       return console.log("Unable to scan directory: " + err);
     }
-    let promises = folders
-      .filter((folder) => {
+    let promises = folders.filter((folder) => {
         const year = parseInt(folder);
         return year >= yearfrom && year <= yearto;
-      })
-      .map(function (folder) {
+    }).map(function (folder) {
         const folderPath = path.join(directoryPath, folder);
         return fs.promises.readdir(folderPath).then((files) => {
-          return files
+        return files
             .reduce((promiseChain, file) => {
-              if (path.extname(file) === ".shp") {
-                return promiseChain.then(() =>
-                  shapefile.read(path.join(folderPath, file)).then((geojson) => {
+            if (path.extname(file) === ".shp") {
+                return promiseChain.then((accumulatedFeatures) =>
+                shapefile.read(path.join(folderPath, file)).then((geojson) => {
                     let filteredFeatures = geojson.features
-                      .filter((feature) => {
+                    .filter((feature) => {
                         //filter location by country and state
-                        const location = feature.properties.properties;
+                        const location = feature.properties.location;
                         let countryCondition = true;
                         let stateCondition = true;
                         if (country) {
-                          countryCondition = location.includes(country);
+                        countryCondition = location.includes(country);
                         }
                         if (state) {
-                          stateCondition = location.includes(state);
+                        stateCondition = location.includes(state);
                         }
                         return countryCondition && stateCondition;
-                      })
-                      .map((feature) => {
+                    })
+                    .map((feature) => {
                         const latlong = feature.geometry.coordinates.join(",");
                         return {
-                          type: feature.type,
-                          coordinates: latlong,
-                          properties: { ...feature.properties, count: 1, year: [folder] },
-                          geometry: feature.geometry,
+                        type: feature.type,
+                        coordinates: latlong,
+                        properties: { ...feature.properties, count: 1, year: [folder] },
+                        geometry: feature.geometry,
                         };
-                      });
-                    return filteredFeatures;
-                  })
+                    });
+                    console.log("filteredFeatures", filteredFeatures.length)
+                    if(filteredFeatures.length > 0){
+                        filteredShpFile++;
+                    }
+                    return accumulatedFeatures.concat(filteredFeatures);
+                })
                 );
-              } else {
+            } else {
                 return promiseChain;
-              }
+            }
             }, Promise.resolve([]))
-            .then((filteredFeaturesPerFile) => {
-              if (filteredFeaturesPerFile.length > 0) {
-                filteredShpFile++; // increment the count of filtered shapefiles
-              }
-              return filteredFeaturesPerFile;
-            });
         });
-      });
+    });
     Promise.all(promises)
       .then((dataArrays) => {
-        // console.log("dataArrays", dataArrays)
         let data = [].concat(...dataArrays);
         let finalData = [];
         data.forEach((item) => {
@@ -241,7 +239,7 @@ server.get("/api/process-shapefiles-demo", async (req, res) => {
           row.properties.frequency = percentage;
           row.properties.total_shapefile = filteredShpFile;
         });
-
+        console.log("filteredShpFile", filteredShpFile)
         res.json(finalData);
       })
       .catch((err) => {
@@ -267,85 +265,81 @@ server.get("/api/get-burnt-scar-geojson", async (req, res) => {
           if (err) {
             return console.log("Unable to scan directory: " + err);
           }
-          let promises = folders
-            .filter((folder) => {
-              const year = parseInt(folder);
-              return year >= yearfrom && year <= yearto;
-            })
-            .map(function (folder) {
-              const folderPath = path.join(directoryPath, folder);
-              return fs.promises.readdir(folderPath).then((files) => {
-                return files
-                  .reduce((promiseChain, file) => {
-                    if (path.extname(file) === ".shp") {
-                      return promiseChain.then(() =>
-                        shapefile.read(path.join(folderPath, file)).then((geojson) => {
-                          let filteredFeatures = geojson.features
-                            .filter((feature) => {
-                              //filter location by country and state
-                              const location = feature.properties.properties;
-                              let countryCondition = true;
-                              let stateCondition = true;
-                              if (country) {
-                                countryCondition = location.includes(country);
-                              }
-                              if (state) {
-                                stateCondition = location.includes(state);
-                              }
-                              return countryCondition && stateCondition;
-                            })
-                            .map((feature) => {
-                              const latlong = feature.geometry.coordinates.join(",");
-                              return {
-                                type: feature.type,
-                                coordinates: latlong,
-                                properties: { ...feature.properties, count: 1, year: [folder] },
-                                geometry: feature.geometry,
-                              };
-                            });
-                          return filteredFeatures;
+        let promises = folders.filter((folder) => {
+            const year = parseInt(folder);
+            return year >= yearfrom && year <= yearto;
+        }).map(function (folder) {
+            const folderPath = path.join(directoryPath, folder);
+            return fs.promises.readdir(folderPath).then((files) => {
+            return files
+                .reduce((promiseChain, file) => {
+                if (path.extname(file) === ".shp") {
+                    return promiseChain.then((accumulatedFeatures) =>
+                    shapefile.read(path.join(folderPath, file)).then((geojson) => {
+                        let filteredFeatures = geojson.features
+                        .filter((feature) => {
+                            //filter location by country and state
+                            const location = feature.properties.location;
+                            let countryCondition = true;
+                            let stateCondition = true;
+                            if (country) {
+                            countryCondition = location.includes(country);
+                            }
+                            if (state) {
+                            stateCondition = location.includes(state);
+                            }
+                            return countryCondition && stateCondition;
                         })
-                      );
-                    } else {
-                      return promiseChain;
-                    }
-                  }, Promise.resolve([]))
-                  .then((filteredFeaturesPerFile) => {
-                    if (filteredFeaturesPerFile.length > 0) {
-                      filteredShpFile++; // increment the count of filtered shapefiles
-                    }
-                    return filteredFeaturesPerFile;
-                  });
-              });
+                        .map((feature) => {
+                            const latlong = feature.geometry.coordinates.join(",");
+                            return {
+                            type: feature.type,
+                            coordinates: latlong,
+                            properties: { ...feature.properties, count: 1, year: [folder] },
+                            geometry: feature.geometry,
+                            };
+                        });
+                        console.log("filteredFeatures", filteredFeatures.length)
+                        if(filteredFeatures.length > 0){
+                            filteredShpFile++;
+                        }
+                        return accumulatedFeatures.concat(filteredFeatures);
+                    })
+                    );
+                } else {
+                    return promiseChain;
+                }
+                }, Promise.resolve([]))
             });
-          Promise.all(promises)
+        });
+        Promise.all(promises)
             .then((dataArrays) => {
-              let data = [].concat(...dataArrays);
-              let finalData = [];
-              data.forEach((item) => {
+                let data = [].concat(...dataArrays);
+                let finalData = [];
+                data.forEach((item) => {
                 let found = finalData.find((d) => d.coordinates === item.coordinates);
                 if (!found) {
-                  finalData.push(item);
+                    finalData.push(item);
                 } else {
-                  found.properties.count++;
-                  if (!found.properties.year.includes(item.properties.year[0])) {
+                    found.properties.count++;
+                    if (!found.properties.year.includes(item.properties.year[0])) {
                     found.properties.year.push(item.properties.year[0]);
-                  }
+                    }
                 }
-              });
-      
-              // Calculate the percentage of duplicates for each row
-              finalData.forEach((row) => {
+                });
+        
+                // Calculate the percentage of duplicates for each row
+                finalData.forEach((row) => {
                 let percentage = ((row.properties.count / filteredShpFile) * 100).toFixed(2);
                 row.properties.frequency = percentage;
                 row.properties.total_shapefile = filteredShpFile;
-              });
-      
-              res.json(finalData);
+                });
+        
+                res.json(finalData);
             })
             .catch((err) => {
-              console.log(err);
-              res.status(500).send("An error occurred while processing the shapefiles.");
+                console.log(err);
+                res.status(500).send("An error occurred while processing the shapefiles.");
             });
         });
     }
