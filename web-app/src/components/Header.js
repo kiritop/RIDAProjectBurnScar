@@ -61,7 +61,10 @@ export default function Header() {
 
     try {
       const response = await axios.post("http://localhost:3000/login", payload);
-    } catch (error) {}
+      return response.data; // return the response data
+    } catch (error) {
+      console.error(error); // log the error message
+    }
   };
   return (
     <AppBar position="static" sx={{ backgroundColor: "#0077b6", color: "#fff" }}>
