@@ -29,7 +29,7 @@ server.use(bodyParser.json()); // ให้ server(express) ใช้งาน�
 server.use(morgan("dev")); // ให้ server(express) ใช้งานการ morgam module
 server.use(cors()); // ให้ server(express) ใช้งานการ cors module
 
-server.get("/read-shapefile", async (req, res) => {
+server.get("/api/read-shapefile", async (req, res) => {
 
   const shapefilePath = "./output/N_Vi1_20240321/N_Vi1_20240321.shp";
 
@@ -73,7 +73,7 @@ server.get("/read-shapefile", async (req, res) => {
 //   res.json(features);
 // });
 
-server.get("api/process-shapefiles", async (req, res) => {
+server.get("/api/process-shapefiles", async (req, res) => {
   let data = [];
   const directoryPath = path.join(__dirname, "./output/demo");
 
@@ -153,7 +153,7 @@ server.get("api/process-shapefiles", async (req, res) => {
   });
 });
 
-server.get("api/process-shapefiles-demo", async (req, res) => {
+server.get("/api/process-shapefiles-demo", async (req, res) => {
   const { yearfrom, yearto, country, state } = req.query; // Extract the parameters from the request query
 
   // You can now use these parameters in your function
@@ -251,7 +251,7 @@ server.get("api/process-shapefiles-demo", async (req, res) => {
   });
 });
 
-server.get("api/get-burnt-scar-geojson", async (req, res) => {
+server.get("/api/get-burnt-scar-geojson", async (req, res) => {
   const { yearfrom, yearto, country, state, api_key } = req.query;
   let sql = "SELECT * FROM users WHERE api_key = ?";
   db.query(sql, [api_key], (err, results) => {
@@ -352,7 +352,7 @@ server.get("api/get-burnt-scar-geojson", async (req, res) => {
   });
 });
 
-server.get("api/get-users", (req, res) => {
+server.get("/api/get-users", (req, res) => {
   const { email } = req.query;
   let sql = "SELECT * FROM users WHERE email = ?";
   db.query(sql, [email], (err, results) => {
@@ -361,7 +361,7 @@ server.get("api/get-users", (req, res) => {
   });
 });
 
-server.post("api/login", (req, res) => {
+server.post("/api/login", (req, res) => {
   const { google_id, name, email, picture_url, api_key } = req.body;
 
   let sql = "SELECT * FROM users WHERE email = ?";
@@ -390,7 +390,7 @@ server.post("api/login", (req, res) => {
 });
 
 // Generate API Key
-server.post("api/generate", (req, res) => {
+server.post("/api/generate", (req, res) => {
   const { email } = req.body;
   const apiKey = crypto.randomBytes(20).toString("hex");
   let sql = "SELECT api_key FROM users WHERE email = ?";
@@ -417,7 +417,7 @@ server.post("api/generate", (req, res) => {
   });
 });
 
-server.get("api/files", (req, res) => {
+server.get("/api/files", (req, res) => {
   const directoryPath = path.join(__dirname, "/output/burnt");
   let id = 1;
   let filesData = [];
@@ -446,7 +446,7 @@ server.get("api/files", (req, res) => {
   res.json(filesData);
 });
 
-server.post("api/getZipFile", function (req, res) {
+server.post("/api/getZipFile", function (req, res) {
   const { filepath } = req.body;
   console.log(filepath);
   const directoryPath = path.join(__dirname, filepath);
