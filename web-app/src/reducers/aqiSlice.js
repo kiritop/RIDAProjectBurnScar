@@ -1,7 +1,7 @@
 // src/reducers/aqiSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-import data from './json/data.json';
+import data from './json/asean.json';
 
 const APIkey = "_YOUR_API_KEY_";
 

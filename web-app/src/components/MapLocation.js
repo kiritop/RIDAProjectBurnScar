@@ -73,7 +73,7 @@ const MapLocation = () => {
           <Popup>
             <div className="mx-auto w-full">
               <h2 className="font-semibold capitalize text-lg">
-                {item.city} 
+                {item?.city} 
               </h2>
               <h3 className="font-semibold">
                 {"AQI: " + (item?.aqi && item?.aqi?.pm25 ? item.aqi.pm25.v : 'N/A')}
