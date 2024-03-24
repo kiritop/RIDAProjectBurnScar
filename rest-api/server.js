@@ -31,7 +31,7 @@ server.use(cors()); // ให้ server(express) ใช้งานการ cor
 
 server.get("/api/read-shapefile", async (req, res) => {
 
-  const shapefilePath = "./output/N_Vi1_20240321/N_Vi1_20240321.shp";
+  const shapefilePath = "./output/fire_predict_20240311_20240317/fire_predict_20240311_20240317.shp";
 
   let features = [];
   await shapefile.open(shapefilePath).then((source) =>
@@ -203,9 +203,9 @@ server.get("/api/process-shapefiles-demo", async (req, res) => {
                         };
                     });
                     console.log("filteredFeatures", filteredFeatures.length)
-                    if(filteredFeatures.length > 0){
-                        filteredShpFile++;
-                    }
+                    // if(filteredFeatures.length > 0){
+                    //     filteredShpFile++;
+                    // }
                     return accumulatedFeatures.concat(filteredFeatures);
                 })
                 );
@@ -213,6 +213,12 @@ server.get("/api/process-shapefiles-demo", async (req, res) => {
                 return promiseChain;
             }
             }, Promise.resolve([]))
+            .then((filteredFeaturesPerFile) => {
+                if (filteredFeaturesPerFile.length > 0) {
+                    filteredShpFile++; // increment the count of filtered shapefiles
+                }
+                return filteredFeaturesPerFile;
+            });
         });
     });
     Promise.all(promises)

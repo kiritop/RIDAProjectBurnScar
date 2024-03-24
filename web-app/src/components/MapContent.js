@@ -20,6 +20,7 @@ const MapContent = () => {
         center={[19.9094, 99.8275]}
         // center={[44, -89.5]}
         zoom={8}
+        preferCanvas={true}
         // maxZoom={18}
         // minZoom={5}
       > 

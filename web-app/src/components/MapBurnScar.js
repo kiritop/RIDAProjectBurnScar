@@ -65,7 +65,7 @@ const percentToColor = (percent) => {
   const onEachFeature = (feature, layer) => {
     // create a popup with the feature's properties
     let popupContent = ` <div style="font-family: Arial, sans-serif; padding: 10px; border-radius: 5px;">
-      <h4 style="text-align: center">Chiang Rai, Thailand</h4>
+      <h4 style="text-align: center">${feature?.properties?.location}</h4>
       <table>
         <tr><td><strong>Latitude:</strong></td><td style="text-align:right">${feature.geometry.coordinates[1]}</td></tr>
         <tr><td><strong>Longitude:</strong></td><td style="text-align:right">${feature.geometry.coordinates[0]}</td></tr>
