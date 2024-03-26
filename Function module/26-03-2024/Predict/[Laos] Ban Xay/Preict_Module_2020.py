@@ -35,9 +35,6 @@ def preprocess(data_path, drop_columns):
 
     df = pd.read_csv(data_path)
 
-    # Replace NaN with Mean for each columns
-    df = df.fillna(df.mean())
-
     # Drop Label Column from Dataset
     label = df[['Label']] # Ground Truth
     lat = df[['Latitude_WGS84']] # Latitude
@@ -45,7 +42,13 @@ def preprocess(data_path, drop_columns):
     df = df.drop(columns=['Latitude_WGS84', 'Longitude_WGS84', 'Label'])
 
     # Normalize data
-    df_nor = MinMaxScaler().fit_transform(df)  # MinMax Scaler
+    # Specify the path where your model is saved
+    load_path = 'D:\Work\Code งาน\Lab-docker\RIDA\Export Model\26-03-2024'
+
+    # Load the scaler using pickle
+    with open(load_path, 'rb') as f:
+        loaded_scaler = pickle.load(f)
+    df_nor = loaded_scaler.transform(df) # MinMax Scaler
     df_nor = pd.DataFrame(df_nor, columns=df.columns)  # Convert Normalize data as Dataframe
 
     # Rename Features
