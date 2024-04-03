@@ -1,0 +1,129 @@
+[
+    {
+      "city": "Ayeyarwady",
+      "lat": "16.8000",
+      "lng": "95.7500",
+      "country": "Myanmar",
+      "iso2": "MM",
+      "admin_name": "Ayeyarwady",
+      "capital": "admin"
+    },
+    {
+      "city": "Bago",
+      "lat": "17.3333",
+      "lng": "96.5000",
+      "country": "Myanmar",
+      "iso2": "MM",
+      "admin_name": "Bago",
+      "capital": "admin"
+    },
+    {
+      "city": "Chin",
+      "lat": "22.0000",
+      "lng": "93.7500",
+      "country": "Myanmar",
+      "iso2": "MM",
+      "admin_name": "Chin",
+      "capital": "admin"
+    },
+    {
+      "city": "Kachin",
+      "lat": "25.6000",
+      "lng": "97.2500",
+      "country": "Myanmar",
+      "iso2": "MM",
+      "admin_name": "Kachin",
+      "capital": "admin"
+    },
+    {
+      "city": "Kayah",
+      "lat": "19.5000",
+      "lng": "97.2500",
+      "country": "Myanmar",
+      "iso2": "MM",
+      "admin_name": "Kayah",
+      "capital": "admin"
+    },
+    {
+      "city": "Kayin",
+      "lat": "17.1667",
+      "lng": "97.9167",
+      "country": "Myanmar",
+      "iso2": "MM",
+      "admin_name": "Kayin",
+      "capital": "admin"
+    },
+    {
+      "city": "Magway",
+      "lat": "20.1500",
+      "lng": "94.9167",
+      "country": "Myanmar",
+      "iso2": "MM",
+      "admin_name": "Magway",
+      "capital": "admin"
+    },
+    {
+      "city": "Mandalay",
+      "lat": "21.9667",
+      "lng": "96.0833",
+      "country": "Myanmar",
+      "iso2": "MM",
+      "admin_name": "Mandalay",
+      "capital": "primary"
+    },
+    {
+      "city": "Mon",
+      "lat": "16.5000",
+      "lng": "97.5000",
+      "country": "Myanmar",
+      "iso2": "MM",
+      "admin_name": "Mon",
+      "capital": "admin"
+    },
+    {
+      "city": "Rakhine",
+      "lat": "19.0000",
+      "lng": "93.7500",
+      "country": "Myanmar",
+      "iso2": "MM",
+      "admin_name": "Rakhine",
+      "capital": "admin"
+    },
+    {
+      "city": "Sagaing",
+      "lat": "22.0000",
+      "lng": "95.0000",
+      "country": "Myanmar",
+      "iso2": "MM",
+      "admin_name": "Sagaing",
+      "capital": "admin"
+    },
+    {
+      "city": "Shan",
+      "lat": "21.5000",
+      "lng": "97.0000",
+      "country": "Myanmar",
+      "iso2": "MM",
+      "admin_name": "Shan",
+      "capital": "admin"
+    },
+    {
+      "city": "Tanintharyi",
+      "lat": "12.0833",
+      "lng": "98.2000",
+      "country": "Myanmar",
+      "iso2": "MM",
+      "admin_name": "Tanintharyi",
+      "capital": "admin"
+    },
+    {
+      "city": "Yangon",
+      "lat": "16.8000",
+      "lng": "96.1500",
+      "country": "Myanmar",
+      "iso2": "MM",
+      "admin_name": "Yangon",
+      "capital": "primary"
+    }
+  ]
+  

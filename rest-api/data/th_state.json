@@ -1,0 +1,695 @@
+[
+  {
+    "city": "Bangkok",
+    "lat": "13.7563",
+    "lng": "100.5018",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Bangkok",
+    "capital": "primary"
+  },
+  {
+    "city": "Nonthaburi",
+    "lat": "13.8667",
+    "lng": "100.5167",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Nonthaburi",
+    "capital": "admin"
+  },
+  {
+    "city": "Samut Prakan",
+    "lat": "13.5993",
+    "lng": "100.5968",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Samut Prakan",
+    "capital": "admin"
+  },
+  {
+    "city": "Pathum Thani",
+    "lat": "14.0229",
+    "lng": "100.5328",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Pathum Thani",
+    "capital": "admin"
+  },
+  {
+    "city": "Phra Nakhon Si Ayutthaya",
+    "lat": "14.3556",
+    "lng": "100.5526",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Phra Nakhon Si Ayutthaya",
+    "capital": "admin"
+  },
+  {
+    "city": "Ang Thong",
+    "lat": "14.5893",
+    "lng": "100.4558",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Ang Thong",
+    "capital": "admin"
+  },
+  {
+    "city": "Lop Buri",
+    "lat": "14.799",
+    "lng": "100.6534",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Lop Buri",
+    "capital": "admin"
+  },
+  {
+    "city": "Sing Buri",
+    "lat": "14.8875",
+    "lng": "100.4014",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Sing Buri",
+    "capital": "admin"
+  },
+  {
+    "city": "Chai Nat",
+    "lat": "15.1905",
+    "lng": "100.1297",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Chai Nat",
+    "capital": "admin"
+  },
+  {
+    "city": "Saraburi",
+    "lat": "14.5289",
+    "lng": "100.9101",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Saraburi",
+    "capital": "admin"
+  },
+  {
+    "city": "Chon Buri",
+    "lat": "13.3611",
+    "lng": "100.9847",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Chon Buri",
+    "capital": "admin"
+  },
+  {
+    "city": "Rayong",
+    "lat": "12.684",
+    "lng": "101.2786",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Rayong",
+    "capital": "admin"
+  },
+  {
+    "city": "Chanthaburi",
+    "lat": "12.6113",
+    "lng": "102.1031",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Chanthaburi",
+    "capital": "admin"
+  },
+  {
+    "city": "Trat",
+    "lat": "12.2451",
+    "lng": "102.5123",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Trat",
+    "capital": "admin"
+  },
+  {
+    "city": "Chachoengsao",
+    "lat": "13.679",
+    "lng": "101.0752",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Chachoengsao",
+    "capital": "admin"
+  },
+  {
+    "city": "Prachin Buri",
+    "lat": "14.055",
+    "lng": "101.3598",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Prachin Buri",
+    "capital": "admin"
+  },
+  {
+    "city": "Nakhon Nayok",
+    "lat": "14.2044",
+    "lng": "101.215",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Nakhon Nayok",
+    "capital": "admin"
+  },
+  {
+    "city": "Sa Kaeo",
+    "lat": "13.8139",
+    "lng": "102.0739",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Sa Kaeo",
+    "capital": "admin"
+  },
+  {
+    "city": "Nakhon Ratchasima",
+    "lat": "14.9707",
+    "lng": "102.1019",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Nakhon Ratchasima",
+    "capital": "admin"
+  },
+  {
+    "city": "Buri Ram",
+    "lat": "15.0594",
+    "lng": "103.033",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Buri Ram",
+    "capital": "admin"
+  },
+  {
+    "city": "Surin",
+    "lat": "14.8828",
+    "lng": "103.4933",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Surin",
+    "capital": "admin"
+  },
+  {
+    "city": "Si Sa Ket",
+    "lat": "15.1203",
+    "lng": "104.329",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Si Sa Ket",
+    "capital": "admin"
+  },
+  {
+    "city": "Ubon Ratchathani",
+    "lat": "15.2384",
+    "lng": "104.8487",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Ubon Ratchathani",
+    "capital": "admin"
+  },
+  {
+    "city": "Yasothon",
+    "lat": "15.7942",
+    "lng": "104.145",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Yasothon",
+    "capital": "admin"
+  },
+  {
+    "city": "Chaiyaphum",
+    "lat": "15.8047",
+    "lng": "102.038",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Chaiyaphum",
+    "capital": "admin"
+  },
+  {
+    "city": "Amnat Charoen",
+    "lat": "15.8586",
+    "lng": "104.625",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Amnat Charoen",
+    "capital": "admin"
+  },
+  {
+    "city": "Bueng Kan",
+    "lat": "18.3635",
+    "lng": "103.6512",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Bueng Kan",
+    "capital": "admin"
+  },
+  {
+    "city": "Nong Bua Lam Phu",
+    "lat": "17.2041",
+    "lng": "102.4403",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Nong Bua Lam Phu",
+    "capital": "admin"
+  },
+  {
+    "city": "Khon Kaen",
+    "lat": "16.4467",
+    "lng": "102.833",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Khon Kaen",
+    "capital": "admin"
+  },
+  {
+    "city": "Udon Thani",
+    "lat": "17.4041",
+    "lng": "102.789",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Udon Thani",
+    "capital": "admin"
+  },
+  {
+    "city": "Loei",
+    "lat": "17.4919",
+    "lng": "101.7313",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Loei",
+    "capital": "admin"
+  },
+  {
+    "city": "Nong Khai",
+    "lat": "17.8784",
+    "lng": "102.742",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Nong Khai",
+    "capital": "admin"
+  },
+  {
+    "city": "Maha Sarakham",
+    "lat": "16.1845",
+    "lng": "103.3002",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Maha Sarakham",
+    "capital": "admin"
+  },
+  {
+    "city": "Roi Et",
+    "lat": "16.0538",
+    "lng": "103.6529",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Roi Et",
+    "capital": "admin"
+  },
+  {
+    "city": "Kalasin",
+    "lat": "16.4314",
+    "lng": "103.5063",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Kalasin",
+    "capital": "admin"
+  },
+  {
+    "city": "Sakon Nakhon",
+    "lat": "17.1572",
+    "lng": "104.1472",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Sakon Nakhon",
+    "capital": "admin"
+  },
+  {
+    "city": "Nakhon Phanom",
+    "lat": "17.4",
+    "lng": "104.777",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Nakhon Phanom",
+    "capital": "admin"
+  },
+  {
+    "city": "Mukdahan",
+    "lat": "16.5458",
+    "lng": "104.7223",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Mukdahan",
+    "capital": "admin"
+  },
+  {
+    "city": "Chiang Mai",
+    "lat": "18.7904",
+    "lng": "98.9847",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Chiang Mai",
+    "capital": "admin"
+  },
+  {
+    "city": "Lamphun",
+    "lat": "18.503",
+    "lng": "99.0747",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Lamphun",
+    "capital": "admin"
+  },
+  {
+    "city": "Lampang",
+    "lat": "18.2923",
+    "lng": "99.4928",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Lampang",
+    "capital": "admin"
+  },
+  {
+    "city": "Uttaradit",
+    "lat": "17.6273",
+    "lng": "100.0993",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Uttaradit",
+    "capital": "admin"
+  },
+  {
+    "city": "Phrae",
+    "lat": "18.149",
+    "lng": "100.141",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Phrae",
+    "capital": "admin"
+  },
+  {
+    "city": "Nan",
+    "lat": "18.7783",
+    "lng": "100.773",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Nan",
+    "capital": "admin"
+  },
+  {
+    "city": "Phayao",
+    "lat": "19.1729",
+    "lng": "99.8879",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Phayao",
+    "capital": "admin"
+  },
+  {
+    "city": "Chiang Rai",
+    "lat": "19.9086",
+    "lng": "99.8328",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Chiang Rai",
+    "capital": "admin"
+  },
+  {
+    "city": "Mae Hong Son",
+    "lat": "19.302",
+    "lng": "97.9658",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Mae Hong Son",
+    "capital": "admin"
+  },
+  {
+    "city": "Nakhon Sawan",
+    "lat": "15.705",
+    "lng": "100.071",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Nakhon Sawan",
+    "capital": "admin"
+  },
+  {
+    "city": "Uthai Thani",
+    "lat": "15.379",
+    "lng": "100.024",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Uthai Thani",
+    "capital": "admin"
+  },
+  {
+    "city": "Kamphaeng Phet",
+    "lat": "16.482",
+    "lng": "99.522",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Kamphaeng Phet",
+    "capital": "admin"
+  },
+  {
+    "city": "Tak",
+    "lat": "16.882",
+    "lng": "99.128",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Tak",
+    "capital": "admin"
+  },
+  {
+    "city": "Sukhothai",
+    "lat": "17.013",
+    "lng": "99.823",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Sukhothai",
+    "capital": "admin"
+  },
+  {
+    "city": "Phitsanulok",
+    "lat": "16.824",
+    "lng": "100.258",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Phitsanulok",
+    "capital": "admin"
+  },
+  {
+    "city": "Phichit",
+    "lat": "16.449",
+    "lng": "100.368",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Phichit",
+    "capital": "admin"
+  },
+  {
+    "city": "Phetchabun",
+    "lat": "16.419",
+    "lng": "101.159",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Phetchabun",
+    "capital": "admin"
+  },
+  {
+    "city": "Ratchaburi",
+    "lat": "13.528",
+    "lng": "99.813",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Ratchaburi",
+    "capital": "admin"
+  },
+  {
+    "city": "Kanchanaburi",
+    "lat": "14.0208",
+    "lng": "99.5328",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Kanchanaburi",
+    "capital": "admin"
+  },
+  {
+    "city": "Suphan Buri",
+    "lat": "14.475",
+    "lng": "100.118",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Suphan Buri",
+    "capital": "admin"
+  },
+  {
+    "city": "Nakhon Pathom",
+    "lat": "13.817",
+    "lng": "100.031",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Nakhon Pathom",
+    "capital": "admin"
+  },
+  {
+    "city": "Samut Sakhon",
+    "lat": "13.547",
+    "lng": "100.273",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Samut Sakhon",
+    "capital": "admin"
+  },
+  {
+    "city": "Samut Songkhram",
+    "lat": "13.412",
+    "lng": "100.001",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Samut Songkhram",
+    "capital": "admin"
+  },
+  {
+    "city": "Phetchaburi",
+    "lat": "13.112",
+    "lng": "99.952",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Phetchaburi",
+    "capital": "admin"
+  },
+  {
+    "city": "Prachuap Khiri Khan",
+    "lat": "11.803",
+    "lng": "99.797",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Prachuap Khiri Khan",
+    "capital": "admin"
+  },
+  {
+    "city": "Chumphon",
+    "lat": "10.513",
+    "lng": "99.187",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Chumphon",
+    "capital": "admin"
+  },
+  {
+    "city": "Ranong",
+    "lat": "9.962",
+    "lng": "98.623",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Ranong",
+    "capital": "admin"
+  },
+  {
+    "city": "Surat Thani",
+    "lat": "9.1501",
+    "lng": "99.3401",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Surat Thani",
+    "capital": "admin"
+  },
+  {
+    "city": "Phangnga",
+    "lat": "8.4508",
+    "lng": "98.5258",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Phangnga",
+    "capital": "admin"
+  },
+  {
+    "city": "Phuket",
+    "lat": "7.8804",
+    "lng": "98.3923",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Phuket",
+    "capital": "admin"
+  },
+  {
+    "city": "Krabi",
+    "lat": "8.052",
+    "lng": "98.912",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Krabi",
+    "capital": "admin"
+  },
+  {
+    "city": "Nakhon Si Thammarat",
+    "lat": "8.399",
+    "lng": "99.97",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Nakhon Si Thammarat",
+    "capital": "admin"
+  },
+  {
+    "city": "Trang",
+    "lat": "7.5634",
+    "lng": "99.608",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Trang",
+    "capital": "admin"
+  },
+  {
+    "city": "Phatthalung",
+    "lat": "7.617",
+    "lng": "100.067",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Phatthalung",
+    "capital": "admin"
+  },
+  {
+    "city": "Satun",
+    "lat": "6.622",
+    "lng": "100.067",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Satun",
+    "capital": "admin"
+  },
+  {
+    "city": "Songkhla",
+    "lat": "7.207",
+    "lng": "100.602",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Songkhla",
+    "capital": "admin"
+  },
+  {
+    "city": "Pattani",
+    "lat": "6.862",
+    "lng": "101.25",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Pattani",
+    "capital": "admin"
+  },
+  {
+    "city": "Yala",
+    "lat": "6.554",
+    "lng": "101.282",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Yala",
+    "capital": "admin"
+  },
+  {
+    "city": "Narathiwat",
+    "lat": "6.43",
+    "lng": "101.826",
+    "country": "Thailand",
+    "iso2": "TH",
+    "admin_name": "Narathiwat",
+    "capital": "admin"
+  }
+]
