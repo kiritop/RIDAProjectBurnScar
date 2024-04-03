@@ -1,0 +1,156 @@
+[
+    {
+      "city": "Attapeu",
+      "lat": "14.93634000",
+      "lng": "107.10119310",
+      "country": "Laos",
+      "iso2": "LA",
+      "admin_name": "Attapeu",
+      "capital": "admin"
+    },
+    {
+      "city": "Bokeo",
+      "lat": "20.28726620",
+      "lng": "100.70978670",
+      "country": "Laos",
+      "iso2": "LA",
+      "admin_name": "Bokeo",
+      "capital": "admin"
+    },
+    {
+      "city": "Bolikhamsai",
+      "lat": "18.43629240",
+      "lng": "104.47233010",
+      "country": "Laos",
+      "iso2": "LA",
+      "admin_name": "Bolikhamsai",
+      "capital": "admin"
+    },
+    {
+      "city": "Champasak",
+      "lat": "14.88386640",
+      "lng": "105.96998780",
+      "country": "Laos",
+      "iso2": "LA",
+      "admin_name": "Champasak",
+      "capital": "admin"
+    },
+    {
+      "city": "Houaphanh",
+      "lat": "20.32541750",
+      "lng": "104.10013260",
+      "country": "Laos",
+      "iso2": "LA",
+      "admin_name": "Houaphanh",
+      "capital": "admin"
+    },
+    {
+      "city": "Khammouane",
+      "lat": "17.63840660",
+      "lng": "105.21948080",
+      "country": "Laos",
+      "iso2": "LA",
+      "admin_name": "Khammouane",
+      "capital": "admin"
+    },
+    {
+      "city": "Luang Namtha",
+      "lat": "20.91701870",
+      "lng": "101.16173560",
+      "country": "Laos",
+      "iso2": "LA",
+      "admin_name": "Luang Namtha",
+      "capital": "admin"
+    },
+    {
+      "city": "Luang Prabang",
+      "lat": "19.88601",
+      "lng": "102.13503",
+      "country": "Laos",
+      "iso2": "LA",
+      "admin_name": "Luang Prabang",
+      "capital": "primary"
+    },
+    {
+      "city": "Oudomxay",
+      "lat": "20.69229",
+      "lng": "101.98368",
+      "country": "Laos",
+      "iso2": "LA",
+      "admin_name": "Oudomxay",
+      "capital": "admin"
+    },
+    {
+      "city": "Phongsaly",
+      "lat": "21.6808",
+      "lng": "102.1003",
+      "country": "Laos",
+      "iso2": "LA",
+      "admin_name": "Phongsaly",
+      "capital": "admin"
+    },
+    {
+      "city": "Salavan",
+      "lat": "15.71652",
+      "lng": "106.41744",
+      "country": "Laos",
+      "iso2": "LA",
+      "admin_name": "Salavan",
+      "capital": "admin"
+    },
+    {
+      "city": "Savannakhet",
+      "lat": "16.5703",
+      "lng": "104.7622",
+      "country": "Laos",
+      "iso2": "LA",
+      "admin_name": "Savannakhet",
+      "capital": "admin"
+    },
+    {
+      "city": "Vientiane",
+      "lat": "17.96667",
+      "lng": "102.6",
+      "country": "Laos",
+      "iso2": "LA",
+      "admin_name": "Vientiane",
+      "capital": "primary"
+    },
+    {
+      "city": "Sainyabuli",
+      "lat": "19.25756",
+      "lng": "101.71032",
+      "country": "Laos",
+      "iso2": "LA",
+      "admin_name": "Sainyabuli",
+      "capital": "admin"
+    },
+    {
+      "city": "Sekong",
+      "lat": "14.89204",
+      "lng": "105.87787",
+      "country": "Laos",
+      "iso2": "LA",
+      "admin_name": "Sekong",
+      "capital": "admin"
+    },
+    {
+      "city": "Xaisomboun",
+      "lat": "18.05944",
+      "lng": "102.74167",
+      "country": "Laos",
+      "iso2": "LA",
+      "admin_name": "Xaisomboun",
+      "capital": "admin"
+    },
+    {
+      "city": "Xiangkhouang",
+      "lat": "19.60930030",
+      "lng": "103.72891670",
+      "country": "Laos",
+      "iso2": "LA",
+      "admin_name": "Xiangkhouang",
+      "capital": "admin"
+    }
+]
+  

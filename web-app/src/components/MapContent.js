@@ -3,7 +3,7 @@ import "leaflet/dist/leaflet.css";
 import BaseMap from "./layers/BaseMap";
 import MapLocation from "./MapLocation";
 import MapHotspot from "./MapHotspot";
-import MapBurnScar from "./MapBurnScar";
+// import MapBurnScar from "./MapBurnScar";
 import { MapContainer } from "react-leaflet";
 import { useSelector } from 'react-redux';
 import ChangeView from './ChangeView'; // ต้องการ import uiSlice ที่มี saveLayerSettings.fulfilled
@@ -26,7 +26,7 @@ const MapContent = () => {
       > 
         <ChangeView />
         <BaseMap />
-        {burntScar && <MapBurnScar />}
+        {/* {burntScar && <MapBurnScar />} */}
         {aqi && <MapLocation />} 
         {hotSpot && <MapHotspot />} 
       </MapContainer>

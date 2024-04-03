@@ -7,7 +7,7 @@ const fs = require("fs");
 const path = require("path");
 const unzipper = require("unzipper");
 const archiver = require("archiver");
-const mysql = require("mysql");
+const mysql = require("mysql2");
 const crypto = require("crypto");
 
 // Create connection to MySQL
@@ -15,7 +15,7 @@ const db = mysql.createConnection({
   host: "localhost",
   user: "root",
   password: "root1234",
-  database: "ridadb",
+  database: "RidaDB",
 });
 
 // Connect to MySQL

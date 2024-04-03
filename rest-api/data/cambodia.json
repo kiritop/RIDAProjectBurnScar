@@ -1,0 +1,183 @@
+[
+    {
+      "city": "Banteay Meanchey",
+      "lat": "13.6672596",
+      "lng": "102.9849004",
+      "country": "Cambodia",
+      "iso2": "KH",
+      "admin_name": "Banteay Meanchey",
+      "capital": "admin"
+    },
+    {
+      "city": "Battambang",
+      "lat": "13.0286971",
+      "lng": "102.989615",
+      "country": "Cambodia",
+      "iso2": "KH",
+      "admin_name": "Battambang",
+      "capital": "admin"
+    },
+    {
+      "city": "Kampong Cham",
+      "lat": "12.0982918",
+      "lng": "105.3131185",
+      "country": "Cambodia",
+      "iso2": "KH",
+      "admin_name": "Kampong Cham",
+      "capital": "admin"
+    },
+    {
+      "city": "Kampong Chhnang",
+      "lat": "12.140275",
+      "lng": "104.565527",
+      "country": "Cambodia",
+      "iso2": "KH",
+      "admin_name": "Kampong Chhnang",
+      "capital": "admin"
+    },
+    {
+      "city": "Kampong Speu",
+      "lat": "11.4533822",
+      "lng": "104.5205416",
+      "country": "Cambodia",
+      "iso2": "KH",
+      "admin_name": "Kampong Speu",
+      "capital": "admin"
+    },
+    {
+      "city": "Kampong Thom",
+      "lat": "12.71199613",
+      "lng": "104.8889977",
+      "country": "Cambodia",
+      "iso2": "KH",
+      "admin_name": "Kampong Thom",
+      "capital": "admin"
+    },
+    {
+      "city": "Kampot",
+      "lat": "10.61708966",
+      "lng": "104.1813459",
+      "country": "Cambodia",
+      "iso2": "KH",
+      "admin_name": "Kampot",
+      "capital": "admin"
+    },
+    {
+      "city": "Kandal",
+      "lat": "11.48799998",
+      "lng": "105.3240036",
+      "country": "Cambodia",
+      "iso2": "KH",
+      "admin_name": "Kandal",
+      "capital": "admin"
+    },
+    {
+      "city": "Koh Kong",
+      "lat": "11.61753897",
+      "lng": "102.9849329",
+      "country": "Cambodia",
+      "iso2": "KH",
+      "admin_name": "Koh Kong",
+      "capital": "admin"
+    },
+    {
+      "city": "Kratié",
+      "lat": "12.46899612",
+      "lng": "106.0239967",
+      "country": "Cambodia",
+      "iso2": "KH",
+      "admin_name": "Kratié",
+      "capital": "admin"
+    },
+    {
+      "city": "Mondulkiri",
+      "lat": "12.44999711",
+      "lng": "107.1999997",
+      "country": "Cambodia",
+      "iso2": "KH",
+      "admin_name": "Mondulkiri",
+      "capital": "admin"
+    },
+    {
+      "city": "Phnom Penh",
+      "lat": "11.55003013",
+      "lng": "104.9166345",
+      "country": "Cambodia",
+      "iso2": "KH",
+      "admin_name": "Phnom Penh",
+      "capital": "primary"
+    },
+    {
+      "city": "Pouthisat",
+      "lat": "12.53369102",
+      "lng": "103.9166955",
+      "country": "Cambodia",
+      "iso2": "KH",
+      "admin_name": "Pouthisat",
+      "capital": "admin"
+    },
+    {
+      "city": "Preah Vihear",
+      "lat": "13.816701",
+      "lng": "104.9667037",
+      "country": "Cambodia",
+      "iso2": "KH",
+      "admin_name": "Preah Vihear",
+      "capital": "admin"
+    },
+    {
+      "city": "Prey Veng",
+      "lat": "11.0799991",
+      "lng": "105.8010036",
+      "country": "Cambodia",
+      "iso2": "KH",
+      "admin_name": "Prey Veng",
+      "capital": "admin"
+    },
+    {
+      "city": "Ratanakiri",
+      "lat": "13.73939",
+      "lng": "106.98727",
+      "country": "Cambodia",
+      "iso2": "KH",
+      "admin_name": "Ratanakiri",
+      "capital": "admin"
+    },
+    {
+      "city": "Siem Reap",
+      "lat": "13.36179",
+      "lng": "103.86056",
+      "country": "Cambodia",
+      "iso2": "KH",
+      "admin_name": "Siem Reap",
+      "capital": "admin"
+    },
+    {
+      "city": "Stung Treng",
+      "lat": "13.52300408",
+      "lng": "105.9740016",
+      "country": "Cambodia",
+      "iso2": "KH",
+      "admin_name": "Stung Treng",
+      "capital": "admin"
+    },
+    {
+      "city": "Svay Rieng",
+      "lat": "11.08785",
+      "lng": "105.79935",
+      "country": "Cambodia",
+      "iso2": "KH",
+      "admin_name": "Svay Rieng",
+      "capital": "admin"
+    },
+    {
+      "city": "Takéo",
+      "lat": "10.98375978",
+      "lng": "104.7833093",
+      "country": "Cambodia",
+      "iso2": "KH",
+      "admin_name": "Takéo",
+      "capital": "admin"
+    }
+  ]
+  

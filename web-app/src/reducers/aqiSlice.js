@@ -1,7 +1,7 @@
 // src/reducers/aqiSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-import data from './json/asean.json';
+import data from './json/data.json';
 import CONFIG from '../config';
 
 export const fetchAqiData = createAsyncThunk('aqi/fetchAqiData', async () => {

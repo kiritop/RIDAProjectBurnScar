@@ -79,8 +79,8 @@ const MapLocation = () => {
                 {"AQI: " + (item?.aqi && item?.aqi?.pm25 ? item.aqi.pm25.v : 'N/A')}
               </h3>
               <div className="mt-3 flex space-x-2">
-                <h3>{item.admin_name}</h3>
-                <h3>{item.country}</h3>
+                <h3>{item?.admin_name}</h3>
+                <h3>{item?.country}</h3>
               </div>
             </div>
           </Popup>

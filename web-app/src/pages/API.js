@@ -123,8 +123,8 @@ const API = () => {
     if (!email) {
       Swal.fire({
         icon: "error",
-        title: "Oops...",
-        text: "Please login first!",
+        title: "PLEASE SIGN IN",
+        text: "FOR GENERATE API KEY",
       });
       return;
     }
