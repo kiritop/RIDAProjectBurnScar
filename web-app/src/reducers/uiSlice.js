@@ -1,5 +1,7 @@
 // src/reducers/uiSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import data from './json/data_state.json';
+import dayjs from 'dayjs';
 
 // Async action using createAsyncThunk
 export const saveLayerSettings = createAsyncThunk(
@@ -19,7 +21,9 @@ const uiSlice = createSlice({
     sidebarForm :{
       yearRange : [year, year],
       country : 'All',
-      province : 'All'
+      province : 'All',
+      date: dayjs(currentDate).format('YYYY-MM-DD'),
+      iso3: null
     },
     current_lat: "18.7889", 
     current_lng: "98.9833", 
@@ -29,6 +33,7 @@ const uiSlice = createSlice({
     status: "idle",
     loadingMap: false,
     loadingSidebar: false,
+    cities: [],
     error: null, // สร้าง state สำหรับข้อมูล form control ของ Sidebar
   },
   reducers: {
@@ -36,7 +41,6 @@ const uiSlice = createSlice({
       state.isSidebarOpen = !state.isSidebarOpen;
     },
     updateSidebarForm: (state, action) => {
-      console.lop("action.payload", action.payload);
       state.sidebarForm = action.payload; // อัปเดตข้อมูล form control ของ Sidebar
     },
     setLoadingMap: (state, action) => {
@@ -44,6 +48,12 @@ const uiSlice = createSlice({
     },
     setLoadingSidebar: (state, action) => {
       state.loadingSidebar = action.payload;
+    },
+    getCities: (state, action) => {
+      
+      const country = action.payload;
+      let cities_data = data.filter(item => item.country === country);
+      state.cities = cities_data.sort((a, b) => a.city.localeCompare(b.city));
     },
   },
   extraReducers: (builder) => {
@@ -68,6 +78,6 @@ const uiSlice = createSlice({
   },
 });
 
-export const { toggleSidebar, updateSidebarForm, setLoadingMap, setLoadingSidebar } = uiSlice.actions;
+export const { toggleSidebar, updateSidebarForm, setLoadingMap, setLoadingSidebar, getCities } = uiSlice.actions;
 
 export default uiSlice.reducer;

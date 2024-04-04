@@ -3,26 +3,42 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import Papa from 'papaparse';
 import CONFIG from '../config';
 
-export const fetchHotSpotData = createAsyncThunk('hotSpot/fetchHotSpotData', async () => {
+export const fetchHotSpotData = createAsyncThunk('hotSpot/fetchHotSpotData', async (filter) => {
     // รับวันที่ปัจจุบัน
     const currentDate = new Date();
     const year = currentDate.getFullYear();
     const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // เดือนเริ่มต้นที่ 0
     const day = String(currentDate.getDate()).padStart(2, '0');
-
+    console.log("filter", filter)
+    
     // Fetch the CSV data from the API URL
-    const response = await fetch(`https://firms.modaps.eosdis.nasa.gov/api/area/csv/${CONFIG.HOT_SPOT_API_KEY}/MODIS_NRT/world/1/${year}-${month}-${day}`);
-    const csvData = await response.text();
-    // Parse the CSV data
-    let data;
-    Papa.parse(csvData, {
-        header: true, // Assumes the first row contains column headers
-        complete: (result) => {
-            data = result.data; // Set the JSON data
-        },
-    });
+    if(filter.iso3){
+      const response = await fetch(`https://firms.modaps.eosdis.nasa.gov/api/country/csv/${CONFIG.HOT_SPOT_API_KEY}/MODIS_NRT/${filter.iso3}/1/${year}-${month}-${day}`);
+      const csvData = await response.text();
+      // Parse the CSV data
+      let data;
+      Papa.parse(csvData, {
+          header: true, // Assumes the first row contains column headers
+          complete: (result) => {
+              data = result.data; // Set the JSON data
+          },
+      });
+      return data;
 
-    return data;
+    }else{
+      const response = await fetch(`https://firms.modaps.eosdis.nasa.gov/api/area/csv/${CONFIG.HOT_SPOT_API_KEY}/MODIS_NRT/world/1/${year}-${month}-${day}`);
+      const csvData = await response.text();
+      // Parse the CSV data
+      let data;
+      Papa.parse(csvData, {
+          header: true, // Assumes the first row contains column headers
+          complete: (result) => {
+              data = result.data; // Set the JSON data
+          },
+      });
+      return data;
+    }
+    
 });
 
 const hotSpotSlice = createSlice({

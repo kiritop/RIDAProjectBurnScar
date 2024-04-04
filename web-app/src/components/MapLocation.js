@@ -10,15 +10,16 @@ import { setLoadingMap } from '../reducers/uiSlice';
 const MapLocation = () => {
   const dispatch = useDispatch();
   const aqiData = useSelector(state => state.aqi.data);
+  const sidebarForm = useSelector(state => state.ui.sidebarForm);
 
   useEffect(() => {
     dispatch(setLoadingMap(true));
-    dispatch(fetchAqiData())
+    dispatch(fetchAqiData(sidebarForm))
     .finally(() => {
       dispatch(setLoadingMap(false));
     });
     
-  }, [dispatch]);
+  }, [dispatch, sidebarForm]);
 
   const circleIcon = (index) => {
     const aqi = (aqiData && aqiData?.[index]?.aqi?.pm25 ? aqiData?.[index]?.aqi.pm25.v : null)

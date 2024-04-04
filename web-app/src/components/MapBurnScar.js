@@ -21,7 +21,7 @@ const MapBurnScar = () => {
       dispatch(setLoadingMap(false));
     });
     
-  }, [dispatch]);
+  }, [dispatch, sidebarForm]);
 
 const percentToColor = (percent) => {
   const value = percent / 100;

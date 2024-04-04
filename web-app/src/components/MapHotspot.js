@@ -7,16 +7,17 @@ import { setLoadingMap } from '../reducers/uiSlice';
 const MapHotspot = () => {
   const hotSpotData = useSelector(state => state.hotSpot.data);
   const dispatch = useDispatch();
+  const sidebarForm = useSelector(state => state.ui.sidebarForm);
 
 
   useEffect(() => {
     dispatch(setLoadingMap(true));
-    dispatch(fetchHotSpotData())
+    dispatch(fetchHotSpotData(sidebarForm))
     .finally(() => {
       dispatch(setLoadingMap(false));
     });
     
-  }, [dispatch]);
+  }, [dispatch, sidebarForm]);
 
   return (
     <>

@@ -1,5 +1,5 @@
 // Sidebar.js
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 import Box from '@mui/joy/Box';
 import Drawer from '@mui/joy/Drawer';
@@ -17,111 +17,59 @@ import Typography from '@mui/joy/Typography';
 import Slider from "@mui/material/Slider";
 import { Select, Switch, MenuItem } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { saveLayerSettings, setLoadingMap } from '../reducers/uiSlice';
+import { saveLayerSettings, setLoadingMap, getCities } from '../reducers/uiSlice';
 import { fetchBurntScarData } from '../reducers/burntScarSlice';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs from 'dayjs';
 
 const countries = [
                     { 
                       name:'Select all',
                       value: 'All',
+                      iso3:"",
                       lat:'19.9094',
                       lng:'99.8275'
                     },
                     { 
                       name:'Thailand',
                       value: 'Thailand',
+                      iso3:"THA",
                       lat:'19.9094',
                       lng:'99.8275'
                     },
                     { 
                       name:'Myanmar',
                       value: 'Myanmar',
+                      iso3:"MMR",
                       lat:'16.871311',
                       lng:'96.199379'
                     },
                     { 
                       name:'Laos',
                       value: 'Laos',
+                      iso3:"LAO",
                       lat:'19.889271',
                       lng:'102.133453'
                     },
                     { 
                       name:'Vietnam',
                       value: 'Vietnam',
+                      iso3:"VNM",
                       lat:'21.028511',
                       lng:'105.804817'
                     }
-                  ];
-const provinces = [
-                    { 
-                      name:'Select all',
-                      value: 'All',
-                      lat:'19.9094',
-                      lng:'99.8275'
-                    },
-                    { 
-                      name:'Chiang Mai',
-                      value: 'Chiang Mai',
-                      lat: "18.7889", 
-                      lng: "98.9833", 
-                    },
-                    { 
-                      name:'Chiang Rai',
-                      value: 'Chiang Rai',
-                      lat: "19.9094", 
-                      lng: "99.8275", 
-                    },
-                    { 
-                      name:'Lampang',
-                      value: 'Lampang',
-                      lat: "18.3000", 
-                      lng: "99.5000", 
-                    },
-                    { 
-                      name:'Lamphun',
-                      value: 'Lamphun',
-                      lat: "18.5865", 
-                      lng: "99.0121", 
-                    },
-                    { 
-                      name:'Mae Hong Son',
-                      value: 'Mae Hong Son',
-                      lat: "19.3011", 
-                      lng: "97.9700", 
-                    },
-                    { 
-                      name:'Nan',
-                      value: 'Nan',
-                      lat: "18.7893", 
-                      lng: "100.7766", 
-                    },
-                    { 
-                      name:'Phayao',
-                      value: 'Phayao',
-                      lat: "19.1652", 
-                      lng: "99.9036",
-                    },
-                    { 
-                      name:'Phrae',
-                      value: 'Phrae',
-                      lat: "18.1436", 
-                      lng: "100.1417", 
-                    },
-                    { 
-                      name:'Uttaradit',
-                      value: 'Uttaradit',
-                      lat: "17.6256", 
-                      lng: "100.0942", 
-                    },
                   ];
 
 export default function Sidebar({ isOpen , toggleDrawer}) {
 
   const ui = useSelector(state => state.ui);
 
-  const [yearRange, setYearRange] = React.useState(ui.sidebarForm.yearRange);
-  const [country, setCountry] = React.useState(ui.sidebarForm.country);
-  const [province, setProvince] = React.useState(ui.sidebarForm.province);
+  const [yearRange, setYearRange] = useState(ui.sidebarForm.yearRange);
+  const [country, setCountry] = useState(ui.sidebarForm.country);
+  const [city, setCity] = useState(ui.sidebarForm.city);
   const [burntScar, setBurntScar] = useState(ui.burntScar);
   const [aqi, setAqi] = useState(ui.aqi);
   const [hotSpot, setHotSpot] = useState(ui.hotSpot);
@@ -132,18 +80,28 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
   const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // เดือนเริ่มต้นที่ 0
   const day = String(currentDate.getDate()).padStart(2, '0');
 
+  const cities = useSelector((state) => state.ui ? state.ui.cities : []);
+  const [date, setDate] = useState(ui.sidebarForm.date);
+
   const handleCountryChange = (event) => {
     setCountry(event.target.value);
+    setCity('All');
   };
 
-  const handleProvinceChange = (event) => {
-    setProvince(event.target.value);
+  const handleCityChange = (event) => {
+    setCity(event.target.value);
   };
 
   //set year range 
   const handleYearChange = (event, newValue) => {
     setYearRange(newValue);
   };
+
+  useEffect(() => {
+    if (country) {
+      dispatch(getCities(country));
+    }
+  }, [country, dispatch]);
 
 
 
@@ -170,37 +128,40 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
   };
 
   const handleSave = () => {
+
+    let valueFilter = country
+    const country_filter = countries.find((country) => country.value === valueFilter);
+    const iso3 = country_filter ? country_filter.iso3 : null;
+
     const sidebarForm = {
       yearRange : yearRange,
       country : country,
-      province : province
+      city : city,
+      date : date,
+      iso3: iso3
     }
-    
-    if(province === "All" || country!=="Thailand" ){
-      let valueToFilter = country
-      let filteredCountries = countries.filter(country => country.value === valueToFilter);
+    if(city === "All" || valueFilter ==="All"){
+      let filteredCountries = countries.filter(country => country.value === valueFilter);
       let current_lat = filteredCountries[0].lat
       let current_lng = filteredCountries[0].lng
       // Dispatch the save action with the current state
-      dispatch(saveLayerSettings({ sidebarForm, burntScar, aqi, hotSpot, current_lat, current_lng }));
+      dispatch(saveLayerSettings({ sidebarForm, burntScar, aqi, hotSpot, current_lat, current_lng}));
     }else{
-      let valueToFilter = province
-      let filteredCountries = provinces.filter(state => state.value === valueToFilter);
+      let valueToFilter = city
+      let filteredCountries = cities.filter(city => city.city === valueToFilter);
       let current_lat = filteredCountries[0].lat
       let current_lng = filteredCountries[0].lng
       // Dispatch the save action with the current state
-      dispatch(saveLayerSettings({ sidebarForm, burntScar, aqi, hotSpot, current_lat, current_lng }));
+      dispatch(saveLayerSettings({ sidebarForm, burntScar, aqi, hotSpot, current_lat, current_lng}));
     }
-
-
     
-    if(burntScar){
-      dispatch(setLoadingMap(true));
-      dispatch(fetchBurntScarData(sidebarForm))
-      .finally(() => {
-        dispatch(setLoadingMap(false));
-      });
-    }
+    // if(burntScar){
+    //   dispatch(setLoadingMap(true));
+    //   dispatch(fetchBurntScarData(sidebarForm))
+    //   .finally(() => {
+    //     dispatch(setLoadingMap(false));
+    //   });
+    // }
     toggleDrawer(); 
   };
 
@@ -275,17 +236,18 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
           </Box>
         </FormControl>
           
-        {country === 'Thailand' && burntScar === true && (<Typography level="title-md" fontWeight="bold" sx={{ mt: 2 }}>
+        {country !== 'All' && (<Typography level="title-md" fontWeight="bold" sx={{ mt: 2 }}>
           State
         </Typography>)}
         <FormControl orientation="horizontal">
           <Box sx={{ flex: 1, pr: 1 }}>
             <Stack spacing={2}>
-              {country === 'Thailand' && burntScar === true && (
-                  <Select value={province} onChange={handleProvinceChange}>
-                    {provinces.map((province) => (
-                      <MenuItem key={province.value} value={province.value}>
-                        {province.name}
+              {country !== 'All' && (
+                  <Select value={city} onChange={handleCityChange}>
+                    <MenuItem value="All">Select All</MenuItem>
+                    {cities.map((city) => (
+                      <MenuItem key={city.city} value={city.city}>
+                        {city.city}
                       </MenuItem>
                     ))}
                   </Select>
@@ -293,6 +255,30 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
             </Stack>
           </Box>
         </FormControl>
+
+        {burntScar === false && aqi === false &&(<Typography level="title-md" fontWeight="bold" sx={{ mt: 2 }}>
+          Date
+        </Typography>)}
+        <FormControl orientation="horizontal">
+          <Box sx={{ flex: 1, pr: 1 }}>
+            <Stack spacing={2}>
+              {burntScar === false && aqi === false &&(
+                 <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DemoContainer components={['DatePicker']}>
+                    <DatePicker 
+                      label="Choose Date" 
+                      value={dayjs(date)}  
+                      sx={{ flexGrow: 1 }} 
+                      onChange={(newValue) => setDate(newValue.format('YYYY-MM-DD'))}
+                    />
+                  </DemoContainer>
+                </LocalizationProvider>
+              )}
+            </Stack>
+          </Box>
+        </FormControl>
+
+        
 
         <Typography level="title-md" fontWeight="bold" sx={{ mt: 2 }}>
           Map Layer
@@ -321,7 +307,7 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
           <Box sx={{ flex: 1, mt: 1, mr: 1 }}>
             <FormLabel sx={{ typography: 'title-sm' }}>Hotspot layer</FormLabel>
             <FormHelperText sx={{ typography: 'body-sm' }}>
-              On {month}/{day}/{year}
+              On {dayjs(date).format('MM/DD/YYYY')}
             </FormHelperText>
           </Box>
           <Switch checked={hotSpot} onChange={handleChange} name="hotSpot" />
@@ -345,7 +331,7 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
           Clear
         </Button> */}
         <Box sx={{ flex: 1, mt: 1, mr: 1 }}/>
-        <Button onClick={handleSave} >Save</Button>
+        <Button onClick={handleSave} >Submit</Button>
       </Stack>
     </Sheet>
   </Drawer>

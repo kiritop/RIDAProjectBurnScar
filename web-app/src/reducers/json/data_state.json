@@ -1,0 +1,1542 @@
+[
+    {
+      "city": "Attapeu",
+      "lat": "14.93634000",
+      "lng": "107.10119310",
+      "country": "Laos",
+      "iso2": "LA",
+      "admin_name": "Attapeu",
+      "capital": "admin"
+    },
+    {
+      "city": "Bokeo",
+      "lat": "20.28726620",
+      "lng": "100.70978670",
+      "country": "Laos",
+      "iso2": "LA",
+      "admin_name": "Bokeo",
+      "capital": "admin"
+    },
+    {
+      "city": "Bolikhamsai",
+      "lat": "18.43629240",
+      "lng": "104.47233010",
+      "country": "Laos",
+      "iso2": "LA",
+      "admin_name": "Bolikhamsai",
+      "capital": "admin"
+    },
+    {
+      "city": "Champasak",
+      "lat": "14.88386640",
+      "lng": "105.96998780",
+      "country": "Laos",
+      "iso2": "LA",
+      "admin_name": "Champasak",
+      "capital": "admin"
+    },
+    {
+      "city": "Houaphanh",
+      "lat": "20.32541750",
+      "lng": "104.10013260",
+      "country": "Laos",
+      "iso2": "LA",
+      "admin_name": "Houaphanh",
+      "capital": "admin"
+    },
+    {
+      "city": "Khammouane",
+      "lat": "17.63840660",
+      "lng": "105.21948080",
+      "country": "Laos",
+      "iso2": "LA",
+      "admin_name": "Khammouane",
+      "capital": "admin"
+    },
+    {
+      "city": "Luang Namtha",
+      "lat": "20.91701870",
+      "lng": "101.16173560",
+      "country": "Laos",
+      "iso2": "LA",
+      "admin_name": "Luang Namtha",
+      "capital": "admin"
+    },
+    {
+      "city": "Luang Prabang",
+      "lat": "19.88601",
+      "lng": "102.13503",
+      "country": "Laos",
+      "iso2": "LA",
+      "admin_name": "Luang Prabang",
+      "capital": "primary"
+    },
+    {
+      "city": "Oudomxay",
+      "lat": "20.69229",
+      "lng": "101.98368",
+      "country": "Laos",
+      "iso2": "LA",
+      "admin_name": "Oudomxay",
+      "capital": "admin"
+    },
+    {
+      "city": "Phongsaly",
+      "lat": "21.6808",
+      "lng": "102.1003",
+      "country": "Laos",
+      "iso2": "LA",
+      "admin_name": "Phongsaly",
+      "capital": "admin"
+    },
+    {
+      "city": "Salavan",
+      "lat": "15.71652",
+      "lng": "106.41744",
+      "country": "Laos",
+      "iso2": "LA",
+      "admin_name": "Salavan",
+      "capital": "admin"
+    },
+    {
+      "city": "Savannakhet",
+      "lat": "16.5703",
+      "lng": "104.7622",
+      "country": "Laos",
+      "iso2": "LA",
+      "admin_name": "Savannakhet",
+      "capital": "admin"
+    },
+    {
+      "city": "Vientiane",
+      "lat": "17.96667",
+      "lng": "102.6",
+      "country": "Laos",
+      "iso2": "LA",
+      "admin_name": "Vientiane",
+      "capital": "primary"
+    },
+    {
+      "city": "Sainyabuli",
+      "lat": "19.25756",
+      "lng": "101.71032",
+      "country": "Laos",
+      "iso2": "LA",
+      "admin_name": "Sainyabuli",
+      "capital": "admin"
+    },
+    {
+      "city": "Sekong",
+      "lat": "14.89204",
+      "lng": "105.87787",
+      "country": "Laos",
+      "iso2": "LA",
+      "admin_name": "Sekong",
+      "capital": "admin"
+    },
+    {
+      "city": "Xaisomboun",
+      "lat": "18.05944",
+      "lng": "102.74167",
+      "country": "Laos",
+      "iso2": "LA",
+      "admin_name": "Xaisomboun",
+      "capital": "admin"
+    },
+    {
+      "city": "Xiangkhouang",
+      "lat": "19.60930030",
+      "lng": "103.72891670",
+      "country": "Laos",
+      "iso2": "LA",
+      "admin_name": "Xiangkhouang",
+      "capital": "admin"
+    },
+    {
+        "city": "Ayeyarwady",
+        "lat": "16.8000",
+        "lng": "95.7500",
+        "country": "Myanmar",
+        "iso2": "MM",
+        "admin_name": "Ayeyarwady",
+        "capital": "admin"
+      },
+      {
+        "city": "Bago",
+        "lat": "17.3333",
+        "lng": "96.5000",
+        "country": "Myanmar",
+        "iso2": "MM",
+        "admin_name": "Bago",
+        "capital": "admin"
+      },
+      {
+        "city": "Chin",
+        "lat": "22.0000",
+        "lng": "93.7500",
+        "country": "Myanmar",
+        "iso2": "MM",
+        "admin_name": "Chin",
+        "capital": "admin"
+      },
+      {
+        "city": "Kachin",
+        "lat": "25.6000",
+        "lng": "97.2500",
+        "country": "Myanmar",
+        "iso2": "MM",
+        "admin_name": "Kachin",
+        "capital": "admin"
+      },
+      {
+        "city": "Kayah",
+        "lat": "19.5000",
+        "lng": "97.2500",
+        "country": "Myanmar",
+        "iso2": "MM",
+        "admin_name": "Kayah",
+        "capital": "admin"
+      },
+      {
+        "city": "Kayin",
+        "lat": "17.1667",
+        "lng": "97.9167",
+        "country": "Myanmar",
+        "iso2": "MM",
+        "admin_name": "Kayin",
+        "capital": "admin"
+      },
+      {
+        "city": "Magway",
+        "lat": "20.1500",
+        "lng": "94.9167",
+        "country": "Myanmar",
+        "iso2": "MM",
+        "admin_name": "Magway",
+        "capital": "admin"
+      },
+      {
+        "city": "Mandalay",
+        "lat": "21.9667",
+        "lng": "96.0833",
+        "country": "Myanmar",
+        "iso2": "MM",
+        "admin_name": "Mandalay",
+        "capital": "primary"
+      },
+      {
+        "city": "Mon",
+        "lat": "16.5000",
+        "lng": "97.5000",
+        "country": "Myanmar",
+        "iso2": "MM",
+        "admin_name": "Mon",
+        "capital": "admin"
+      },
+      {
+        "city": "Rakhine",
+        "lat": "19.0000",
+        "lng": "93.7500",
+        "country": "Myanmar",
+        "iso2": "MM",
+        "admin_name": "Rakhine",
+        "capital": "admin"
+      },
+      {
+        "city": "Sagaing",
+        "lat": "22.0000",
+        "lng": "95.0000",
+        "country": "Myanmar",
+        "iso2": "MM",
+        "admin_name": "Sagaing",
+        "capital": "admin"
+      },
+      {
+        "city": "Shan",
+        "lat": "21.5000",
+        "lng": "97.0000",
+        "country": "Myanmar",
+        "iso2": "MM",
+        "admin_name": "Shan",
+        "capital": "admin"
+      },
+      {
+        "city": "Tanintharyi",
+        "lat": "12.0833",
+        "lng": "98.2000",
+        "country": "Myanmar",
+        "iso2": "MM",
+        "admin_name": "Tanintharyi",
+        "capital": "admin"
+      },
+      {
+        "city": "Yangon",
+        "lat": "16.8000",
+        "lng": "96.1500",
+        "country": "Myanmar",
+        "iso2": "MM",
+        "admin_name": "Yangon",
+        "capital": "primary"
+      },
+      {
+        "city": "Ha Noi",
+        "lat": "21.0285",
+        "lng": "105.8542",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Ha Noi",
+        "capital": "primary"
+      },
+      {
+        "city": "Ho Chi Minh City",
+        "lat": "10.8231",
+        "lng": "106.6297",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Ho Chi Minh",
+        "capital": "primary"
+      },
+      {
+        "city": "Hai Phong",
+        "lat": "20.8324",
+        "lng": "106.6801",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Hai Phong",
+        "capital": "minor"
+      },
+      {
+        "city": "Da Nang",
+        "lat": "16.0544",
+        "lng": "108.2022",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Da Nang",
+        "capital": "minor"
+      },
+      {
+        "city": "Can Tho",
+        "lat": "10.0455",
+        "lng": "105.7468",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Can Tho",
+        "capital": "minor"
+      },
+      {
+        "city": "An Giang",
+        "lat": "10.5000",
+        "lng": "105.1667",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "An Giang",
+        "capital": "admin"
+      },
+      {
+        "city": "Ba Ria-Vung Tau",
+        "lat": "10.3475",
+        "lng": "107.0844",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Ba Ria-Vung Tau",
+        "capital": "admin"
+      },
+      {
+        "city": "Bac Lieu",
+        "lat": "9.2930",
+        "lng": "105.7241",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Bac Lieu",
+        "capital": "admin"
+      },
+      {
+        "city": "Bac Kan",
+        "lat": "22.1333",
+        "lng": "105.8333",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Bac Kan",
+        "capital": "admin"
+      },
+      {
+        "city": "Bac Giang",
+        "lat": "21.2724",
+        "lng": "106.1947",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Bac Giang",
+        "capital": "admin"
+      },
+      {
+        "city": "Bac Ninh",
+        "lat": "21.1861",
+        "lng": "106.0560",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Bac Ninh",
+        "capital": "admin"
+      },
+      {
+        "city": "Ben Tre",
+        "lat": "10.2355",
+        "lng": "106.3753",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Ben Tre",
+        "capital": "admin"
+      },
+      {
+        "city": "Binh Dinh",
+        "lat": "13.7500",
+        "lng": "109.1833",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Binh Dinh",
+        "capital": "admin"
+      },
+      {
+        "city": "Binh Duong",
+        "lat": "11.1712",
+        "lng": "106.5026",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Binh Duong",
+        "capital": "admin"
+      },
+      {
+        "city": "Binh Phuoc",
+        "lat": "11.7500",
+        "lng": "106.7500",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Binh Phuoc",
+        "capital": "admin"
+      },
+      {
+        "city": "Binh Thuan",
+        "lat": "10.9444",
+        "lng": "108.0014",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Binh Thuan",
+        "capital": "admin"
+      },
+      {
+        "city": "Ca Mau",
+        "lat": "9.1769",
+        "lng": "105.1500",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Ca Mau",
+        "capital": "admin"
+      },
+      {
+        "city": "Cao Bang",
+        "lat": "22.6667",
+        "lng": "106.2500",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Cao Bang",
+        "capital": "admin"
+      },
+      {
+        "city": "Dak Lak",
+        "lat": "12.6670",
+        "lng": "108.0430",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Dak Lak",
+        "capital": "admin"
+      },
+      {
+        "city": "Dak Nong",
+        "lat": "12.0514",
+        "lng": "107.9594",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Dak Nong",
+        "capital": "admin"
+      },
+      {
+        "city": "Dien Bien",
+        "lat": "21.3833",
+        "lng": "103.0167",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Dien Bien",
+        "capital": "admin"
+      },
+      {
+        "city": "Dong Nai",
+        "lat": "11.0333",
+        "lng": "107.1667",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Dong Nai",
+        "capital": "admin"
+      },
+      {
+        "city": "Dong Thap",
+        "lat": "10.7500",
+        "lng": "105.8333",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Dong Thap",
+        "capital": "admin"
+      },
+      {
+        "city": "Gia Lai",
+        "lat": "13.9833",
+        "lng": "108.0000",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Gia Lai",
+        "capital": "admin"
+      },
+      {
+        "city": "Ha Giang",
+        "lat": "22.8333",
+        "lng": "104.9833",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Ha Giang",
+        "capital": "admin"
+      },
+      {
+        "city": "Hai Duong",
+        "lat": "20.9375",
+        "lng": "106.3150",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Hai Duong",
+        "capital": "admin"
+      },
+      {
+        "city": "Ha Nam",
+        "lat": "20.6000",
+        "lng": "105.9167",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Ha Nam",
+        "capital": "admin"
+      },
+      {
+        "city": "Ha Tinh",
+        "lat": "18.3333",
+        "lng": "105.9000",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Ha Tinh",
+        "capital": "admin"
+      },
+      {
+        "city": "Hau Giang",
+        "lat": "9.7833",
+        "lng": "105.4667",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Hau Giang",
+        "capital": "admin"
+      },
+      {
+        "city": "Hoa Binh",
+        "lat": "20.8333",
+        "lng": "105.3333",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Hoa Binh",
+        "capital": "admin"
+      },
+      {
+        "city": "Hung Yen",
+        "lat": "20.6464",
+        "lng": "106.0514",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Hung Yen",
+        "capital": "admin"
+      },
+      {
+        "city": "Khanh Hoa",
+        "lat": "12.2500",
+        "lng": "109.1833",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Khanh Hoa",
+        "capital": "admin"
+      },
+      {
+        "city": "Kien Giang",
+        "lat": "10.0000",
+        "lng": "105.0833",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Kien Giang",
+        "capital": "admin"
+      },
+      {
+        "city": "Kon Tum",
+        "lat": "14.3333",
+        "lng": "107.8333",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Kon Tum",
+        "capital": "admin"
+      },
+      {
+        "city": "Lai Chau",
+        "lat": "22.3964",
+        "lng": "103.4586",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Lai Chau",
+        "capital": "admin"
+      },
+      {
+        "city": "Lam Dong",
+        "lat": "11.5000",
+        "lng": "107.5000",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Lam Dong",
+        "capital": "admin"
+      },
+      {
+        "city": "Lang Son",
+        "lat": "21.8333",
+        "lng": "106.7333",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Lang Son",
+        "capital": "admin"
+      },
+      {
+        "city": "Lao Cai",
+        "lat": "22.4167",
+        "lng": "103.9833",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Lao Cai",
+        "capital": "admin"
+      },
+      {
+        "city": "Long An",
+        "lat": "10.7500",
+        "lng": "106.1667",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Long An",
+        "capital": "admin"
+      },
+      {
+        "city": "Nam Dinh",
+        "lat": "20.4333",
+        "lng": "106.1667",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Nam Dinh",
+        "capital": "admin"
+      },
+      {
+        "city": "Nghe An",
+        "lat": "19.3333",
+        "lng": "105.8333",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Nghe An",
+        "capital": "admin"
+      },
+      {
+        "city": "Ninh Binh",
+        "lat": "20.2539",
+        "lng": "105.9750",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Ninh Binh",
+        "capital": "admin"
+      },
+      {
+        "city": "Ninh Thuan",
+        "lat": "11.7500",
+        "lng": "108.8333",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Ninh Thuan",
+        "capital": "admin"
+      },
+      {
+        "city": "Phu Tho",
+        "lat": "21.3333",
+        "lng": "105.6667",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Phu Tho",
+        "capital": "admin"
+      },
+      {
+        "city": "Phu Yen",
+        "lat": "13.0833",
+        "lng": "109.3000",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Phu Yen",
+        "capital": "admin"
+      },
+      {
+        "city": "Quang Binh",
+        "lat": "17.5000",
+        "lng": "106.3333",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Quang Binh",
+        "capital": "admin"
+      },
+      {
+        "city": "Quang Nam",
+        "lat": "15.7500",
+        "lng": "108.5000",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Quang Nam",
+        "capital": "admin"
+      },
+      {
+        "city": "Quang Ngai",
+        "lat": "15.1167",
+        "lng": "108.8000",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Quang Ngai",
+        "capital": "admin"
+      },
+      {
+        "city": "Quang Ninh",
+        "lat": "20.9167",
+        "lng": "107.1667",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Quang Ninh",
+        "capital": "admin"
+      },
+      {
+        "city": "Quang Tri",
+        "lat": "16.7500",
+        "lng": "107.2000",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Quang Tri",
+        "capital": "admin"
+      },
+      {
+        "city": "Soc Trang",
+        "lat": "9.6035",
+        "lng": "105.9800",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Soc Trang",
+        "capital": "admin"
+      },
+      {
+        "city": "Son La",
+        "lat": "21.3333",
+        "lng": "103.9000",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Son La",
+        "capital": "admin"
+      },
+      {
+        "city": "Tay Ninh",
+        "lat": "11.3000",
+        "lng": "106.1000",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Tay Ninh",
+        "capital": "admin"
+      },
+      {
+        "city": "Thai Binh",
+        "lat": "20.4500",
+        "lng": "106.3333",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Thai Binh",
+        "capital": "admin"
+      },
+      {
+        "city": "Thai Nguyen",
+        "lat": "21.5942",
+        "lng": "105.8482",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Thai Nguyen",
+        "capital": "admin"
+      },
+      {
+        "city": "Thanh Hoa",
+        "lat": "19.8000",
+        "lng": "105.7667",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Thanh Hoa",
+        "capital": "admin"
+      },
+      {
+        "city": "Thua Thien-Hue",
+        "lat": "16.4333",
+        "lng": "107.6000",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Thua Thien-Hue",
+        "capital": "admin"
+      },
+      {
+        "city": "Tien Giang",
+        "lat": "10.3833",
+        "lng": "106.3500",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Tien Giang",
+        "capital": "admin"
+      },
+      {
+        "city": "Tra Vinh",
+        "lat": "9.9167",
+        "lng": "106.3333",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Tra Vinh",
+        "capital": "admin"
+      },
+      {
+        "city": "Tuyen Quang",
+        "lat": "21.8233",
+        "lng": "105.2183",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Tuyen Quang",
+        "capital": "admin"
+      },
+      {
+        "city": "Vinh Long",
+        "lat": "10.2500",
+        "lng": "105.9667",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Vinh Long",
+        "capital": "admin"
+      },
+      {
+        "city": "Vinh Phuc",
+        "lat": "21.3089",
+        "lng": "105.6033",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Vinh Phuc",
+        "capital": "admin"
+      },
+      {
+        "city": "Yen Bai",
+        "lat": "21.5000",
+        "lng": "104.8333",
+        "country": "Vietnam",
+        "iso2": "VN",
+        "admin_name": "Yen Bai",
+        "capital": "admin"
+      },
+      {
+        "city": "Bangkok",
+        "lat": "13.7563",
+        "lng": "100.5018",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Bangkok",
+        "capital": "primary"
+      },
+      {
+        "city": "Nonthaburi",
+        "lat": "13.8667",
+        "lng": "100.5167",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Nonthaburi",
+        "capital": "admin"
+      },
+      {
+        "city": "Samut Prakan",
+        "lat": "13.5993",
+        "lng": "100.5968",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Samut Prakan",
+        "capital": "admin"
+      },
+      {
+        "city": "Pathum Thani",
+        "lat": "14.0229",
+        "lng": "100.5328",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Pathum Thani",
+        "capital": "admin"
+      },
+      {
+        "city": "Phra Nakhon Si Ayutthaya",
+        "lat": "14.3556",
+        "lng": "100.5526",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Phra Nakhon Si Ayutthaya",
+        "capital": "admin"
+      },
+      {
+        "city": "Ang Thong",
+        "lat": "14.5893",
+        "lng": "100.4558",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Ang Thong",
+        "capital": "admin"
+      },
+      {
+        "city": "Lop Buri",
+        "lat": "14.799",
+        "lng": "100.6534",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Lop Buri",
+        "capital": "admin"
+      },
+      {
+        "city": "Sing Buri",
+        "lat": "14.8875",
+        "lng": "100.4014",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Sing Buri",
+        "capital": "admin"
+      },
+      {
+        "city": "Chai Nat",
+        "lat": "15.1905",
+        "lng": "100.1297",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Chai Nat",
+        "capital": "admin"
+      },
+      {
+        "city": "Saraburi",
+        "lat": "14.5289",
+        "lng": "100.9101",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Saraburi",
+        "capital": "admin"
+      },
+      {
+        "city": "Chon Buri",
+        "lat": "13.3611",
+        "lng": "100.9847",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Chon Buri",
+        "capital": "admin"
+      },
+      {
+        "city": "Rayong",
+        "lat": "12.684",
+        "lng": "101.2786",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Rayong",
+        "capital": "admin"
+      },
+      {
+        "city": "Chanthaburi",
+        "lat": "12.6113",
+        "lng": "102.1031",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Chanthaburi",
+        "capital": "admin"
+      },
+      {
+        "city": "Trat",
+        "lat": "12.2451",
+        "lng": "102.5123",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Trat",
+        "capital": "admin"
+      },
+      {
+        "city": "Chachoengsao",
+        "lat": "13.679",
+        "lng": "101.0752",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Chachoengsao",
+        "capital": "admin"
+      },
+      {
+        "city": "Prachin Buri",
+        "lat": "14.055",
+        "lng": "101.3598",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Prachin Buri",
+        "capital": "admin"
+      },
+      {
+        "city": "Nakhon Nayok",
+        "lat": "14.2044",
+        "lng": "101.215",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Nakhon Nayok",
+        "capital": "admin"
+      },
+      {
+        "city": "Sa Kaeo",
+        "lat": "13.8139",
+        "lng": "102.0739",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Sa Kaeo",
+        "capital": "admin"
+      },
+      {
+        "city": "Nakhon Ratchasima",
+        "lat": "14.9707",
+        "lng": "102.1019",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Nakhon Ratchasima",
+        "capital": "admin"
+      },
+      {
+        "city": "Buri Ram",
+        "lat": "15.0594",
+        "lng": "103.033",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Buri Ram",
+        "capital": "admin"
+      },
+      {
+        "city": "Surin",
+        "lat": "14.8828",
+        "lng": "103.4933",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Surin",
+        "capital": "admin"
+      },
+      {
+        "city": "Si Sa Ket",
+        "lat": "15.1203",
+        "lng": "104.329",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Si Sa Ket",
+        "capital": "admin"
+      },
+      {
+        "city": "Ubon Ratchathani",
+        "lat": "15.2384",
+        "lng": "104.8487",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Ubon Ratchathani",
+        "capital": "admin"
+      },
+      {
+        "city": "Yasothon",
+        "lat": "15.7942",
+        "lng": "104.145",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Yasothon",
+        "capital": "admin"
+      },
+      {
+        "city": "Chaiyaphum",
+        "lat": "15.8047",
+        "lng": "102.038",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Chaiyaphum",
+        "capital": "admin"
+      },
+      {
+        "city": "Amnat Charoen",
+        "lat": "15.8586",
+        "lng": "104.625",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Amnat Charoen",
+        "capital": "admin"
+      },
+      {
+        "city": "Bueng Kan",
+        "lat": "18.3635",
+        "lng": "103.6512",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Bueng Kan",
+        "capital": "admin"
+      },
+      {
+        "city": "Nong Bua Lam Phu",
+        "lat": "17.2041",
+        "lng": "102.4403",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Nong Bua Lam Phu",
+        "capital": "admin"
+      },
+      {
+        "city": "Khon Kaen",
+        "lat": "16.4467",
+        "lng": "102.833",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Khon Kaen",
+        "capital": "admin"
+      },
+      {
+        "city": "Udon Thani",
+        "lat": "17.4041",
+        "lng": "102.789",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Udon Thani",
+        "capital": "admin"
+      },
+      {
+        "city": "Loei",
+        "lat": "17.4919",
+        "lng": "101.7313",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Loei",
+        "capital": "admin"
+      },
+      {
+        "city": "Nong Khai",
+        "lat": "17.8784",
+        "lng": "102.742",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Nong Khai",
+        "capital": "admin"
+      },
+      {
+        "city": "Maha Sarakham",
+        "lat": "16.1845",
+        "lng": "103.3002",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Maha Sarakham",
+        "capital": "admin"
+      },
+      {
+        "city": "Roi Et",
+        "lat": "16.0538",
+        "lng": "103.6529",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Roi Et",
+        "capital": "admin"
+      },
+      {
+        "city": "Kalasin",
+        "lat": "16.4314",
+        "lng": "103.5063",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Kalasin",
+        "capital": "admin"
+      },
+      {
+        "city": "Sakon Nakhon",
+        "lat": "17.1572",
+        "lng": "104.1472",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Sakon Nakhon",
+        "capital": "admin"
+      },
+      {
+        "city": "Nakhon Phanom",
+        "lat": "17.4",
+        "lng": "104.777",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Nakhon Phanom",
+        "capital": "admin"
+      },
+      {
+        "city": "Mukdahan",
+        "lat": "16.5458",
+        "lng": "104.7223",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Mukdahan",
+        "capital": "admin"
+      },
+      {
+        "city": "Chiang Mai",
+        "lat": "18.7904",
+        "lng": "98.9847",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Chiang Mai",
+        "capital": "admin"
+      },
+      {
+        "city": "Lamphun",
+        "lat": "18.503",
+        "lng": "99.0747",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Lamphun",
+        "capital": "admin"
+      },
+      {
+        "city": "Lampang",
+        "lat": "18.2923",
+        "lng": "99.4928",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Lampang",
+        "capital": "admin"
+      },
+      {
+        "city": "Uttaradit",
+        "lat": "17.6273",
+        "lng": "100.0993",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Uttaradit",
+        "capital": "admin"
+      },
+      {
+        "city": "Phrae",
+        "lat": "18.149",
+        "lng": "100.141",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Phrae",
+        "capital": "admin"
+      },
+      {
+        "city": "Nan",
+        "lat": "18.7783",
+        "lng": "100.773",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Nan",
+        "capital": "admin"
+      },
+      {
+        "city": "Phayao",
+        "lat": "19.1729",
+        "lng": "99.8879",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Phayao",
+        "capital": "admin"
+      },
+      {
+        "city": "Chiang Rai",
+        "lat": "19.9086",
+        "lng": "99.8328",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Chiang Rai",
+        "capital": "admin"
+      },
+      {
+        "city": "Mae Hong Son",
+        "lat": "19.302",
+        "lng": "97.9658",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Mae Hong Son",
+        "capital": "admin"
+      },
+      {
+        "city": "Nakhon Sawan",
+        "lat": "15.705",
+        "lng": "100.071",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Nakhon Sawan",
+        "capital": "admin"
+      },
+      {
+        "city": "Uthai Thani",
+        "lat": "15.379",
+        "lng": "100.024",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Uthai Thani",
+        "capital": "admin"
+      },
+      {
+        "city": "Kamphaeng Phet",
+        "lat": "16.482",
+        "lng": "99.522",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Kamphaeng Phet",
+        "capital": "admin"
+      },
+      {
+        "city": "Tak",
+        "lat": "16.882",
+        "lng": "99.128",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Tak",
+        "capital": "admin"
+      },
+      {
+        "city": "Sukhothai",
+        "lat": "17.013",
+        "lng": "99.823",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Sukhothai",
+        "capital": "admin"
+      },
+      {
+        "city": "Phitsanulok",
+        "lat": "16.824",
+        "lng": "100.258",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Phitsanulok",
+        "capital": "admin"
+      },
+      {
+        "city": "Phichit",
+        "lat": "16.449",
+        "lng": "100.368",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Phichit",
+        "capital": "admin"
+      },
+      {
+        "city": "Phetchabun",
+        "lat": "16.419",
+        "lng": "101.159",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Phetchabun",
+        "capital": "admin"
+      },
+      {
+        "city": "Ratchaburi",
+        "lat": "13.528",
+        "lng": "99.813",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Ratchaburi",
+        "capital": "admin"
+      },
+      {
+        "city": "Kanchanaburi",
+        "lat": "14.0208",
+        "lng": "99.5328",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Kanchanaburi",
+        "capital": "admin"
+      },
+      {
+        "city": "Suphan Buri",
+        "lat": "14.475",
+        "lng": "100.118",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Suphan Buri",
+        "capital": "admin"
+      },
+      {
+        "city": "Nakhon Pathom",
+        "lat": "13.817",
+        "lng": "100.031",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Nakhon Pathom",
+        "capital": "admin"
+      },
+      {
+        "city": "Samut Sakhon",
+        "lat": "13.547",
+        "lng": "100.273",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Samut Sakhon",
+        "capital": "admin"
+      },
+      {
+        "city": "Samut Songkhram",
+        "lat": "13.412",
+        "lng": "100.001",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Samut Songkhram",
+        "capital": "admin"
+      },
+      {
+        "city": "Phetchaburi",
+        "lat": "13.112",
+        "lng": "99.952",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Phetchaburi",
+        "capital": "admin"
+      },
+      {
+        "city": "Prachuap Khiri Khan",
+        "lat": "11.803",
+        "lng": "99.797",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Prachuap Khiri Khan",
+        "capital": "admin"
+      },
+      {
+        "city": "Chumphon",
+        "lat": "10.513",
+        "lng": "99.187",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Chumphon",
+        "capital": "admin"
+      },
+      {
+        "city": "Ranong",
+        "lat": "9.962",
+        "lng": "98.623",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Ranong",
+        "capital": "admin"
+      },
+      {
+        "city": "Surat Thani",
+        "lat": "9.1501",
+        "lng": "99.3401",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Surat Thani",
+        "capital": "admin"
+      },
+      {
+        "city": "Phangnga",
+        "lat": "8.4508",
+        "lng": "98.5258",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Phangnga",
+        "capital": "admin"
+      },
+      {
+        "city": "Phuket",
+        "lat": "7.8804",
+        "lng": "98.3923",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Phuket",
+        "capital": "admin"
+      },
+      {
+        "city": "Krabi",
+        "lat": "8.052",
+        "lng": "98.912",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Krabi",
+        "capital": "admin"
+      },
+      {
+        "city": "Nakhon Si Thammarat",
+        "lat": "8.399",
+        "lng": "99.97",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Nakhon Si Thammarat",
+        "capital": "admin"
+      },
+      {
+        "city": "Trang",
+        "lat": "7.5634",
+        "lng": "99.608",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Trang",
+        "capital": "admin"
+      },
+      {
+        "city": "Phatthalung",
+        "lat": "7.617",
+        "lng": "100.067",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Phatthalung",
+        "capital": "admin"
+      },
+      {
+        "city": "Satun",
+        "lat": "6.622",
+        "lng": "100.067",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Satun",
+        "capital": "admin"
+      },
+      {
+        "city": "Songkhla",
+        "lat": "7.207",
+        "lng": "100.602",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Songkhla",
+        "capital": "admin"
+      },
+      {
+        "city": "Pattani",
+        "lat": "6.862",
+        "lng": "101.25",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Pattani",
+        "capital": "admin"
+      },
+      {
+        "city": "Yala",
+        "lat": "6.554",
+        "lng": "101.282",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Yala",
+        "capital": "admin"
+      },
+      {
+        "city": "Narathiwat",
+        "lat": "6.43",
+        "lng": "101.826",
+        "country": "Thailand",
+        "iso2": "TH",
+        "admin_name": "Narathiwat",
+        "capital": "admin"
+      }
+]
+  
