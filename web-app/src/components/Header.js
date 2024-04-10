@@ -14,13 +14,23 @@ import { Button } from "@mui/material";
 import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
-import CONFIG from '../config';
+import CONFIG from "../config";
 
-const pages = ["Map", "Learning Material", "APIs", "About US"];
+const pages = [
+  { name: "Map" },
+  {
+    name: "Dash Board",
+    subMenu: ["Hotspot", "Burnt scar", "PM2.5"],
+  },
+  { name: "Learning Material" },
+  { name: "APIs" },
+  { name: "About US" },
+];
 // const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 export default function Header() {
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorElGoogle, setAnchorElGoogle] = React.useState(null);
   const [userInfo, setUserInfo] = React.useState(JSON.parse(localStorage.getItem("myData")) || "");
 
   React.useEffect(() => {
@@ -31,6 +41,8 @@ export default function Header() {
     switch (page) {
       case "Map":
         return "/";
+      case "Hotspot":
+        return "/dash_board";
       case "Learning Material":
         return "/learning_material";
       case "APIs":
@@ -46,9 +58,18 @@ export default function Header() {
     setAnchorEl(event.currentTarget);
   };
 
+  const handleGoogle = (event) => {
+    setAnchorElGoogle(event.currentTarget);
+  };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const handleGoogleClose = () => {
+    setAnchorElGoogle(null);
+  };
+
 
   const loginApi = async (name, email) => {
     const payload = {
@@ -58,7 +79,7 @@ export default function Header() {
     };
 
     try {
-      const response = await axios.post(CONFIG.API_URL+"/login", payload);
+      const response = await axios.post(CONFIG.API_URL + "/login", payload);
       return response.data; // return the response data
     } catch (error) {
       console.error(error); // log the error message
@@ -86,16 +107,42 @@ export default function Header() {
           RIDA - BURNT SCAR MAP PROJECT
         </Typography>
         <Box sx={{ flexGrow: 12, display: { xs: "none", md: "flex" } }} />
-        {pages.map((page) => (
-          <Button
-            key={page}
-            underline="none"
-            href={getPageUrl(page)}
-            sx={{ my: 2, display: "block", color: "#fff", mx: 1, fontFamily: "monospace", fontWeight: 700 }}
-          >
-            <center> {page}</center>
-          </Button>
-        ))}
+        {pages.map((page, index) => {
+          return (
+            <div key={index}>
+              <Button
+                underline="none"
+                onClick={(event) => {
+                  event.preventDefault();
+                  if (!page.subMenu) {
+                    window.location.href = getPageUrl(page.name);
+                  } else {
+                    handleMenu(event);
+                  }
+                }}
+                sx={{ my: 2, display: "block", color: "#fff", mx: 1, fontFamily: "monospace", fontWeight: 700 }}
+              >
+                <center>{page.name}</center>
+              </Button>
+              {page.subMenu && (
+                <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
+                  {page.subMenu.map((subPage) => (
+                    <MenuItem
+                      key={subPage}
+                      onClick={(event) => {
+                        event.preventDefault();
+                        window.location.href = getPageUrl(subPage);
+                        handleClose();
+                      }}
+                    >
+                      {subPage}
+                    </MenuItem>
+                  ))}
+                </Menu>
+              )}
+            </div>
+          );
+        })}
 
         <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "flex-end" }}>
           {!userInfo ? (
@@ -105,14 +152,14 @@ export default function Header() {
                 aria-label="account of current user"
                 aria-controls="menu-appbar"
                 aria-haspopup="true"
-                onClick={handleMenu}
+                onClick={handleGoogle}
                 color="inherit"
               >
                 <GoogleIcon />
               </IconButton>
               <Menu
                 id="menu-appbar"
-                anchorEl={anchorEl}
+                anchorEl={anchorElGoogle}
                 anchorOrigin={{
                   vertical: "top",
                   horizontal: "right",
@@ -122,10 +169,10 @@ export default function Header() {
                   vertical: "top",
                   horizontal: "right",
                 }}
-                open={Boolean(anchorEl)}
-                onClose={handleClose}
+                open={Boolean(anchorElGoogle)}
+                onClose={handleGoogleClose}
               >
-                <MenuItem onClick={handleClose}>
+                <MenuItem onClick={handleGoogleClose}>
                   <GoogleLogin
                     onSuccess={(credentialResponse) => {
                       const decoded = jwtDecode(credentialResponse?.credential);
@@ -167,7 +214,7 @@ export default function Header() {
                   horizontal: "right",
                 }}
                 open={Boolean(anchorEl)}
-                onClose={handleClose}
+                onClose={handleGoogleClose}
               >
                 <MenuItem
                   onClick={() => {

@@ -8,6 +8,7 @@ import API from "./pages/API";
 import "./App.css";
 import LoginPage from "./pages/loginpage";
 import Layout from "./components/layout";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<Map />} />
+          <Route path="/dash_board" element={<Dashboard />} />
           <Route path="/learning_material" element={<Course />} />
           <Route path="/api" element={<API />} />
           <Route path="/about_us" element={<AboutUS />} />
