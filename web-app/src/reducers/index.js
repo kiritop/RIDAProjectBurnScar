@@ -6,7 +6,7 @@ import hotSpotReducer from "./hotSpotSlice";
 import uiReducer from "./uiSlice";
 import usersReducer from "./userSlice";
 import tableReducer from "./tableSlice";
-
+import dashboardSlice from "./dashboardSlice";
 
 const rootReducer = combineReducers({
   aqi: aqiReducer,
@@ -14,8 +14,9 @@ const rootReducer = combineReducers({
   hotSpot: hotSpotReducer,
   ui: uiReducer,
   users: usersReducer,
-  table: tableReducer
- 
+  table: tableReducer,
+  dash: dashboardSlice,
+
   // คุณสามารถเพิ่ม reducers อื่น ๆ ที่นี่
 });
 

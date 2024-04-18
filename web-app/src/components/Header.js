@@ -42,7 +42,9 @@ export default function Header() {
       case "Map":
         return "/";
       case "Hotspot":
-        return "/dash_board";
+        return "/hot_spot";
+        case "PM2.5":
+          return "/pm_25";
       case "Learning Material":
         return "/learning_material";
       case "APIs":
