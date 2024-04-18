@@ -31,6 +31,7 @@ const pages = [
 export default function Header() {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [anchorElGoogle, setAnchorElGoogle] = React.useState(null);
+
   const [userInfo, setUserInfo] = React.useState(JSON.parse(localStorage.getItem("myData")) || "");
 
   React.useEffect(() => {
@@ -43,8 +44,8 @@ export default function Header() {
         return "/";
       case "Hotspot":
         return "/hot_spot";
-        case "PM2.5":
-          return "/pm_25";
+      case "PM2.5":
+        return "/pm_25";
       case "Learning Material":
         return "/learning_material";
       case "APIs":
@@ -71,7 +72,6 @@ export default function Header() {
   const handleGoogleClose = () => {
     setAnchorElGoogle(null);
   };
-
 
   const loginApi = async (name, email) => {
     const payload = {
@@ -196,7 +196,7 @@ export default function Header() {
                 aria-label="account of current user"
                 aria-controls="menu-appbar"
                 aria-haspopup="true"
-                onClick={handleMenu}
+                onClick={handleGoogle}
                 color="inherit"
               >
                 <AccountCircle />
@@ -205,7 +205,7 @@ export default function Header() {
 
               <Menu
                 id="menu-appbar"
-                anchorEl={anchorEl}
+                anchorEl={anchorElGoogle}
                 anchorOrigin={{
                   vertical: "top",
                   horizontal: "right",
@@ -215,7 +215,7 @@ export default function Header() {
                   vertical: "top",
                   horizontal: "right",
                 }}
-                open={Boolean(anchorEl)}
+                open={Boolean(anchorElGoogle)}
                 onClose={handleGoogleClose}
               >
                 <MenuItem
