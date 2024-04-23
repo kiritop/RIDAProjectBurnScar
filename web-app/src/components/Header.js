@@ -30,7 +30,8 @@ const pages = [
 
 export default function Header() {
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const [anchorElGoogle, setAnchorElGoogle] = React.useState(null);
+  const [anchorElSignIn, setAnchorElSignIn] = React.useState(null);
+  const [anchorElSignOut, setAnchorElSignOut] = React.useState(null);
 
   const [userInfo, setUserInfo] = React.useState(JSON.parse(localStorage.getItem("myData")) || "");
 
@@ -57,20 +58,12 @@ export default function Header() {
     }
   }
 
-  const handleMenu = (event) => {
-    setAnchorEl(event.currentTarget);
+  const handleOpen = (setter) => (event) => {
+    setter(event.currentTarget);
   };
 
-  const handleGoogle = (event) => {
-    setAnchorElGoogle(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleGoogleClose = () => {
-    setAnchorElGoogle(null);
+  const handleClose = (setter) => () => {
+    setter(null);
   };
 
   const loginApi = async (name, email) => {
@@ -119,7 +112,7 @@ export default function Header() {
                   if (!page.subMenu) {
                     window.location.href = getPageUrl(page.name);
                   } else {
-                    handleMenu(event);
+                    handleOpen(setAnchorEl)(event);
                   }
                 }}
                 sx={{ my: 2, display: "block", color: "#fff", mx: 1, fontFamily: "monospace", fontWeight: 700 }}
@@ -127,14 +120,14 @@ export default function Header() {
                 <center>{page.name}</center>
               </Button>
               {page.subMenu && (
-                <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
+                <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose(setAnchorEl)}>
                   {page.subMenu.map((subPage) => (
                     <MenuItem
                       key={subPage}
                       onClick={(event) => {
                         event.preventDefault();
+                        handleClose(setAnchorEl)();
                         window.location.href = getPageUrl(subPage);
-                        handleClose();
                       }}
                     >
                       {subPage}
@@ -154,14 +147,14 @@ export default function Header() {
                 aria-label="account of current user"
                 aria-controls="menu-appbar"
                 aria-haspopup="true"
-                onClick={handleGoogle}
+                onClick={handleOpen(setAnchorElSignIn)}
                 color="inherit"
               >
                 <GoogleIcon />
               </IconButton>
               <Menu
                 id="menu-appbar"
-                anchorEl={anchorElGoogle}
+                anchorEl={anchorElSignIn}
                 anchorOrigin={{
                   vertical: "top",
                   horizontal: "right",
@@ -171,10 +164,10 @@ export default function Header() {
                   vertical: "top",
                   horizontal: "right",
                 }}
-                open={Boolean(anchorElGoogle)}
-                onClose={handleGoogleClose}
+                open={Boolean(anchorElSignIn)}
+                onClose={handleClose(setAnchorElSignIn)}
               >
-                <MenuItem onClick={handleGoogleClose}>
+                <MenuItem onClick={handleClose(setAnchorElSignIn)}>
                   <GoogleLogin
                     onSuccess={(credentialResponse) => {
                       const decoded = jwtDecode(credentialResponse?.credential);
@@ -182,7 +175,7 @@ export default function Header() {
                       const email = decoded.email;
                       setUserInfo(email);
                       loginApi(name, email);
-                      window.location.reload();
+                      handleClose(setAnchorElSignIn)();
                     }}
                     onError={() => {}}
                   />
@@ -196,7 +189,7 @@ export default function Header() {
                 aria-label="account of current user"
                 aria-controls="menu-appbar"
                 aria-haspopup="true"
-                onClick={handleGoogle}
+                onClick={handleOpen(setAnchorElSignOut)}
                 color="inherit"
               >
                 <AccountCircle />
@@ -205,7 +198,7 @@ export default function Header() {
 
               <Menu
                 id="menu-appbar"
-                anchorEl={anchorElGoogle}
+                anchorEl={anchorElSignOut}
                 anchorOrigin={{
                   vertical: "top",
                   horizontal: "right",
@@ -215,13 +208,13 @@ export default function Header() {
                   vertical: "top",
                   horizontal: "right",
                 }}
-                open={Boolean(anchorElGoogle)}
-                onClose={handleGoogleClose}
+                open={Boolean(anchorElSignOut)}
+                onClose={handleClose(setAnchorElSignOut)}
               >
                 <MenuItem
                   onClick={() => {
                     setUserInfo(null);
-                    window.location.reload();
+                    handleClose(setAnchorElSignOut)();
                   }}
                 >
                   Sign Out

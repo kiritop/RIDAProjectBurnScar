@@ -1,17 +1,24 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import MUIDataTable from "mui-datatables";
 import { Container, CircularProgress, FormControl, TableCell, InputLabel } from "@mui/material";
-import CONFIG from "../config";
 import { Chart } from "react-google-charts";
 import { Select, MenuItem } from "@mui/material";
 import dataAll from "../reducers/json/data_state.json";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchPM25Data } from "../reducers/dashboardSlice";
 
 function PM25() {
-  const [pm25Data, setPm25Data] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [country, setCountry] = useState("TH");
+  const dispatch = useDispatch();
+  const dataPM25 = useSelector((state) => state.dashboard.dataPM25);
+  const filteredData = dataAll.filter((data) => data.iso2 === country);
+
+  useEffect(() => {
+    dispatch(fetchPM25Data(filteredData));
+  }, [country]);
 
   const date = new Date();
 
@@ -19,42 +26,10 @@ function PM25() {
     day: "numeric",
     month: "long",
     year: "numeric",
-  });
+  }); 
 
-  const filteredData = dataAll.filter((data) => data.iso2 === country);
-
-  useEffect(() => {
-    const fetchData = async (data) => {
-      const url = `https://api.waqi.info/feed/geo:${data.lat};${data.lng}/?token=${CONFIG.AQI_API_KEY}`;
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      let result = await response.json();
-
-      const pm25Value = result.data.iaqi.pm25.v;
-      return { city: data.city, pm25: pm25Value };
-    };
-
-    // Fetch data from all URLs
-    Promise.all(filteredData.map((url) => fetchData(url)))
-      .then((values) => {
-        // Sort the values from max to min
-        const sortedValues = values.sort((a, b) => b.pm25 - a.pm25);
-        setPm25Data(sortedValues);
-        console.log(sortedValues); // Log the sorted PM2.5 values
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error(error);
-        setLoading(false);
-      });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [country]);
-
-  const chartData = [["City", "PM2.5 Value"], ...pm25Data.map((item) => [item.city, item.pm25])];
-
-  const tableData = [...pm25Data.map((item) => [item.city, item.pm25])];
+  const chartData = [["City", "PM2.5 Value"], ...dataPM25.map((item) => [item.city, item.pm25])];  
+  const tableData = [...dataPM25.map((item) => [item.city, item.pm25])];
 
   const LineOptions = {
     title: "Air Quality Index (PM 2.5) for Given Date" + dateTitle,
@@ -137,7 +112,7 @@ function PM25() {
 
         <Box display="flex" justifyContent="space-between" alignItems="start" my={3}>
           <Box mr={2} sx={{ borderRadius: 5, overflow: "hidden", flex: 1 }}>
-            {loading ? (
+            {!dataPM25 ? (
               <Box display="flex" justifyContent="center" alignItems="center" height="100%">
                 <CircularProgress />
               </Box>

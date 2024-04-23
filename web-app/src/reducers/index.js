@@ -15,7 +15,7 @@ const rootReducer = combineReducers({
   ui: uiReducer,
   users: usersReducer,
   table: tableReducer,
-  dash: dashboardSlice,
+  dashboard: dashboardSlice,
 
   // คุณสามารถเพิ่ม reducers อื่น ๆ ที่นี่
 });
