@@ -3,7 +3,7 @@ import {GeoJSON} from "react-leaflet";
 import L from "leaflet"; // import Leaflet library
 import './custom.css';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchBurntScarData } from '../reducers/burntScarSlice';
+import { fetchBurntScarPolygon } from '../reducers/burntScarSlice';
 import { setLoadingMap } from '../reducers/uiSlice';
 
 
@@ -16,7 +16,7 @@ const MapBurnScar = () => {
 
   useEffect(() => {
     dispatch(setLoadingMap(true));
-    dispatch(fetchBurntScarData(sidebarForm))
+    dispatch(fetchBurntScarPolygon(sidebarForm))
     .finally(() => {
       dispatch(setLoadingMap(false));
     });
@@ -39,14 +39,13 @@ const percentToColor = (percent) => {
 };
 
   // define a custom pointToLayer function
-  const pointToLayer = (feature, latlng) => {
+  const polygonToLayer = (feature, latlngs) => {
+    console.log("feature", feature)
     // get the color based on the fire type
-    const color = percentToColor(feature.properties.frequency);
-    // create a circle marker with a fixed pixel radius of 1
-    let marker = L.circleMarker(latlng, { radius: 0.1, color: color, fillOpacity: 1 });
+    // const color = percentToColor(feature.properties.frequency);
+    // create a polygon marker
+    let marker = L.polygon(latlngs, { color: 'red', fillOpacity: 1 });
 
-    
-    
     return marker;
   };
 
@@ -64,18 +63,18 @@ const percentToColor = (percent) => {
 
   const onEachFeature = (feature, layer) => {
     // create a popup with the feature's properties
-    let popupContent = ` <div style="font-family: Arial, sans-serif; padding: 10px; border-radius: 5px;">
-      <h4 style="text-align: center">${feature?.properties?.location}</h4>
-      <table>
-        <tr><td><strong>Latitude:</strong></td><td style="text-align:right">${feature.geometry.coordinates[1]}</td></tr>
-        <tr><td><strong>Longitude:</strong></td><td style="text-align:right">${feature.geometry.coordinates[0]}</td></tr>
-        <tr><td><strong>Burnt ratio :</strong></td><td style="background-color:${percentToColor(feature.properties.frequency)};text-align:right;color:#000000;">${feature.properties.frequency} % </td></tr>
-        <tr><td><strong>Burnt frequency (times / total) :</strong></td><td style="text-align:right">${feature.properties.count}/${feature.properties.total_shapefile}</td></tr>
-        <tr><td><strong>Burnt year :</strong></td><td style="text-align:right">${feature.properties.year}</td></tr>
-      </table>
-    </div>`;
-    // ${feature.properties.year.map(item => `<tr><td><strong>Burnt year :</strong></td> <td style="text-align:right">${item}</td></tr>`).join('')}
-    layer.bindPopup(popupContent, { className: 'custom-popup' }); // add a custom class name
+    // let popupContent = ` <div style="font-family: Arial, sans-serif; padding: 10px; border-radius: 5px;">
+    //   <h4 style="text-align: center">${feature?.properties?.location}</h4>
+    //   <table>
+    //     <tr><td><strong>Latitude:</strong></td><td style="text-align:right">${feature.geometry.coordinates[1]}</td></tr>
+    //     <tr><td><strong>Longitude:</strong></td><td style="text-align:right">${feature.geometry.coordinates[0]}</td></tr>
+    //     <tr><td><strong>Burnt ratio :</strong></td><td style="background-color:${percentToColor(feature.properties.frequency)};text-align:right;color:#000000;">${feature.properties.frequency} % </td></tr>
+    //     <tr><td><strong>Burnt frequency (times / total) :</strong></td><td style="text-align:right">${feature.properties.count}/${feature.properties.total_shapefile}</td></tr>
+    //     <tr><td><strong>Burnt year :</strong></td><td style="text-align:right">${feature.properties.year}</td></tr>
+    //   </table>
+    // </div>`;
+    // // ${feature.properties.year.map(item => `<tr><td><strong>Burnt year :</strong></td> <td style="text-align:right">${item}</td></tr>`).join('')}
+    // layer.bindPopup(popupContent, { className: 'custom-popup' }); // add a custom class name
   };
 
 
@@ -84,12 +83,13 @@ const percentToColor = (percent) => {
      {
           // Iterate the borderData with .map():
           burntScarData.map((data, index) => {
+            // Convert the coordinates to a format that can be used by Leaflet
+            // Convert the coordinates to a format that can be used by Leaflet
+            const coordinates = data.geometry.coordinates.map(coordinate => [coordinate[1], coordinate[0]]);
 
-            return (
-              // Pass data to layer via props:
-              <>
-                <GeoJSON key={index} data={data} pointToLayer={pointToLayer} onEachFeature={onEachFeature} />
-              </>
+          return (
+            // Pass data to layer via props:
+            <GeoJSON key={index} data={{...data, geometry: {...data.geometry, coordinates: [coordinates]}}} style={{color: 'red', weight: 1, fillOpacity: 0.5}} coordsToLatLng={coords => new L.LatLng(coords[0], coords[1])} onEachFeature={onEachFeature} />
             )
           })
       }

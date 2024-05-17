@@ -12,9 +12,10 @@ const crypto = require("crypto");
 
 // Create connection to MySQL
 const db = mysql.createConnection({
-  host: "localhost",
+  host: "10.1.29.33",
+  port: '3306',
   user: "root",
-  password: "root1234",
+  password: "gdkll,@MFU2024",
   database: "RidaDB",
 });
 
@@ -43,6 +44,48 @@ server.get("/api/read-shapefile", async (req, res) => {
   );
 
   res.json(features);
+});
+
+// สร้าง endpoint สำหรับ query ข้อมูลตามช่วงวันที่
+server.get('/api/get-burnt-from-date', (req, res) => {
+  let startYear = req.query.start; // รับปีที่เริ่มต้นจาก query parameter
+  let endYear = req.query.end; // รับปีที่สิ้นสุดจาก query parameter
+
+  // แปลงปีเป็นวันที่ที่สามารถใช้ใน SQL query
+  // let startDate = `${startYear}-01-01`;
+  // let endDate = `${endYear}-12-31`;
+
+  let startDate = `2020-01-01`;
+  let endDate = `2021-12-31`;
+
+  let sql = `SELECT BURNT_SCAR_ID, AP_EN, PV_EN, FIRE_DATE, LATITUDE, LONGITUDE, REPLACE(REPLACE(GEOMETRY_DATA, '(', '['), ')', ']') AS GEOMETRY_DATA, GEOMETRY_TYPE FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN '${startDate}' AND '${endDate}'`;
+
+  db.query(sql, (err, results) => {
+    if (err) throw err;
+
+    // แปลงข้อมูลเป็นรูปแบบ GeoJSON
+    let geojson = {
+      type: "FeatureCollection",
+      features: results.map(item => ({
+        type: "Feature",
+        properties: {
+          BURNT_SCAR_ID: item.BURNT_SCAR_ID,
+          AP_EN: item.AP_EN,
+          PV_EN: item.PV_EN,
+          FIRE_DATE: item.FIRE_DATE,
+          LATITUDE: item.LATITUDE,
+          LONGITUDE: item.LONGITUDE,
+        },
+        geometry: {
+          type: item.GEOMETRY_TYPE,
+          coordinates: JSON.parse(item.GEOMETRY_DATA)
+        }
+      }))
+    };
+
+    // ส่งข้อมูลกลับไปยัง client
+    res.json(geojson);
+  });
 });
 
 

@@ -47,6 +47,8 @@ export default function Header() {
         return "/hot_spot";
       case "PM2.5":
         return "/pm_25";
+      case "Burnt scar":
+        return "/burn_scar";
       case "Learning Material":
         return "/learning_material";
       case "APIs":

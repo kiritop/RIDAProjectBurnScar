@@ -8,6 +8,12 @@ export const fetchBurntScarData = createAsyncThunk('burntScar/fetchBurntScarData
     return data;
 });
 
+export const fetchBurntScarPolygon = createAsyncThunk('burntScar/fetchBurntScarPolygon', async (filter) => {
+  const response = await fetch(`${CONFIG.API_URL}/get-burnt-from-date?start=${filter.yearRange[0]}&end=${filter.yearRange[1]}`);
+  const data = await response.json();
+  return data;
+});
+
 const burntScarSlice = createSlice({
   name: 'burntScar',
   initialState: { data: [], loading: false },
@@ -19,6 +25,14 @@ const burntScarSlice = createSlice({
       })
       .addCase(fetchBurntScarData.fulfilled, (state, action) => {
         state.data = action.payload;
+        state.loading = false;
+      })
+      .addCase(fetchBurntScarPolygon.pending, (state) => {
+        state.data = [];
+        state.loading = true;
+      })
+      .addCase(fetchBurntScarPolygon.fulfilled, (state, action) => {
+        state.data = action.payload.features;
         state.loading = false;
       });
   },

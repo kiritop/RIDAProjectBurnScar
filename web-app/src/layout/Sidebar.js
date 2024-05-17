@@ -18,7 +18,7 @@ import Slider from "@mui/material/Slider";
 import { Select, Switch, MenuItem } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { saveLayerSettings, setLoadingMap, getCities } from '../reducers/uiSlice';
-import { fetchBurntScarData } from '../reducers/burntScarSlice';
+import { fetchBurntScarPolygon } from '../reducers/burntScarSlice';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -155,13 +155,13 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
       dispatch(saveLayerSettings({ sidebarForm, burntScar, aqi, hotSpot, current_lat, current_lng}));
     }
     
-    // if(burntScar){
-    //   dispatch(setLoadingMap(true));
-    //   dispatch(fetchBurntScarData(sidebarForm))
-    //   .finally(() => {
-    //     dispatch(setLoadingMap(false));
-    //   });
-    // }
+    if(burntScar){
+      dispatch(setLoadingMap(true));
+      dispatch(fetchBurntScarPolygon(sidebarForm))
+      .finally(() => {
+        dispatch(setLoadingMap(false));
+      });
+    }
     toggleDrawer(); 
   };
 
