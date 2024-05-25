@@ -63,18 +63,18 @@ const percentToColor = (percent) => {
 
   const onEachFeature = (feature, layer) => {
     // create a popup with the feature's properties
-    // let popupContent = ` <div style="font-family: Arial, sans-serif; padding: 10px; border-radius: 5px;">
-    //   <h4 style="text-align: center">${feature?.properties?.location}</h4>
-    //   <table>
-    //     <tr><td><strong>Latitude:</strong></td><td style="text-align:right">${feature.geometry.coordinates[1]}</td></tr>
-    //     <tr><td><strong>Longitude:</strong></td><td style="text-align:right">${feature.geometry.coordinates[0]}</td></tr>
-    //     <tr><td><strong>Burnt ratio :</strong></td><td style="background-color:${percentToColor(feature.properties.frequency)};text-align:right;color:#000000;">${feature.properties.frequency} % </td></tr>
-    //     <tr><td><strong>Burnt frequency (times / total) :</strong></td><td style="text-align:right">${feature.properties.count}/${feature.properties.total_shapefile}</td></tr>
-    //     <tr><td><strong>Burnt year :</strong></td><td style="text-align:right">${feature.properties.year}</td></tr>
-    //   </table>
-    // </div>`;
+    let popupContent = ` <div style="font-family: Arial, sans-serif; padding: 10px; border-radius: 5px;">
+      <h4 style="text-align: center">${feature?.properties?.PV_EN}, ${feature?.properties?.AP_EN}, ${feature?.properties?.COUNTRY}</h4>
+      <table>
+        <h5 style="text-align: center">Centroid</h5>
+        <tr><td><strong>Latitude:</strong></td><td style="text-align:right">${feature.properties.LATITUDE}</td></tr>
+        <tr><td><strong>Longitude:</strong></td><td style="text-align:right">${feature.properties.LONGITUDE}</td></tr>
+        <tr><td><strong>Fire date :</strong></td><td style="text-align:right">${feature.properties.FIRE_DATE}</td></tr>
+        <tr><td><strong>Area M :</strong></td><td style="text-align:right">${feature.properties.AREA}</td></tr>
+      </table>
+    </div>`;
     // // ${feature.properties.year.map(item => `<tr><td><strong>Burnt year :</strong></td> <td style="text-align:right">${item}</td></tr>`).join('')}
-    // layer.bindPopup(popupContent, { className: 'custom-popup' }); // add a custom class name
+    layer.bindPopup(popupContent, { className: 'custom-popup' }); // add a custom class name
   };
 
 

@@ -11,6 +11,7 @@
     "my": "^0.3.3",
     "mysql2": "^3.9.2",
     "node-cron": "^3.0.3",
+    "read-excel-file": "^5.7.1",
     "shapefile": "^0.6.6",
     "sql": "^0.78.0",
     "unzipper": "^0.10.14"

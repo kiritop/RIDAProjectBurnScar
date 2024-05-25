@@ -58,7 +58,7 @@ server.get('/api/get-burnt-from-date', (req, res) => {
   let startDate = `2020-01-01`;
   let endDate = `2021-12-31`;
 
-  let sql = `SELECT BURNT_SCAR_ID, AP_EN, PV_EN, FIRE_DATE, LATITUDE, LONGITUDE, REPLACE(REPLACE(GEOMETRY_DATA, '(', '['), ')', ']') AS GEOMETRY_DATA, GEOMETRY_TYPE FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN '${startDate}' AND '${endDate}'`;
+  let sql = `SELECT BURNT_SCAR_ID, AP_EN, PV_EN, FIRE_DATE, AREA, COUNTRY, LATITUDE, LONGITUDE, REPLACE(REPLACE(GEOMETRY_DATA, '(', '['), ')', ']') AS GEOMETRY_DATA, GEOMETRY_TYPE FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN '${startDate}' AND '${endDate}'`;
 
   db.query(sql, (err, results) => {
     if (err) throw err;
@@ -72,6 +72,8 @@ server.get('/api/get-burnt-from-date', (req, res) => {
           BURNT_SCAR_ID: item.BURNT_SCAR_ID,
           AP_EN: item.AP_EN,
           PV_EN: item.PV_EN,
+          COUNTRY: item.COUNTRY,
+          AREA: item.AREA,
           FIRE_DATE: item.FIRE_DATE,
           LATITUDE: item.LATITUDE,
           LONGITUDE: item.LONGITUDE,
