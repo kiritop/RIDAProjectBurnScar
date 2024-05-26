@@ -3,11 +3,12 @@ import { Chart } from "react-google-charts";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import MUIDataTable from "mui-datatables";
-import { Container, CircularProgress, TableCell, InputLabel, FormControl, Select, MenuItem } from "@mui/material";
+import { Container, CircularProgress, TableCell, InputLabel, FormControl, Select, MenuItem, Grid, Card, CardContent } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchHotspotData, fetchHotspotDataCountry } from "../reducers/dashboardSlice";
-import Slider from "@mui/material/Slider";
-import Stack from '@mui/joy/Stack';
+import { DateRange } from 'react-date-range';
+import 'react-date-range/dist/styles.css'; // main css file
+import 'react-date-range/dist/theme/default.css'; // theme css file
 
 
 function BurntScar() {
@@ -19,6 +20,14 @@ function BurntScar() {
   const [tableData, setTableData] = useState([]);
   const [yearRange, setYearRange] = useState([2010, 2020]); // Add this line
   console.log(dataHotspotC);
+
+  const [state, setState] = useState([
+    {
+      startDate: new Date(),
+      endDate: null,
+      key: 'selection'
+    }
+  ]);
 
   // แยก fetchHotspotData
   useEffect(() => {
@@ -174,59 +183,70 @@ function BurntScar() {
         <Box height={10} />
         <Box height={10} />
 
-        <Box display="flex" justifyContent="space-between" alignItems="start" my={3}>
-          <FormControl orientation="horizontal">
-            <Box my={1} sx={{ minWidth: 120, display: "flex", justifyContent: "flex-end" }}>
-              <Stack spacing={2} direction="row" alignItems="center">
-                <Slider
-                  value={yearRange}
-                  onChange={(event, newValue) => setYearRange(newValue)}
-                  valueLabelDisplay="on"
-                  min={2000}
-                  max={2030}
-                  step={1}
-                />
-              </Stack>
-            </Box>
-          </FormControl>
-        </Box>
-      
-        <Box sx={{ minWidth: 120, display: "flex", justifyContent: "flex-end" }}>
-          <Box mr={24}>
-            <InputLabel id="country-select-label">Select Country :</InputLabel>
-          </Box>
-        </Box>
-        <Box my={1} sx={{ minWidth: 120, display: "flex", justifyContent: "flex-end" }}>
-          <FormControl sx={{ m: 1, width: 300, backgroundColor: "#fff", borderRadius: 2 }}>
-            <Select labelId="country-select-label" value={country} onChange={(event) => setCountry(event.target.value)}>
-              <MenuItem value={"THA"}>Thailand</MenuItem>
-              <MenuItem value={"VNM"}>Vietnam</MenuItem>
-              <MenuItem value={"MMR"}>Myanmar</MenuItem>
-              <MenuItem value={"LAO"}>Laos</MenuItem>
-            </Select>
-          </FormControl>
-        </Box>
-        <Box display="flex" justifyContent="space-between" alignItems="start" my={3}>
-          <Box mr={2} sx={{ borderRadius: 5, overflow: "hidden", flex: 1 }}>
-            {!dataHotspotC ? (
-              <Box display="flex" justifyContent="center" alignItems="center" height="100%">
-                <CircularProgress />
-              </Box>
-            ) : (
-              <Chart width={"100%"} height={600} chartType="LineChart" data={chartData} options={LineOptions} />
-            )}
-          </Box>
-          <Box height={20} />
+        <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <Card>
+              <CardContent>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} md={6}>
+                    <Box my={1} sx={{display: "flex", justifyContent: "flex-end" }}>
+                      <DateRange
+                        editableDateInputs={true}
+                        onChange={item => setState([item.selection])}
+                        moveRangeOnFirstSelection={false}
+                        ranges={state}
+                      />
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <Box sx={{ minWidth: 120, display: "flex", justifyContent: "flex-end" }}>
+                      <Box mr={24}>
+                        <InputLabel id="country-select-label">Select Country :</InputLabel>
+                      </Box>
+                    </Box>
+                    <Box my={1} sx={{ minWidth: 120, display: "flex", justifyContent: "flex-end" }}>
+                      <FormControl sx={{ m: 1, width: 300, backgroundColor: "#fff", borderRadius: 2 }}>
+                        <Select labelId="country-select-label" value={country} onChange={(event) => setCountry(event.target.value)}>
+                          <MenuItem value={"THA"}>Thailand</MenuItem>
+                          <MenuItem value={"VNM"}>Vietnam</MenuItem>
+                          <MenuItem value={"MMR"}>Myanmar</MenuItem>
+                          <MenuItem value={"LAO"}>Laos</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Box>
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+          </Grid>
 
-          <Box sx={{ borderRadius: 5, overflow: "hidden", flex: 1 }}>
-            <MUIDataTable
-              title={<h3>Calculate the total number of hotspot per country on {dateTitle}</h3>}
-              data={tableData}
-              columns={columns}
-              options={options}
-            />
-          </Box>
-        </Box>
+          <Grid item xs={12} md={6}>
+            <Card>
+              <CardContent>
+                {!dataHotspotC ? (
+                  <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+                    <CircularProgress />
+                  </Box>
+                ) : (
+                  <Chart width={"100%"} height={600} chartType="LineChart" data={chartData} options={LineOptions} />
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <Card>
+              <CardContent>
+                <MUIDataTable
+                  title={<h3>Calculate the total number of hotspot per country on {dateTitle}</h3>}
+                  data={tableData}
+                  columns={columns}
+                  options={options}
+                />
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
       </Container>
     </>
   );
