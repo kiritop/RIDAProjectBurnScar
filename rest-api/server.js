@@ -48,19 +48,26 @@ server.get("/api/read-shapefile", async (req, res) => {
 
 // สร้าง endpoint สำหรับ query ข้อมูลตามช่วงวันที่
 server.get('/api/get-burnt-from-date', (req, res) => {
-  let startDate = req.query.startDate; // รับปีที่เริ่มต้นจาก query parameter
-  let endDate = req.query.endDate; // รับปีที่สิ้นสุดจาก query parameter
+  let startDate = req.query.startDate; // Get the start date from the query parameter
+  let endDate = req.query.endDate; // Get the end date from the query parameter
   let country = req.query.country;
   let province = req.query.province;
 
+  // Construct the SQL query
+  let sql = `SELECT BURNT_SCAR_ID, AP_EN, PV_EN, FIRE_DATE, AREA, COUNTRY, LATITUDE, LONGITUDE, REPLACE(REPLACE(GEOMETRY_DATA, '(', '['), ')', ']') AS GEOMETRY_DATA, GEOMETRY_TYPE FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN '${startDate}' AND '${endDate}'`;
 
-  let sql = `SELECT BURNT_SCAR_ID, AP_EN, PV_EN, FIRE_DATE, AREA, COUNTRY, LATITUDE, LONGITUDE, REPLACE(REPLACE(GEOMETRY_DATA, '(', '['), ')', ']') AS GEOMETRY_DATA, GEOMETRY_TYPE FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN '${startDate}' AND '${endDate}'
-  AND COUNTRY = '${country}' AND PV_EN = '${province}' `;
+  // Add conditions for country and province if they are provided
+  if (country) {
+    sql += ` AND COUNTRY = '${country}'`;
+  }
+  if (province) {
+    sql += ` AND PV_EN = '${province}'`;
+  }
 
   db.query(sql, (err, results) => {
     if (err) throw err;
 
-    // แปลงข้อมูลเป็นรูปแบบ GeoJSON
+    // Convert data to GeoJSON format
     let geojson = {
       type: "FeatureCollection",
       features: results.map(item => ({
@@ -82,7 +89,7 @@ server.get('/api/get-burnt-from-date', (req, res) => {
       }))
     };
 
-    // ส่งข้อมูลกลับไปยัง client
+    // Send the data back to the client
     res.json(geojson);
   });
 });
