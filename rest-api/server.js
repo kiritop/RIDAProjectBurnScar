@@ -48,17 +48,14 @@ server.get("/api/read-shapefile", async (req, res) => {
 
 // สร้าง endpoint สำหรับ query ข้อมูลตามช่วงวันที่
 server.get('/api/get-burnt-from-date', (req, res) => {
-  let startYear = req.query.start; // รับปีที่เริ่มต้นจาก query parameter
-  let endYear = req.query.end; // รับปีที่สิ้นสุดจาก query parameter
+  let startDate = req.query.startDate; // รับปีที่เริ่มต้นจาก query parameter
+  let endDate = req.query.endDate; // รับปีที่สิ้นสุดจาก query parameter
+  let country = req.query.country;
+  let province = req.query.province;
 
-  // แปลงปีเป็นวันที่ที่สามารถใช้ใน SQL query
-  // let startDate = `${startYear}-01-01`;
-  // let endDate = `${endYear}-12-31`;
 
-  let startDate = `2020-01-01`;
-  let endDate = `2021-12-31`;
-
-  let sql = `SELECT BURNT_SCAR_ID, AP_EN, PV_EN, FIRE_DATE, AREA, COUNTRY, LATITUDE, LONGITUDE, REPLACE(REPLACE(GEOMETRY_DATA, '(', '['), ')', ']') AS GEOMETRY_DATA, GEOMETRY_TYPE FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN '${startDate}' AND '${endDate}'`;
+  let sql = `SELECT BURNT_SCAR_ID, AP_EN, PV_EN, FIRE_DATE, AREA, COUNTRY, LATITUDE, LONGITUDE, REPLACE(REPLACE(GEOMETRY_DATA, '(', '['), ')', ']') AS GEOMETRY_DATA, GEOMETRY_TYPE FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN '${startDate}' AND '${endDate}'
+  AND COUNTRY = '${country}' AND PV_EN = '${province}' `;
 
   db.query(sql, (err, results) => {
     if (err) throw err;
@@ -407,7 +404,7 @@ server.get("/api/get-users", (req, res) => {
 });
 
 server.post("/api/login", (req, res) => {
-  const { google_id, name, email, picture_url, api_key } = req.body;
+  const { username, first_name, last_name, email, picture_url, api_key } = req.body;
 
   let sql = "SELECT * FROM users WHERE email = ?";
   db.query(sql, [email], (err, results) => {
@@ -420,9 +417,9 @@ server.post("/api/login", (req, res) => {
     if (results.length > 0) {
       res.send("Logged in successfully");
     } else {
-      sql = "INSERT INTO users (google_id, name, email, picture_url, api_key) VALUES (?, ?, ?, ?, ?)";
+      sql = "INSERT INTO users (username, first_name, last_name, email, picture_url, api_key) VALUES (?, ?, ?, ?, ?)";
 
-      db.query(sql, [google_id, name, email, picture_url, api_key], (err, results) => {
+      db.query(sql, [username, first_name, last_name, email, picture_url, api_key], (err, results) => {
         if (err) {
           console.error(err);
           res.status(500).send("Server error");
