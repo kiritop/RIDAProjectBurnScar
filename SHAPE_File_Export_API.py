@@ -83,7 +83,7 @@ def export_to_shapefile():
             buffer.seek(0)
             response = make_response(buffer.read())
             response.headers.set('Content-Type', 'application/zip')
-            response.headers.set('Content-Disposition', 'attachment', filename=filename)
+            response.headers.set('Content-Disposition', 'attachment; filename=' + filename)
             return response
 
 if __name__ == '__main__':
