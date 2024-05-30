@@ -187,7 +187,41 @@ function BurntScar() {
           <Grid item xs={12}>
             <Card>
               <CardContent>
-                <Grid container spacing={2}>
+                <Grid item xs={12} md={6}>
+                  <Box sx={{ minWidth: 120, display: "flex", justifyContent: "flex-end" }}>
+                    <Box mr={24}>
+                      <InputLabel id="country-select-label">Select Country :</InputLabel>
+                    </Box>
+                  </Box>
+                  <Box my={1} sx={{ minWidth: 120, display: "flex", justifyContent: "flex-end" }}>
+                    <FormControl sx={{ m: 1, width: 300, backgroundColor: "#fff", borderRadius: 2 }}>
+                      <Select labelId="country-select-label" value={country} onChange={(event) => setCountry(event.target.value)}>
+                        <MenuItem value={"THA"}>Thailand</MenuItem>
+                        <MenuItem value={"VNM"}>Vietnam</MenuItem>
+                        <MenuItem value={"MMR"}>Myanmar</MenuItem>
+                        <MenuItem value={"LAO"}>Laos</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Box>
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <Box sx={{ minWidth: 120, display: "flex", justifyContent: "flex-end" }}>
+                    <Box mr={24}>
+                      <InputLabel id="country-select-label">Select Province :</InputLabel>
+                    </Box>
+                  </Box>
+                  <Box my={1} sx={{ minWidth: 120, display: "flex", justifyContent: "flex-end" }}>
+                    <FormControl sx={{ m: 1, width: 300, backgroundColor: "#fff", borderRadius: 2 }}>
+                      <Select labelId="country-select-label" value={country} onChange={(event) => setCountry(event.target.value)}>
+                        <MenuItem value={"THA"}>Thailand</MenuItem>
+                        <MenuItem value={"VNM"}>Vietnam</MenuItem>
+                        <MenuItem value={"MMR"}>Myanmar</MenuItem>
+                        <MenuItem value={"LAO"}>Laos</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Box>
+                </Grid>
+                {/* <Grid container spacing={2}>
                   <Grid item xs={12} md={6}>
                     <Box my={1} sx={{display: "flex", justifyContent: "flex-end" }}>
                       <DateRange
@@ -198,24 +232,8 @@ function BurntScar() {
                       />
                     </Box>
                   </Grid>
-                  <Grid item xs={12} md={6}>
-                    <Box sx={{ minWidth: 120, display: "flex", justifyContent: "flex-end" }}>
-                      <Box mr={24}>
-                        <InputLabel id="country-select-label">Select Country :</InputLabel>
-                      </Box>
-                    </Box>
-                    <Box my={1} sx={{ minWidth: 120, display: "flex", justifyContent: "flex-end" }}>
-                      <FormControl sx={{ m: 1, width: 300, backgroundColor: "#fff", borderRadius: 2 }}>
-                        <Select labelId="country-select-label" value={country} onChange={(event) => setCountry(event.target.value)}>
-                          <MenuItem value={"THA"}>Thailand</MenuItem>
-                          <MenuItem value={"VNM"}>Vietnam</MenuItem>
-                          <MenuItem value={"MMR"}>Myanmar</MenuItem>
-                          <MenuItem value={"LAO"}>Laos</MenuItem>
-                        </Select>
-                      </FormControl>
-                    </Box>
-                  </Grid>
-                </Grid>
+                  
+                </Grid> */}
               </CardContent>
             </Card>
           </Grid>

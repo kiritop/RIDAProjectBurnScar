@@ -46,6 +46,35 @@ server.get("/api/read-shapefile", async (req, res) => {
   res.json(features);
 });
 
+server.get("/api/get-province", async (req, res) => {
+  const { country } = req.query;
+  let sql = `SELECT DISTINCT PV_EN FROM RidaDB.BURNT_SCAR_INFO WHERE ISO3 = ?`;
+  db.query(sql, [country], (err, results) => {
+    if (err) throw err;
+    res.send(results);
+  });
+});
+
+
+server.get("/api/get-data-for-bubble", async (req, res) => {
+  const { fromDate, toDate, country, province } = req.query;
+  let sql = `SELECT ISO3 AS COUNTRY_ISO3, PV_EN, YEAR(FIRE_DATE) AS FIRE_YEAR, MONTH(FIRE_DATE) AS FIRE_MONTH, SUM(AREA) as SUM_AREA FROM RidaDB.BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN '${fromDate}' AND '${toDate}'`;
+
+  if (country) {
+    sql += ` AND ISO3 = '${country}'`;
+  }
+  if (province) {
+    sql += ` AND PV_EN = '${province}'`;
+  }
+
+  sql += ` GROUP BY COUNTRY, ISO3, FIRE_YEAR, FIRE_MONTH, PV_EN `;
+  db.query(sql, [fromDate, toDate], (err, results) => {
+    if (err) throw err;
+    res.send(results);
+  });
+});
+
+
 // สร้าง endpoint สำหรับ query ข้อมูลตามช่วงวันที่
 server.get('/api/get-burnt-from-date', (req, res) => {
   let startDate = req.query.startDate; // Get the start date from the query parameter
@@ -58,7 +87,7 @@ server.get('/api/get-burnt-from-date', (req, res) => {
 
   // Add conditions for country and province if they are provided
   if (country) {
-    sql += ` AND COUNTRY = '${country}'`;
+    sql += ` AND ISO3 = '${country}'`;
   }
   if (province) {
     sql += ` AND PV_EN = '${province}'`;

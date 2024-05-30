@@ -10,6 +10,18 @@ const formattedDate = date.toISOString().slice(0, 10);
 
 console.log(formattedDate);
 
+export const fetchProvinceByCountry = createAsyncThunk("dashboard/fetchProvinceByCountry", async (country) => {
+  try{
+    const response = await fetch(`${CONFIG.API_URL}/get-province?country=${country}`);
+    const data = await response.json();
+    return data;
+  }catch (error){
+    console.error(error);
+    return null;
+  }
+
+});
+
 export const fetchHotspotData = createAsyncThunk("dashboard/fetchHotspotData", async () => {
   const urls = [
     `https://firms.modaps.eosdis.nasa.gov/api/country/csv/579db9c41c852c1f75bc6b73f8b90262/MODIS_NRT/THA/1/${formattedDate}`,
@@ -119,7 +131,13 @@ export const fetchPM25Data = createAsyncThunk("dashboard/fetchPM25Data", async (
 
 export const DashboardSlice = createSlice({
   name: "dashboard",
-  initialState: { dataHotspot: [], dataHotspotCountry: [], dataPM25: [], loading: false },
+  initialState: { 
+    dataHotspot: [], 
+    dataHotspotCountry: [], 
+    dataPM25: [], 
+    loading: false,
+    dataProvince:[]
+  },
   reducers: {
     setFilter: (state, action) => {
       state.filter = action.payload;
@@ -147,7 +165,14 @@ export const DashboardSlice = createSlice({
       .addCase(fetchPM25Data.fulfilled, (state, action) => {
         state.dataPM25 = action.payload;
         state.loading = false;
-      });
+      })
+      .addCase(fetchProvinceByCountry.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchProvinceByCountry.fulfilled, (state, action) => {
+        state.dataProvince = action.payload;
+        state.loading = false;
+      })
   },
 });
 
