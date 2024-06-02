@@ -22,6 +22,19 @@ export const fetchProvinceByCountry = createAsyncThunk("dashboard/fetchProvinceB
 
 });
 
+export const fetchDataForBubble = createAsyncThunk("dashboard/fetchDataForBubble", async (object) => {
+  try{
+    const response = await fetch(`${CONFIG.API_URL}/get-data-for-bubble?country=${object.country}&province=${object.province}&fromDate=${object.startDate}&toDate=${object.endDate}`);
+    const data = await response.json();
+    return data;
+  }catch (error){
+    console.error(error);
+    return null;
+  }
+
+});
+
+
 export const fetchHotspotData = createAsyncThunk("dashboard/fetchHotspotData", async () => {
   const urls = [
     `https://firms.modaps.eosdis.nasa.gov/api/country/csv/579db9c41c852c1f75bc6b73f8b90262/MODIS_NRT/THA/1/${formattedDate}`,
@@ -136,7 +149,8 @@ export const DashboardSlice = createSlice({
     dataHotspotCountry: [], 
     dataPM25: [], 
     loading: false,
-    dataProvince:[]
+    dataProvince:[],
+    dataBubble:[]
   },
   reducers: {
     setFilter: (state, action) => {
@@ -173,6 +187,14 @@ export const DashboardSlice = createSlice({
         state.dataProvince = action.payload;
         state.loading = false;
       })
+      .addCase(fetchDataForBubble.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchDataForBubble.fulfilled, (state, action) => {
+        state.dataBubble = action.payload;
+        state.loading = false;
+      })
+      
   },
 });
 

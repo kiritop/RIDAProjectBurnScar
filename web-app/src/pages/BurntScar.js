@@ -7,29 +7,32 @@ import { Container, CircularProgress, TableCell, InputLabel, FormControl, Select
 import { useDispatch, useSelector } from "react-redux";
 import { fetchHotspotData } from "../reducers/dashboardSlice";
 import { Provider, lightTheme } from '@adobe/react-spectrum';
-import { DatePicker, DateRangePicker } from '@react-spectrum/datepicker';
-import { fetchProvinceByCountry } from '../reducers/dashboardSlice';
+import { DateRangePicker } from '@react-spectrum/datepicker';
+import { fetchProvinceByCountry, fetchDataForBubble } from '../reducers/dashboardSlice';
 import { Form } from '@react-spectrum/form';
+import {parseDate} from '@internationalized/date';
+import { format } from 'date-fns';
+
+import BubbleChart from './../components/BubbleChart';
 
 
 function BurntScar() {
   const dispatch = useDispatch();
   const dataHotspotC = useSelector((state) => state.dashboard.dataHotspotCountry ?? []);
+  const dataProvince = useSelector((state) => state.dashboard.dataProvince ?? []);
   const [country, setCountry] = useState("ALL");
   const [province, setProvince] = useState("ALL");
-  const [chartData, setChartData] = useState([["Country", "Count"]]);
   const [tableData, setTableData] = useState([]);
 
-  const [startDate, setStartDate] = useState(new Date());
-const [endDate, setEndDate] = useState(new Date());
+  const [countryText, setCountryText] = useState("All");
+  const [provinceText, setProvinceText] = useState("All");
 
-  const [state, setState] = useState([
-    {
-      startDate: new Date(),
-      endDate: null,
-      key: 'selection'
-    }
-  ]);
+  let [dateValue, setDateValue] = useState({
+    start: parseDate(format(new Date().setFullYear(new Date().getFullYear() - 1),'yyyy-MM-dd')),
+    end: parseDate(format(new Date(),'yyyy-MM-dd'))
+  });
+
+
 
   // แยก fetchHotspotData
   useEffect(() => {
@@ -46,13 +49,17 @@ const [endDate, setEndDate] = useState(new Date());
 
   // แยก fetchHotspotDataCountry
   useEffect(() => {
-    console.log('country', country)
+    let obj = {
+      country: country,
+      province: province,
+      startDate: format(new Date(dateValue.start),'yyyy-MM-dd'),
+      endDate: format(new Date(dateValue.end),'yyyy-MM-dd')
+    }
     if (country) {
       dispatch(fetchProvinceByCountry(country));
     }
-
-    // Clear interval on unmount
-  }, [dispatch, country]);
+    dispatch(fetchDataForBubble(obj));
+  }, [dispatch, country, province, dateValue]);
 
   // Update chart data when dataHotspotC changes
   useEffect(() => {
@@ -70,7 +77,6 @@ const [endDate, setEndDate] = useState(new Date());
       const newChartData = [["Country", "Count"], ...sortedData.map((e) => [e.country, e.count])];
       const newTableData = [...sortedData.map((item) => [item.country, item.count])];
 
-      setChartData(newChartData);
       setTableData(newTableData);
     }
   }, [dataHotspotC]);
@@ -84,15 +90,6 @@ const [endDate, setEndDate] = useState(new Date());
   });
 
 
-  const LineOptions = {
-    title: "Calculate the total number of hotspot per country on " + dateTitle,
-    hAxis: {
-      title: "Country",
-    },
-    vAxis: {
-      title: "Count",
-    },
-  };
 
   //table
   const columns = [
@@ -139,91 +136,121 @@ const [endDate, setEndDate] = useState(new Date());
     },
   };
 
+  const handleChangeCountry = (event) => {
+    switch (event.target.value) {
+      case 'THA':
+        setCountryText("Thailand");
+        break;
+      case 'VNM':
+        setCountryText("Vietnam");
+        break;
+      case 'LAO':
+        setCountryText("Laos");
+        break;
+      case 'MMR':
+        setCountryText("Myanmar");
+        break;
+      default:
+        break;
+    }
+    setCountry(event.target.value);
+  };
+
+  const handleChangeProvince = (event) => {
+    setProvince(event.target.value);
+    setProvinceText(event.target.value);
+  };
+
+
   return (
     <>
-      <Box h={5} />
-      <Container>
+      <Container maxWidth="xl">
         <Box height={50} />
-        <Typography mb={3} variant="h4" color="initial">
-          Burnt Scar Dashboard
-        </Typography>
-        <Box height={10} />
-        <Box height={10} />
 
         <Grid container spacing={3}>
-  <Grid item xs={12}>
-    <Card>
-      <CardContent>
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={4}>
-            
-            <Box my={1} sx={{ minWidth: 120, display: "flex", justifyContent: "flex-end" }}>
-              <FormControl sx={{ m: 1, width: 300, borderRadius: 2 }} size="small">
-                <InputLabel id="country-select-label">Country</InputLabel>
-                <Select labelId="country-select-label" label="Country" value={country} onChange={(event) => setCountry(event.target.value)}>
-                  <MenuItem value={"ALL"}><em>All</em></MenuItem>
-                  <MenuItem value={"THA"}>Thailand</MenuItem>
-                  <MenuItem value={"VNM"}>Vietnam</MenuItem>
-                  <MenuItem value={"MMR"}>Myanmar</MenuItem>
-                  <MenuItem value={"LAO"}>Laos</MenuItem>
-                </Select>
-              </FormControl>
-            </Box>
-          </Grid>
-          {country !== 'ALL' && (<Grid item xs={12} md={4}>
-            
-            <Box my={1} sx={{ minWidth: 120, display: "flex", justifyContent: "flex-end" }}>
-            {country !== 'ALL' && (<FormControl sx={{ m: 1, width: 300, borderRadius: 2 }} size="small">
-                <InputLabel id="province-select-label">Province</InputLabel>
-                <Select labelId="province-select-label" label="Province" value={province} onChange={(event) => setProvince(event.target.value)}>
-                  <MenuItem value={"ALL"}><em>All</em></MenuItem>
-                  <MenuItem value={"BKK"}>Bangkok</MenuItem>
-                  <MenuItem value={"CM"}>Chiang Mai</MenuItem>
-                  <MenuItem value={"PB"}>Phuket</MenuItem>
-                  <MenuItem value={"SR"}>Surat Thani</MenuItem>
-                </Select>
-              </FormControl>)}
-            </Box>
-          </Grid>)}
-          <Provider theme={lightTheme} colorScheme="light" scale="large">
-            <Form >
-              <Grid item xs={12} md={4} >
-                <DateRangePicker label="Select Date Range" startDate={startDate} endDate={endDate} onChange={({startDate, endDate}) => {setStartDate(startDate); setEndDate(endDate);}} />
-              </Grid>
-            </Form>
-          </Provider>
-        </Grid>
-        
-      </CardContent>
-    </Card>
-</Grid>
-
-
-          <Grid item xs={12} md={6}>
-            <Card>
+          <Grid item xs={12}>
+            <Card sx={{ borderRadius: 3, overflow: "hidden" }} variant="outlined">
               <CardContent>
-                {!dataHotspotC ? (
-                  <Box display="flex" justifyContent="center" alignItems="center" height="100%">
-                    <CircularProgress />
-                  </Box>
-                ) : (
-                  <Chart width={"100%"} height={600} chartType="LineChart" data={chartData} options={LineOptions} />
-                )}
+                <Grid container spacing={3}>
+                  <Grid item xs={12} md={2}>
+                    <Box my={1} sx={{ minWidth: 120, display: "flex", justifyContent: "flex-start" }} >
+                      <FormControl sx={{ m: 1, width: 300, borderRadius: 2 }} size="small">
+                        <InputLabel id="country-select-label">Country</InputLabel>
+                        <Select labelId="country-select-label" label="Country" value={country} onChange={(event) => handleChangeCountry(event)}>
+                          <MenuItem value={"ALL"}><em>All</em></MenuItem>
+                          <MenuItem value={"THA"}>Thailand</MenuItem>
+                          <MenuItem value={"VNM"}>Vietnam</MenuItem>
+                          <MenuItem value={"MMR"}>Myanmar</MenuItem>
+                          <MenuItem value={"LAO"}>Laos</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12} md={4}>
+                    <Box my={1} sx={{ minWidth: 120, display: "flex", justifyContent: "flex-start" }} >
+                      <FormControl sx={{ m: 1, width: 300, borderRadius: 2 }} size="small">
+                        <InputLabel id="province-select-label">Province</InputLabel>
+                        <Select labelId="province-select-label" label="Province" value={province} onChange={(event) => handleChangeProvince(event)}>
+                          <MenuItem key={"ALL"} value={"ALL"}><em>All</em></MenuItem>
+                          {dataProvince.map((pv_en) => (
+                            <MenuItem key={pv_en.PV_EN} value={pv_en.PV_EN}>
+                              {pv_en.PV_EN}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12} md={5.5}>
+                    <Box my={1} sx={{ minWidth: 120, display: "flex", justifyContent: "flex-end" }} >
+                      <Provider theme={lightTheme} colorScheme="light" scale="large">
+                        <Form >
+                            <DateRangePicker 
+                              value={dateValue}
+                              onChange={setDateValue}
+                            />
+                        </Form>
+                      </Provider>
+                    </Box>
+                  </Grid>
+                </Grid>
               </CardContent>
             </Card>
           </Grid>
-
-          <Grid item xs={12} md={6}>
-            <Card>
+          <Grid item xs={12} md={4}>
+            <Card sx={{ borderRadius: 3, overflow: "hidden" }} variant="outlined">
               <CardContent>
+                <Typography  variant="h4" component="div">
+                  Burnt scar in {countryText}
+                </Typography>
+                <Typography  variant="subtitle1" color="text.secondary">
+                  {countryText} burnt scar (  {format(new Date(dateValue.start),'MMM dd yyyy')} - {format(new Date(dateValue.end),'MMM dd yyyy')} )
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} md={8}>
+            <Card sx={{ borderRadius: 3, overflow: "hidden" }} variant="outlined">
+              <CardContent>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} md={8}>
+            <Card sx={{ borderRadius: 3, overflow: "hidden" }} variant="outlined">
+              <CardContent>
+                <BubbleChart/>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Box sx={{ borderRadius: 3, overflow: "hidden", flex: 1 }}>
                 <MUIDataTable
                   title={<h3>Calculate the total number of hotspot per country on {dateTitle}</h3>}
                   data={tableData}
                   columns={columns}
                   options={options}
                 />
-              </CardContent>
-            </Card>
+            </Box>
           </Grid>
         </Grid>
       </Container>
