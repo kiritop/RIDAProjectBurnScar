@@ -5,21 +5,23 @@ import Typography from "@mui/material/Typography";
 import MUIDataTable from "mui-datatables";
 import { Container, CircularProgress, TableCell, InputLabel, FormControl, Select, MenuItem, Grid, Card, CardContent } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchHotspotData, fetchHotspotDataCountry } from "../reducers/dashboardSlice";
-import { DateRange } from 'react-date-range';
-import 'react-date-range/dist/styles.css'; // main css file
-import 'react-date-range/dist/theme/default.css'; // theme css file
+import { fetchHotspotData } from "../reducers/dashboardSlice";
+import { Provider, lightTheme } from '@adobe/react-spectrum';
+import { DatePicker, DateRangePicker } from '@react-spectrum/datepicker';
+import { fetchProvinceByCountry } from '../reducers/dashboardSlice';
+import { Form } from '@react-spectrum/form';
 
 
 function BurntScar() {
   const dispatch = useDispatch();
-  const dataHotspot = useSelector((state) => state.dashboard.dataHotspot);
   const dataHotspotC = useSelector((state) => state.dashboard.dataHotspotCountry ?? []);
-  const [country, setCountry] = useState("THA");
+  const [country, setCountry] = useState("ALL");
+  const [province, setProvince] = useState("ALL");
   const [chartData, setChartData] = useState([["Country", "Count"]]);
   const [tableData, setTableData] = useState([]);
-  const [yearRange, setYearRange] = useState([2010, 2020]); // Add this line
-  console.log(dataHotspotC);
+
+  const [startDate, setStartDate] = useState(new Date());
+const [endDate, setEndDate] = useState(new Date());
 
   const [state, setState] = useState([
     {
@@ -41,25 +43,15 @@ function BurntScar() {
     return () => clearInterval(intervalId);
   }, [dispatch]);
 
-  // useEffect(() => {
-  //   dispatch(setLoadingMap(true));
-  //   dispatch(fetchBurntScarPolygon(sidebarForm))
-  //   .finally(() => {
-  //     dispatch(setLoadingMap(false));
-  //   });
-    
-  // }, [dispatch, sidebarForm]);
 
   // แยก fetchHotspotDataCountry
   useEffect(() => {
-    dispatch(fetchHotspotDataCountry(country));
-    // Fetch data every 30 seconds
-    const intervalId = setInterval(() => {
-      dispatch(fetchHotspotData());
-    }, 300000);
+    console.log('country', country)
+    if (country) {
+      dispatch(fetchProvinceByCountry(country));
+    }
 
     // Clear interval on unmount
-    return () => clearInterval(intervalId);
   }, [dispatch, country]);
 
   // Update chart data when dataHotspotC changes
@@ -83,13 +75,6 @@ function BurntScar() {
     }
   }, [dataHotspotC]);
 
-  let dataFormat = [
-    ["Country", "Count"],
-    ["Thai", dataHotspot?.[0]],
-    ["Myanmar", dataHotspot?.[1]],
-    ["Lao", dataHotspot?.[2]],
-    ["Vietnam", dataHotspot?.[3]],
-  ];
 
   const date = new Date();
   const dateTitle = date.toLocaleDateString("en-GB", {
@@ -98,24 +83,6 @@ function BurntScar() {
     year: "numeric",
   });
 
-  const pieOptions = {
-    title: "Hotspot Count on" + dateTitle,
-    pieHole: 0.4,
-    is3D: false,
-  };
-
-  const barOptions = {
-    title: "Hotspot Count on" + dateTitle,
-    hAxis: { title: "Count" },
-    vAxis: { title: "Country" },
-    bars: "horizontal",
-  };
-
-  const columnOptions = {
-    title: "Hotspot Count on" + dateTitle,
-    hAxis: { title: "Country" },
-    vAxis: { title: "Count" },
-  };
 
   const LineOptions = {
     title: "Calculate the total number of hotspot per country on " + dateTitle,
@@ -184,59 +151,53 @@ function BurntScar() {
         <Box height={10} />
 
         <Grid container spacing={3}>
-          <Grid item xs={12}>
-            <Card>
-              <CardContent>
-                <Grid item xs={12} md={6}>
-                  <Box sx={{ minWidth: 120, display: "flex", justifyContent: "flex-end" }}>
-                    <Box mr={24}>
-                      <InputLabel id="country-select-label">Select Country :</InputLabel>
-                    </Box>
-                  </Box>
-                  <Box my={1} sx={{ minWidth: 120, display: "flex", justifyContent: "flex-end" }}>
-                    <FormControl sx={{ m: 1, width: 300, backgroundColor: "#fff", borderRadius: 2 }}>
-                      <Select labelId="country-select-label" value={country} onChange={(event) => setCountry(event.target.value)}>
-                        <MenuItem value={"THA"}>Thailand</MenuItem>
-                        <MenuItem value={"VNM"}>Vietnam</MenuItem>
-                        <MenuItem value={"MMR"}>Myanmar</MenuItem>
-                        <MenuItem value={"LAO"}>Laos</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <Box sx={{ minWidth: 120, display: "flex", justifyContent: "flex-end" }}>
-                    <Box mr={24}>
-                      <InputLabel id="country-select-label">Select Province :</InputLabel>
-                    </Box>
-                  </Box>
-                  <Box my={1} sx={{ minWidth: 120, display: "flex", justifyContent: "flex-end" }}>
-                    <FormControl sx={{ m: 1, width: 300, backgroundColor: "#fff", borderRadius: 2 }}>
-                      <Select labelId="country-select-label" value={country} onChange={(event) => setCountry(event.target.value)}>
-                        <MenuItem value={"THA"}>Thailand</MenuItem>
-                        <MenuItem value={"VNM"}>Vietnam</MenuItem>
-                        <MenuItem value={"MMR"}>Myanmar</MenuItem>
-                        <MenuItem value={"LAO"}>Laos</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Box>
-                </Grid>
-                {/* <Grid container spacing={2}>
-                  <Grid item xs={12} md={6}>
-                    <Box my={1} sx={{display: "flex", justifyContent: "flex-end" }}>
-                      <DateRange
-                        editableDateInputs={true}
-                        onChange={item => setState([item.selection])}
-                        moveRangeOnFirstSelection={false}
-                        ranges={state}
-                      />
-                    </Box>
-                  </Grid>
-                  
-                </Grid> */}
-              </CardContent>
-            </Card>
+  <Grid item xs={12}>
+    <Card>
+      <CardContent>
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={4}>
+            
+            <Box my={1} sx={{ minWidth: 120, display: "flex", justifyContent: "flex-end" }}>
+              <FormControl sx={{ m: 1, width: 300, borderRadius: 2 }} size="small">
+                <InputLabel id="country-select-label">Country</InputLabel>
+                <Select labelId="country-select-label" label="Country" value={country} onChange={(event) => setCountry(event.target.value)}>
+                  <MenuItem value={"ALL"}><em>All</em></MenuItem>
+                  <MenuItem value={"THA"}>Thailand</MenuItem>
+                  <MenuItem value={"VNM"}>Vietnam</MenuItem>
+                  <MenuItem value={"MMR"}>Myanmar</MenuItem>
+                  <MenuItem value={"LAO"}>Laos</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
           </Grid>
+          {country !== 'ALL' && (<Grid item xs={12} md={4}>
+            
+            <Box my={1} sx={{ minWidth: 120, display: "flex", justifyContent: "flex-end" }}>
+            {country !== 'ALL' && (<FormControl sx={{ m: 1, width: 300, borderRadius: 2 }} size="small">
+                <InputLabel id="province-select-label">Province</InputLabel>
+                <Select labelId="province-select-label" label="Province" value={province} onChange={(event) => setProvince(event.target.value)}>
+                  <MenuItem value={"ALL"}><em>All</em></MenuItem>
+                  <MenuItem value={"BKK"}>Bangkok</MenuItem>
+                  <MenuItem value={"CM"}>Chiang Mai</MenuItem>
+                  <MenuItem value={"PB"}>Phuket</MenuItem>
+                  <MenuItem value={"SR"}>Surat Thani</MenuItem>
+                </Select>
+              </FormControl>)}
+            </Box>
+          </Grid>)}
+          <Provider theme={lightTheme} colorScheme="light" scale="large">
+            <Form >
+              <Grid item xs={12} md={4} >
+                <DateRangePicker label="Select Date Range" startDate={startDate} endDate={endDate} onChange={({startDate, endDate}) => {setStartDate(startDate); setEndDate(endDate);}} />
+              </Grid>
+            </Form>
+          </Provider>
+        </Grid>
+        
+      </CardContent>
+    </Card>
+</Grid>
+
 
           <Grid item xs={12} md={6}>
             <Card>

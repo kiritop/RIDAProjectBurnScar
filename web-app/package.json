@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@adobe/react-spectrum": "^3.35.1",
     "@babel/core": "^7.16.0",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
@@ -16,6 +17,7 @@
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.3",
     "@react-oauth/google": "^0.12.1",
     "@react-spectrum/datepicker": "^3.9.6",
+    "@react-types/provider": "^3.8.1",
     "@reduxjs/toolkit": "^2.2.1",
     "@svgr/webpack": "^8.1.0",
     "@testing-library/jest-dom": "^5.17.0",

@@ -12,10 +12,14 @@ const crypto = require("crypto");
 
 // Create connection to MySQL
 const db = mysql.createConnection({
-  host: "10.1.29.33",
-  port: '3306',
+  // host: "10.1.29.33",
+  // port: '3306',
+  // user: "root",
+  // password: "gdkll,@MFU2024",
+  // database: "RidaDB",
+  host: "localhost",
   user: "root",
-  password: "gdkll,@MFU2024",
+  password: "root1234",
   database: "RidaDB",
 });
 
