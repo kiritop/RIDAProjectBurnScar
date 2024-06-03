@@ -12,6 +12,7 @@ export const saveLayerSettings = createAsyncThunk(
 );
 
 const currentDate = new Date();
+const startDate = new Date();
 const year = currentDate.getFullYear();
 
 const uiSlice = createSlice({
@@ -21,8 +22,10 @@ const uiSlice = createSlice({
     sidebarForm :{
       yearRange : [year, year],
       country : 'All',
-      province : 'All',
+      city : 'All',
       date: dayjs(currentDate).format('YYYY-MM-DD'),
+      startDate : dayjs(startDate.setFullYear(startDate.getFullYear() - 5)).format('YYYY-MM-DD'),
+      endDate : dayjs(currentDate).format('YYYY-MM-DD'),
       iso3: null
     },
     current_lat: "18.7889", 

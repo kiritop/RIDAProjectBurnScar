@@ -104,17 +104,18 @@ server.get('/api/get-burnt-from-date', (req, res) => {
   let country = req.query.country;
   let province = req.query.province;
 
+  console.log()
   // Construct the SQL query
   let sql = `SELECT BURNT_SCAR_ID, AP_EN, PV_EN, FIRE_DATE, AREA, COUNTRY, LATITUDE, LONGITUDE, REPLACE(REPLACE(GEOMETRY_DATA, '(', '['), ')', ']') AS GEOMETRY_DATA, GEOMETRY_TYPE FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN '${startDate}' AND '${endDate}'`;
 
   // Add conditions for country and province if they are provided
-  if (country) {
+  if (country && country!='All') {
     sql += ` AND ISO3 = '${country}'`;
   }
-  if (province) {
+  if (province && province!='All') {
     sql += ` AND PV_EN = '${province}'`;
   }
-
+  console.log('sql', sql)
   db.query(sql, (err, results) => {
     if (err) throw err;
 

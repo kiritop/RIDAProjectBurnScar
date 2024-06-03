@@ -25,6 +25,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
 
+
+
 const countries = [
                     { 
                       name:'Select all',
@@ -83,6 +85,22 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
   const cities = useSelector((state) => state.ui ? state.ui.cities : []);
   const [date, setDate] = useState(ui.sidebarForm.date);
 
+  const [startDate, setStartDate] = useState(ui.sidebarForm.startDate);
+  const [endDate, setEndDate] = useState(ui.sidebarForm.endDate);
+
+  const handleStartDateChange = (date) => {
+    setStartDate(date.format('YYYY-MM-DD'));
+  };
+
+  const handleEndDateChange = (date) => {
+    if (startDate && date < startDate) {
+      // Validate end date not less than start date
+      console.error('End date cannot be less than start date');
+      return;
+    }
+    setEndDate(date.format('YYYY-MM-DD'));
+  };
+
   const handleCountryChange = (event) => {
     setCountry(event.target.value);
     setCity('All');
@@ -134,12 +152,14 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
     const iso3 = country_filter ? country_filter.iso3 : null;
 
     const sidebarForm = {
-      yearRange : yearRange,
       country : country,
       city : city,
       date : date,
+      startDate : startDate,
+      endDate : endDate,
       iso3: iso3
     }
+    console.log("sidebarForm", sidebarForm)
     if(city === "All" || valueFilter ==="All"){
       let filteredCountries = countries.filter(country => country.value === valueFilter);
       let current_lat = filteredCountries[0].lat
@@ -201,24 +221,52 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
       <DialogContent sx={{ gap: 2 }}>
 
       {burntScar === true && (<Typography level="title-md" fontWeight="bold" sx={{ mt: 2 }}>
-          Year Range
+          Date Range
         </Typography>)}
 
         <FormControl orientation="horizontal">
           <Box sx={{ flex: 1, pr: 1 }}>
-            <Stack spacing={2} direction="row" alignItems="center">
-            {burntScar === true && (<Slider
-                value={yearRange}
-                onChange={handleYearChange}
-                valueLabelDisplay="on"
-                min={year-5}
-                max={year}
-                step={1}
-              />)}
+            <Stack spacing={2}>
+            {burntScar === true && (
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DemoContainer components={['DatePicker']}>
+                <DatePicker
+                  label="Start Date"
+                  value={dayjs(startDate)}
+                  onChange={handleStartDateChange}
+                  sx={{ flexGrow: 1 }} 
+                />
+              </DemoContainer>
+            </LocalizationProvider>
+            
+              )}
             </Stack>
           </Box>
         </FormControl>
 
+        <FormControl orientation="horizontal">
+          <Box sx={{ flex: 1, pr: 1 }}>
+            <Stack spacing={2}>
+            {burntScar === true && (
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DemoContainer components={['DatePicker']}>
+                  <DatePicker
+                    label="End Date"
+                    value={dayjs(endDate)}
+                    onChange={handleEndDateChange}
+                    sx={{ flexGrow: 1 }} 
+                    minDate={dayjs(startDate)} // Set minimum date for end date
+                  />
+                </DemoContainer>
+              </LocalizationProvider>
+            
+              )}
+            </Stack>
+          </Box>
+        </FormControl>
+
+
+        
         <Typography level="title-md" fontWeight="bold" sx={{ mt: 2 }}>
           Country
         </Typography>
