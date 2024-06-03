@@ -41,7 +41,7 @@ app.get('/', (req, res) => {
 
 app.get('/point', (req, res) => {
     const rows = [];
-    fs.createReadStream('./data/Lao Burn Area Prediction 2024.csv')
+    fs.createReadStream('./data/Thailand Burn Scar Point 2024.csv')
         .pipe(csv.parse({ headers: true }))
         .on('data', (row) => {
             rows.push(row);

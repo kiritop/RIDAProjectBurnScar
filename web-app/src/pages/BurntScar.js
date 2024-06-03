@@ -1,27 +1,29 @@
 import React, { useEffect, useState } from "react";
-import { Chart } from "react-google-charts";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import MUIDataTable from "mui-datatables";
 import { Container, CircularProgress, TableCell, InputLabel, FormControl, Select, MenuItem, Grid, Card, CardContent } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchHotspotData } from "../reducers/dashboardSlice";
 import { Provider, lightTheme } from '@adobe/react-spectrum';
 import { DateRangePicker } from '@react-spectrum/datepicker';
-import { fetchProvinceByCountry, fetchDataForBubble } from '../reducers/dashboardSlice';
+import { fetchProvinceByCountry, fetchDataForBubble, fetchDataPoint } from '../reducers/dashboardSlice';
 import { Form } from '@react-spectrum/form';
 import {parseDate} from '@internationalized/date';
 import { format } from 'date-fns';
 
 import BubbleChart from './../components/BubbleChart';
+import LineChart from './../components/LineChart';
+
 
 
 function BurntScar() {
   const dispatch = useDispatch();
-  const dataHotspotC = useSelector((state) => state.dashboard.dataHotspotCountry ?? []);
   const dataProvince = useSelector((state) => state.dashboard.dataProvince ?? []);
+  const dataPoint = useSelector((state) => state.dashboard.dataPoint ?? []);
   const [country, setCountry] = useState("ALL");
   const [province, setProvince] = useState("ALL");
+  const [totalPoint, setTotalPoint] = useState(0);
+  const [peek, setPeek] = useState(0);
   const [tableData, setTableData] = useState([]);
 
   const [countryText, setCountryText] = useState("All");
@@ -33,21 +35,6 @@ function BurntScar() {
   });
 
 
-
-  // แยก fetchHotspotData
-  useEffect(() => {
-    dispatch(fetchHotspotData());
-    // Fetch data every 30 seconds
-    const intervalId = setInterval(() => {
-      dispatch(fetchHotspotData());
-    }, 300000);
-
-    // Clear interval on unmount
-    return () => clearInterval(intervalId);
-  }, [dispatch]);
-
-
-  // แยก fetchHotspotDataCountry
   useEffect(() => {
     let obj = {
       country: country,
@@ -59,46 +46,34 @@ function BurntScar() {
       dispatch(fetchProvinceByCountry(country));
     }
     dispatch(fetchDataForBubble(obj));
+    dispatch(fetchDataPoint(obj));
+    
   }, [dispatch, country, province, dateValue]);
 
   // Update chart data when dataHotspotC changes
   useEffect(() => {
-    if (dataHotspotC) {
-      const uniqueDataHotspotC = dataHotspotC.reduce((acc, curr) => {
-        if (!acc.some((item) => item.country === curr.country)) {
-          acc.push(curr);
-        }
-        return acc;
-      }, []);
-      // Sort the data by count in descending order
-      const sortedData = [...uniqueDataHotspotC].sort((a, b) => b.count - a.count);
-
-      // Update your state variables (chartData and tableData)
-      const newChartData = [["Country", "Count"], ...sortedData.map((e) => [e.country, e.count])];
-      const newTableData = [...sortedData.map((item) => [item.country, item.count])];
-
+    if (dataPoint) {
+      
+      const newTableData = [...dataPoint.map((item) => [item['YEAR(FIRE_DATE)'], item.total_rows])];
+      const totalRowsSum = dataPoint.reduce((sum, item) => sum + item.total_rows, 0);
+      const maxTotalRows = Math.max(...dataPoint.map((item) => item.total_rows));
       setTableData(newTableData);
+      setTotalPoint(totalRowsSum);
+      setPeek(maxTotalRows)
     }
-  }, [dataHotspotC]);
+  }, [dataPoint]);
 
-
-  const date = new Date();
-  const dateTitle = date.toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
 
 
 
   //table
   const columns = [
     {
-      name: "Country",
+      name: "Year",
       options: {
         customHeadRender: ({ index, ...column }) => {
           return (
-            <TableCell key={index} style={{ backgroundColor: "#264653", color: "#fff", fontWeight: 600 }}>
+            <TableCell key={index} style={{  fontWeight: 600 }}>
               {column.name}
             </TableCell>
           );
@@ -106,11 +81,11 @@ function BurntScar() {
       },
     },
     {
-      name: "Count",
+      name: "Total point",
       options: {
         customHeadRender: ({ index, ...column }) => {
           return (
-            <TableCell key={index} style={{ backgroundColor: "#fb8500", fontWeight: 600 }}>
+            <TableCell key={index} style={{ fontWeight: 600 }}>
               {column.name}
             </TableCell>
           );
@@ -221,17 +196,33 @@ function BurntScar() {
             <Card sx={{ borderRadius: 3, overflow: "hidden" }} variant="outlined">
               <CardContent>
                 <Typography  variant="h4" component="div">
-                  Burnt scar in {countryText}
+                  Burnt scar in {provinceText != 'ALL' ? provinceText : countryText}
                 </Typography>
                 <Typography  variant="subtitle1" color="text.secondary">
-                  {countryText} burnt scar (  {format(new Date(dateValue.start),'MMM dd yyyy')} - {format(new Date(dateValue.end),'MMM dd yyyy')} )
+                  {provinceText != 'ALL' ? provinceText +', '+ countryText : countryText}  burnt scar (  {format(new Date(dateValue.start),'MMM dd yyyy')} - {format(new Date(dateValue.end),'MMM dd yyyy')} )
                 </Typography>
+                <Box height={20}/>
+                <Typography  variant="h3" component="div">
+                  {totalPoint} Point
+                </Typography>
+                <Box height={20}/>
+                <Card sx={{ borderRadius: 3, overflow: "hidden", border:0, backgroundColor: '#F5F5F5' }} variant="outlined">
+                  <CardContent>
+                    <Typography  variant="subtitle1" color="text.secondary">
+                      Peek
+                    </Typography>
+                    <Typography  variant="h4" color="text.secondary">
+                      {peek}
+                    </Typography>
+                  </CardContent>
+                </Card>
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} md={8}>
             <Card sx={{ borderRadius: 3, overflow: "hidden" }} variant="outlined">
               <CardContent>
+                <LineChart/>              
               </CardContent>
             </Card>
           </Grid>
@@ -243,9 +234,9 @@ function BurntScar() {
             </Card>
           </Grid>
           <Grid item xs={12} md={4}>
-            <Box sx={{ borderRadius: 3, overflow: "hidden", flex: 1 }}>
+            <Box sx={{ borderRadius: 3, overflow: "hidden", flex: 1}}>
                 <MUIDataTable
-                  title={<h3>Calculate the total number of hotspot per country on {dateTitle}</h3>}
+                  title={<h3>Total point of burnt scar on {format(new Date(dateValue.start),'MMM dd yyyy')} - {format(new Date(dateValue.end),'MMM dd yyyy')}</h3>}
                   data={tableData}
                   columns={columns}
                   options={options}

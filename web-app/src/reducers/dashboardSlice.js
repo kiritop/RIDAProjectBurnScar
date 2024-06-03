@@ -34,6 +34,20 @@ export const fetchDataForBubble = createAsyncThunk("dashboard/fetchDataForBubble
 
 });
 
+export const fetchDataPoint = createAsyncThunk("dashboard/fetchDataPoint", async (object) => {
+  try{
+    const response = await fetch(`${CONFIG.API_URL}/get-data-for-point?country=${object.country}&province=${object.province}&fromDate=${object.startDate}&toDate=${object.endDate}`);
+    const data = await response.json();
+    return data;
+  }catch (error){
+    console.error(error);
+    return null;
+  }
+
+});
+
+
+
 
 export const fetchHotspotData = createAsyncThunk("dashboard/fetchHotspotData", async () => {
   const urls = [
@@ -150,7 +164,8 @@ export const DashboardSlice = createSlice({
     dataPM25: [], 
     loading: false,
     dataProvince:[],
-    dataBubble:[]
+    dataBubble:[],
+    dataPoint:[]
   },
   reducers: {
     setFilter: (state, action) => {
@@ -194,6 +209,14 @@ export const DashboardSlice = createSlice({
         state.dataBubble = action.payload;
         state.loading = false;
       })
+      .addCase(fetchDataPoint.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchDataPoint.fulfilled, (state, action) => {
+        state.dataPoint = action.payload;
+        state.loading = false;
+      })
+      
       
   },
 });

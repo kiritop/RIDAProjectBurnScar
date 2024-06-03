@@ -64,14 +64,32 @@ server.get("/api/get-data-for-bubble", async (req, res) => {
   const { fromDate, toDate, country, province } = req.query;
   let sql = `SELECT ISO3 AS COUNTRY_ISO3, PV_EN, YEAR(FIRE_DATE) AS FIRE_YEAR, MONTH(FIRE_DATE) AS FIRE_MONTH, SUM(AREA) as SUM_AREA FROM RidaDB.BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN '${fromDate}' AND '${toDate}'`;
 
-  if (country) {
+  if (country && country!='ALL') {
     sql += ` AND ISO3 = '${country}'`;
   }
-  if (province) {
+  if (province && province!='ALL') {
     sql += ` AND PV_EN = '${province}'`;
   }
 
   sql += ` GROUP BY COUNTRY, ISO3, FIRE_YEAR, FIRE_MONTH, PV_EN `;
+  db.query(sql, [fromDate, toDate], (err, results) => {
+    if (err) throw err;
+    res.send(results);
+  });
+});
+
+
+server.get("/api/get-data-for-point", async (req, res) => {
+  const { fromDate, toDate, country, province } = req.query;
+  let sql = `SELECT ISO3 AS COUNTRY_ISO3, PV_EN, COUNTRY, COUNT(*) AS total_rows,  MONTH(FIRE_DATE),  YEAR(FIRE_DATE) FROM RidaDB.burnt_scar_point WHERE FIRE_DATE BETWEEN '${fromDate}' AND '${toDate}'`;
+
+  if (country && country!='ALL') {
+    sql += ` AND ISO3 = '${country}'`;
+  }
+  if (province && province!='ALL') {
+    sql += ` AND PV_EN = '${province}'`;
+  }
+  sql += ` GROUP BY COUNTRY_ISO3, PV_EN, COUNTRY, MONTH(FIRE_DATE),  YEAR(FIRE_DATE) `;
   db.query(sql, [fromDate, toDate], (err, results) => {
     if (err) throw err;
     res.send(results);
