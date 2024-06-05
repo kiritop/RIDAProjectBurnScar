@@ -157,23 +157,23 @@ def burn_query(df_predicted, lat, long, fire_date):
     cols = df_coordinate.columns.tolist()
     cols = cols[-2:] + cols[:-2]
     df_coordinate = df_coordinate[cols]
-    result_burn = df_coordinate[df_coordinate[df_coordinate.columns[-1]] == 1][[df_coordinate.columns[0], df_coordinate.columns[1]]]
+    result_burn_point = df_coordinate[df_coordinate[df_coordinate.columns[-1]] == 1][[df_coordinate.columns[0], df_coordinate.columns[1]]]
 
     # Add fire date column
-    result_burn['FIRE_DATE'] = fire_date
+    result_burn_point['FIRE_DATE'] = fire_date
 
     # Display predicted burn coordinates
     print('\033[1m'+"Display Coordinate that Predicted as Burn : ")
-    display(result_burn)
+    display(result_burn_point)
 
-    return result_burn
+    return result_burn_point
 
-def save_coordinate_to_database(result_burn, connection_string, point_table_name):
+def save_coordinate_to_database(result_burn_point, connection_string, point_table_name):
     """
     Save the filtered DataFrame to a MySQL database.
     
     Parameters:
-    result_burn (pd.DataFrame): DataFrame containing filtered data.
+    result_burn_point (pd.DataFrame): DataFrame containing filtered data.
     connection_string (str): Database connection string.
     table_name (str, optional): Name of the table to save the data to. Default is 'BURNT_SCAR_POINT'.
     
@@ -184,9 +184,9 @@ def save_coordinate_to_database(result_burn, connection_string, point_table_name
     engine = create_engine(connection_string)
     
     # Save the DataFrame to the database
-    result_burn.to_sql(point_table_name, con=engine, if_exists='append', index=False)
+    result_burn_point.to_sql(point_table_name, con=engine, if_exists='append', index=False)
     
-def find_best_n_clusters(result_burn, start=2, random_state=42):
+def find_best_n_clusters(result_burn_point, start=2, random_state=42):
     """
     Finds the best number of clusters based on the silhouette score.
 
@@ -207,15 +207,15 @@ def find_best_n_clusters(result_burn, start=2, random_state=42):
         Silhouette scores for each number of clusters in the range.
     """
 
-    result_burn = result_burn.drop(columns=['FIRE_DATE', 'COUNTRY', 'ISO3'])
+    result_burn_point = result_burn_point.drop(columns=['FIRE_DATE', 'COUNTRY', 'ISO3'])
     
-    if len(result_burn) < start:
+    if len(result_burn_point) < start:
         print('\033[1m'+"Number of data points must be greater than cluster start.")
         raise ValueError("Number of data points must be greater than start")
 
-    end = min(len(result_burn) // 2, 51)  # Consider at most half the data points, with a maximum of 50 clusters
-    if len(result_burn) // 2 < end:
-        end = len(result_burn) // 2
+    end = min(len(result_burn_point) // 2, 51)  # Consider at most half the data points, with a maximum of 50 clusters
+    if len(result_burn_point) // 2 < end:
+        end = len(result_burn_point) // 2
 
     range_n_clusters = range(start, end)
     silhouette_list = []
@@ -224,9 +224,9 @@ def find_best_n_clusters(result_burn, start=2, random_state=42):
 
     for n_clusters in range_n_clusters:
         clustering = KMeans(n_clusters=n_clusters, random_state=random_state, n_init='auto')
-        clustering.fit(result_burn)
-        cluster_labels = clustering.predict(result_burn)
-        silhouette_avg = silhouette_score(result_burn, cluster_labels)
+        clustering.fit(result_burn_point)
+        cluster_labels = clustering.predict(result_burn_point)
+        silhouette_avg = silhouette_score(result_burn_point, cluster_labels)
         silhouette_list.append(silhouette_avg)
 
         if silhouette_avg > best_score:
@@ -250,7 +250,7 @@ def find_best_n_clusters(result_burn, start=2, random_state=42):
 
     return best_n_clusters, best_score, silhouette_list
 
-def find_best_eps(result_burn, eps_range=None, min_samples=10):
+def find_best_eps(result_burn_point, eps_range=None, min_samples=10):
     """
     Finds the best epsilon value for DBSCAN clustering based on the silhouette score.
 
@@ -270,6 +270,9 @@ def find_best_eps(result_burn, eps_range=None, min_samples=10):
     - silhouette_scores: list of float
       Silhouette scores for each epsilon value in the range.
     """
+
+    result_burn_point = result_burn_point.drop(columns=['FIRE_DATE', 'COUNTRY', 'ISO3'])
+
     if eps_range is None:
         eps_range = [0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009]
 
@@ -279,12 +282,12 @@ def find_best_eps(result_burn, eps_range=None, min_samples=10):
 
     for eps in eps_range:
         print(f"eps value is {eps}")
-        db = DBSCAN(eps=eps, min_samples=min_samples).fit(result_burn)
+        db = DBSCAN(eps=eps, min_samples=min_samples).fit(result_burn_point)
         labels = db.labels_
         print(set(labels))
 
         if len(set(labels)) > 1:  # Ensure that there is more than one cluster
-            silhouette_avg = silhouette_score(result_burn, labels)
+            silhouette_avg = silhouette_score(result_burn_point, labels)
             print(f"For eps value={eps}, labels={labels}, the average silhouette score is {silhouette_avg}")
         else:
             silhouette_avg = -1
@@ -311,7 +314,7 @@ def find_best_eps(result_burn, eps_range=None, min_samples=10):
 
     return best_eps, best_score, silhouette_scores
 
-def find_best_min_samples(result_burn, best_eps, best_n_clusters, min_samples_range=None):
+def find_best_min_samples(result_burn_point, best_eps, best_n_clusters, min_samples_range=None):
     """
     Finds the best min_samples value for DBSCAN clustering to match the number of clusters from KMeans.
 
@@ -331,12 +334,13 @@ def find_best_min_samples(result_burn, best_eps, best_n_clusters, min_samples_ra
     - num_clusters_list: list of int
       Number of clusters for each min_samples value in the range.
     """
+    result_burn_point = result_burn_point.drop(columns=['FIRE_DATE', 'COUNTRY', 'ISO3'])
 
     # Check the length of result_burn
-    if len(result_burn) < 2:
+    if len(result_burn_point) < 2:
         return "Error: result_burn must contain at least 2 samples."
-    elif len(result_burn) >= 2 and len(result_burn) < 50:
-        min_samples_range = range(2, int(len(result_burn) / 2) + 1)
+    elif len(result_burn_point) >= 2 and len(result_burn_point) < 50:
+        min_samples_range = range(2, int(len(result_burn_point) / 2) + 1)
 
     # Set default min_samples_range if not provided
     if min_samples_range is None:
@@ -347,7 +351,7 @@ def find_best_min_samples(result_burn, best_eps, best_n_clusters, min_samples_ra
 
     for min_samples in min_samples_range:
         print(f"min_samples value is {min_samples}")
-        db = DBSCAN(eps=best_eps, min_samples=min_samples).fit(result_burn)
+        db = DBSCAN(eps=best_eps, min_samples=min_samples).fit(result_burn_point)
 
         labels = set([label for label in db.labels_ if label >= 0])
         num_clusters = len(labels)
@@ -375,7 +379,7 @@ def find_best_min_samples(result_burn, best_eps, best_n_clusters, min_samples_ra
 
     return best_min_samples, num_clusters_list
 
-def perform_dbscan(result_burn, best_eps=None, best_min_samples=None):
+def perform_dbscan(result_burn_point, best_eps=None, best_min_samples=None):
     """
     Perform DBSCAN clustering on the given data and plot the clusters.
 
@@ -388,6 +392,8 @@ def perform_dbscan(result_burn, best_eps=None, best_min_samples=None):
     - None
     """
 
+    result_burn_point = result_burn_point.drop(columns=['FIRE_DATE', 'COUNTRY', 'ISO3'])
+
     try:
         eps = best_eps if best_eps is not None else 0.1
         min_samples = best_min_samples if best_min_samples is not None else 5 # Default min_saple for DBSCAN from Scikitlearn
@@ -396,10 +402,13 @@ def perform_dbscan(result_burn, best_eps=None, best_min_samples=None):
         min_samples = 5 # Default min_saple for DBSCAN from Scikitlearn
 
     # Perform DBSCAN on the data
-    db = DBSCAN(eps=eps, min_samples=min_samples).fit(result_burn)
+    db = DBSCAN(eps=eps, min_samples=min_samples).fit(result_burn_point)
 
     # Create a new column in df for the cluster labels
-    result_burn['Cluster'] = db.labels_
+    result_burn_point['Cluster'] = db.labels_
+
+    # Create New Variable Instead
+    result_burn_scar = result_burn_point
 
     # Print the number of clusters
     print('\033[1m'+"Number of Clusters that Clusterd from DBSCAN.")
@@ -410,12 +419,12 @@ def perform_dbscan(result_burn, best_eps=None, best_min_samples=None):
     print() # Add Blank Line
     num_clusters = len(np.unique(db.labels_))
     print(f"Number of clusters: {num_clusters}")
-    print(result_burn['Cluster'].value_counts())
+    print(result_burn_scar['Cluster'].value_counts())
 
     # Plot the clusters
     print('\033[1m'+"Clustering Result Plot.")
     plt.figure(figsize=(10, 10))
-    plt.scatter(result_burn['LONGITUDE'], result_burn['LATITUDE'], c=db.labels_, cmap='viridis')
+    plt.scatter(result_burn_scar['LONGITUDE'], result_burn_scar['LATITUDE'], c=db.labels_, cmap='viridis')
     plt.colorbar()
 
     plt.title('DBSCAN Clustering of Burn Area Geographic Data')
@@ -423,9 +432,9 @@ def perform_dbscan(result_burn, best_eps=None, best_min_samples=None):
     plt.ylabel('Latitude')
     plt.show()
     
-    return result_burn
+    return result_burn_scar
 
-def create_clusters_gdf(result_burn, db_labels_column='Cluster'):
+def create_clusters_gdf(result_burn_scar, db_labels_column='Cluster'):
     """
     Create a GeoDataFrame with convex hull polygons for each cluster.
 
@@ -436,7 +445,7 @@ def create_clusters_gdf(result_burn, db_labels_column='Cluster'):
     Returns:
     - gdf: GeoDataFrame with cluster polygons
     """
-    clusters = [result_burn[result_burn[db_labels_column] == label] for label in np.unique(result_burn[db_labels_column]) if label != -1]
+    clusters = [result_burn_scar[result_burn_scar[db_labels_column] == label] for label in np.unique(result_burn_scar[db_labels_column]) if label != -1]
     polygons = [MultiPoint(cluster[['LONGITUDE', 'LATITUDE']].values).convex_hull for cluster in clusters]
     result_gdf = gpd.GeoDataFrame({'geometry': polygons})
     
@@ -541,30 +550,30 @@ def extract_location_info(results):
         countries.append(country)
     return locations, cities, provinces, countries
 
-def reverse_geocode_point(result_burn):
-    coordinates = list(zip(result_burn['LATITUDE'], result_burn['LONGITUDE']))
+def reverse_geocode_point(result_burn_point):
+    coordinates = list(zip(result_burn_point['LATITUDE'], result_burn_point['LONGITUDE']))
     results = rg.search(coordinates)
 
     locations, cities, provinces, countries = extract_location_info(results)
     
     # Define the list of allowed countries for Reverse Geocode.
     allowed_countries = ['Thailand', "Lao People's Democratic Republic", 'Myanmar', 'Viet Nam', 'Lao']
-    result_burn['COUNTRY'] = countries
+    result_burn_point['COUNTRY'] = countries
     
     # Create a dictionary mapping country names to ISO3 codes using pycountry
     country_to_iso3 = {country.name: country.alpha_3 for country in pycountry.countries}
     
-    result_burn['ISO3'] = result_burn['COUNTRY'].map(country_to_iso3)
-    result_burn.loc[~result_burn['COUNTRY'].isin(allowed_countries), ['COUNTRY', 'ISO3']] = 'NULL'
+    result_burn_point['ISO3'] = result_burn_point['COUNTRY'].map(country_to_iso3)
+    result_burn_point.loc[~result_burn_point['COUNTRY'].isin(allowed_countries), ['COUNTRY', 'ISO3']] = 'NULL'
     
-    result_burn = result_burn[['FIRE_DATE', 'LATITUDE', 'LONGITUDE', 'COUNTRY', 'ISO3']]
+    result_burn_point = result_burn_point[['FIRE_DATE', 'LATITUDE', 'LONGITUDE', 'COUNTRY', 'ISO3']]
 
     print('\033[1m'+"Burn Coordinate that performed Reverse Geocode: ")
-    display(result_burn)
+    display(result_burn_point)
 
-    return result_burn
+    return result_burn_point
 
-def reverse_geocode(result_gdf):
+def reverse_geocode(result_gdf, fire_date):
     result_gdf['LATITUDE'] = result_gdf['centroid'].y
     result_gdf['LONGITUDE'] = result_gdf['centroid'].x
     result_gdf['GEOMETRY_DATA'] = result_gdf['geometry'].apply(extract_coordinates).astype(str)
@@ -584,6 +593,8 @@ def reverse_geocode(result_gdf):
     
     result_gdf['ISO3'] = result_gdf['COUNTRY'].map(country_to_iso3)
     result_gdf.loc[~result_gdf['COUNTRY'].isin(allowed_countries), ['COUNTRY', 'AP_EN', 'PV_EN', 'ISO3']] = 'NULL'
+
+    result_gdf['FIRE_DATE'] = fire_date # Add Fire Date
     
     result_gdf = result_gdf[['FIRE_DATE', 'AP_EN', 'PV_EN', 'COUNTRY', 'LATITUDE', 'LONGITUDE', 'GEOMETRY_DATA', 'GEOMETRY_TYPE', 'AREA', 'ISO3']]
 
@@ -625,38 +636,38 @@ def main():
     df_predicted = make_predictions(loaded_model, df_rename)
     
     # Query only Row Predicted as Burn
-    result_burn = burn_query(df_predicted, lat, long, fire_date)
+    result_burn_point = burn_query(df_predicted, lat, long, fire_date)
 
     # Reverse Geocode for Burn Point
-    reverse_geocode_point(result_burn)
-
-    # Export Burn Coordinate to Database
-    connection_string = 'mysql+pymysql://root:gdkll,%40MFU2024@10.1.29.33:3306/RidaDB' # Connection to Dabase Engine
-    point_table_name = 'BURNT_SCAR_POINT'
-    save_coordinate_to_database(result_burn, connection_string, point_table_name)
+    reverse_geocode_point(result_burn_point)
 
     # Perform Clustering
-    best_n_clusters, best_score, silhouette_list = find_best_n_clusters(result_burn, start=2, random_state=42) # Find Best number of cluster
-    best_eps, best_score, silhouette_scores = find_best_eps(result_burn, eps_range=None, min_samples=10) # Find Best Epsilon
-    best_min_samples, num_clusters_list = find_best_min_samples(result_burn, best_eps, best_n_clusters, min_samples_range=None) # Find Best Minimum Sample
-    result_burn = perform_dbscan(result_burn, best_eps=best_eps, best_min_samples=best_min_samples)
+    best_n_clusters, best_score, silhouette_list = find_best_n_clusters(result_burn_point, start=2, random_state=42) # Find Best number of cluster
+    best_eps, best_score, silhouette_scores = find_best_eps(result_burn_point, eps_range=None, min_samples=10) # Find Best Epsilon
+    best_min_samples, num_clusters_list = find_best_min_samples(result_burn_point, best_eps, best_n_clusters, min_samples_range=None) # Find Best Minimum Sample
+    result_burn_scar = perform_dbscan(result_burn_point, best_eps=best_eps, best_min_samples=best_min_samples)
 
 
     # Concat burn result with Fire Date
-    result_burn = pd.concat([result_burn, fire_date], axis=0)
+    result_burn_scar = pd.concat([result_burn_scar, fire_date], axis=0)
 
     # Call the function to create the GeoDataFrame
     print("Polygons Clustered Plotting and GeoDataFrame include Geometry, Centroid of Each Polygons and Area in Square Meters.")
-    result_gdf = create_clusters_gdf(result_burn)
+    result_gdf = create_clusters_gdf(result_burn_scar)
 
     # Calculate Area of Polygon
     result_gdf = calculate_area(result_gdf)
 
     # Reverse Geocode for Burn Scar Polygon
     print("Completely GeoDataFrame which have been reverse Geocoded. Contain District, Province, Country and Fire Date have been additional.")
-    result_gdf = reverse_geocode(result_gdf)
+    result_gdf = reverse_geocode(result_gdf, fire_date)
 
-    # Export Result to Database
+    # Export Burn Coordinate to Database
+    connection_string = 'mysql+pymysql://root:gdkll,%40MFU2024@10.1.29.33:3306/RidaDB' # Connection to Dabase Engine
+    point_table_name = 'BURNT_SCAR_POINT'
+    save_coordinate_to_database(result_burn_point, connection_string, point_table_name)
+
+    # Export Burn Scar to Database
     scar_table_name = 'BURNT_SCAR_INFO'
     save_result_to_database(result_gdf, connection_string, scar_table_name)
 
