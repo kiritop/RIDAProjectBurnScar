@@ -12,15 +12,15 @@ const crypto = require("crypto");
 
 // Create connection to MySQL
 const db = mysql.createConnection({
-  // host: "10.1.29.33",
-  // port: '3306',
-  // user: "root",
-  // password: "gdkll,@MFU2024",
-  // database: "RidaDB",
-  host: "localhost",
+  host: "10.1.29.33",
+  port: '3306',
   user: "root",
-  password: "root1234",
+  password: "gdkll,@MFU2024",
   database: "RidaDB",
+  // host: "localhost",
+  // user: "root",
+  // password: "root1234",
+  // database: "RidaDB",
 });
 
 // Connect to MySQL
@@ -33,6 +33,107 @@ let server = express();
 server.use(bodyParser.json()); // ให้ server(express) ใช้งานการ parse json
 server.use(morgan("dev")); // ให้ server(express) ใช้งานการ morgam module
 server.use(cors()); // ให้ server(express) ใช้งานการ cors module
+
+
+// SELECT ROUND(SUM(AREA),2) as SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR FROM RidaDB.BURNT_SCAR_INFO WHERE ISO3 = 'THA' AND FIRE_DATE BETWEEN '2020-01-01' AND '2024-01-01' GROUP BY COUNTRY, FIRE_YEAR;
+// SELECT ROUND(SUM(AREA),2) as SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR, MONTH(FIRE_DATE) AS FIRE_MONTH, PV_EN, AP_EN FROM RidaDB.BURNT_SCAR_INFO WHERE YEAR(FIRE_DATE) = '2020' AND ISO3 = 'THA' AND PV_EN = 'Chiang Mai' GROUP BY COUNTRY, FIRE_YEAR, FIRE_MONTH, PV_EN, AP_EN;
+// SELECT ROUND(SUM(AREA),2) as SUM_AREA, COUNTRY FROM RidaDB.BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN '2020-01-01' AND '2024-01-01' GROUP BY COUNTRY;
+// SELECT ROUND(SUM(AREA),2) as SUM_AREA, PV_EN FROM RidaDB.BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN '2020-01-01' AND '2024-01-01' AND ISO3 = 'THA' GROUP BY PV_EN;
+// SELECT ROUND(SUM(AREA),2) as SUM_AREA, AP_EN FROM RidaDB.BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN '2020-01-01' AND '2024-01-01' AND PV_EN = 'Chiang Mai' GROUP BY AP_EN;
+
+
+
+
+server.get('/api/line-chart', (req, res) => {
+  const iso3 = req.query.iso3;
+  const startDate = req.query.startDate;
+  const endDate = req.query.endDate;
+
+  const firstQuery = `
+    SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR
+    FROM BURNT_SCAR_INFO
+    WHERE FIRE_DATE BETWEEN ? AND ?
+    ${iso3 ? 'AND ISO3 = ?' : ''}
+    GROUP BY COUNTRY, FIRE_YEAR;
+  `;
+
+  const queryParameters = [startDate, endDate];
+  if (iso3) {
+    queryParameters.push(iso3);
+  }
+
+  db.query(firstQuery, queryParameters, (error, results) => {
+    if (error) {
+      console.error('Error executing first query:', error);
+      res.status(500).send('Internal server error');
+      return;
+    }
+
+    const secondQuery = `
+      SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR,
+        MONTH(FIRE_DATE) AS FIRE_MONTH, PV_EN, AP_EN
+      FROM BURNT_SCAR_INFO
+      WHERE YEAR(FIRE_DATE) IN (?) 
+      ${iso3 ? 'AND ISO3 = ?' : ''}
+      GROUP BY COUNTRY, FIRE_YEAR, FIRE_MONTH, PV_EN, AP_EN;
+    `;
+
+    const fireYear = results.map((row) => row.FIRE_YEAR);
+    const secondQueryParameters = [fireYear];
+    if (iso3) {
+      secondQueryParameters.push(iso3);
+    }
+
+    db.query(secondQuery, secondQueryParameters, (error, secondResults) => {
+      if (error) {
+        console.error('Error executing second query:', error);
+        res.status(500).send('Internal server error');
+        return;
+      }
+
+
+      const transformedData = [];
+
+      results.forEach((row) => {
+        const { FIRE_YEAR } = row;
+        const yearly = row; // directly use the current row for summary
+        const details = secondResults.filter((secondRow) => secondRow.FIRE_YEAR === FIRE_YEAR);
+
+        const transformedYearData = {
+          yearly,
+          details
+        };
+        transformedData.push(transformedYearData)
+        
+
+      });
+
+      res.json(transformedData);
+    });
+  });
+});
+
+
+
+server.get("/api/overview-chart", async (req, res) => {
+  const { fromDate, toDate, country, province } = req.query;
+  let sql = `SELECT ROUND(SUM(AREA),2) as SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR, PV_EN, AP_EN FROM RidaDB.BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN '${fromDate}' AND '${toDate}' `;
+
+  if (country && country!='ALL') {
+    sql += ` AND ISO3 = '${country}'`;
+  }
+  if (province && province!='ALL') {
+    sql += ` AND PV_EN = '${province}'`;
+  }
+  sql += ` GROUP BY COUNTRY, FIRE_YEAR, PV_EN, AP_EN  `;
+
+  db.query(sql, [fromDate, toDate], (err, results) => {
+    if (err) throw err;
+    res.send(results);
+  });
+});
+
+
 
 server.get("/api/read-shapefile", async (req, res) => {
 
@@ -145,116 +246,6 @@ server.get('/api/get-burnt-from-date', (req, res) => {
     res.json(geojson);
   });
 });
-
-
-
-//read data from burnt folder
-// server.get("/api/process-shapefiles-demo", async (req, res) => {
-//     const { yearfrom, yearto, country, state } = req.query; // Extract the parameters from the request query
-  
-//     // You can now use these parameters in your function
-//     // For example, you might want to use them to filter the data you're processing
-  
-//       const directoryPath = path.join(__dirname, "./output/burnt");
-//       let filteredShpFile = 0; // keep total of filtered shapefile
-//       fs.readdir(directoryPath, function (err, years) {
-//       if (err) {
-//           return console.log("Unable to scan directory: " + err);
-//       }
-//       let promises = years
-//           .filter((year) => {
-//           const yearInt = parseInt(year);
-//           return yearInt >= yearfrom && yearInt <= yearto;
-//           })
-//           .map(function (year) {
-//           const yearPath = path.join(directoryPath, year);
-//           return fs.promises.readdir(yearPath).then((locations) => {
-//               return locations.map(function (location) {
-//               const locationPath = path.join(yearPath, location);
-//               return fs.promises.readdir(locationPath).then((files) => {
-//                   return files
-//                   .reduce((promiseChain, file) => {
-//                       if (path.extname(file) === ".shp") {
-//                       return promiseChain.then(() =>
-//                           shapefile.read(path.join(locationPath, file)).then((geojson) => {
-//                           let filteredFeatures = geojson.features
-//                               .filter((feature) => {
-//                               //filter location by country and state
-//                               const location = feature.properties.location;
-//                               let countryCondition = true;
-//                               let stateCondition = true;
-//                               if (country) {
-//                                   countryCondition = location.includes(country);
-//                               }
-//                               if (state) {
-//                                   stateCondition = location.includes(state);
-//                               }
-//                               return countryCondition && stateCondition;
-//                               })
-//                               .map((feature) => {
-//                               const latlong = feature.geometry.coordinates.join(",");
-//                               console.log("latlong", latlong)
-//                               return {
-//                                   type: feature.type,
-//                                   coordinates: latlong,
-//                                   properties: { ...feature.properties, count: 1, year: [year] },
-//                                   geometry: feature.geometry,
-//                               };
-//                               });
-//                           return filteredFeatures;
-//                           })
-//                       );
-//                       } else {
-//                       return promiseChain;
-//                       }
-//                   }, Promise.resolve([]))
-//                   .then((filteredFeaturesPerFile) => {
-//                       if (filteredFeaturesPerFile.length > 0) {
-//                           console.log("filteredFeaturesPerFile.length", filteredFeaturesPerFile.length)
-//                           filteredShpFile++; // increment the count of filtered shapefiles
-//                       }
-//                       return filteredFeaturesPerFile;
-//                   });
-//               });
-//               });
-//           });
-//       });
-  
-  
-//       Promise.all(promises)
-//         .then((dataArrays) => {
-//           let data = [].concat(...dataArrays);
-//           let finalData = [];
-//           data = data.filter(item => item !== undefined);
-//           data.forEach((item) => {
-//             let found = finalData.find((d) => d.coordinates === item.coordinates);
-//             if (!found) {
-//               finalData.push(item);
-//             } else {
-//               found.properties.count++;
-//               if (!found.properties.year.includes(item.properties.year[0])) {
-//                 found.properties.year.push(item.properties.year[0]);
-//               }
-//             }
-//           });
-  
-//           // Calculate the percentage of duplicates for each row
-//           finalData.forEach((row) => {
-//             // Use the formula (count / filteredShpFile) * 100 and round to two decimals
-//             let percentage = ((row.properties.count / filteredShpFile) * 100).toFixed(2);
-//             // Add the percentage to the properties as frequency
-//             row.properties.frequency = percentage;
-//             row.properties.total_shapefile = filteredShpFile;
-//           });
-  
-//           res.json(finalData);
-//         })
-//         .catch((err) => {
-//           console.log(err);
-//           res.status(500).send("An error occurred while processing the shapefiles.");
-//         });
-//     });
-//   });
 
 
 server.get("/api/process-shapefiles-demo", async (req, res) => {

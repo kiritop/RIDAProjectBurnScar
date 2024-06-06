@@ -89,7 +89,7 @@ const percentToColor = (percent) => {
 
           return (
             // Pass data to layer via props:
-            <GeoJSON key={index} data={{...data, geometry: {...data.geometry, coordinates: [coordinates]}}} style={{color: 'red', weight: 1, fillOpacity: 0.5}} coordsToLatLng={coords => new L.LatLng(coords[0], coords[1])} onEachFeature={onEachFeature} />
+            <GeoJSON key={index} data={{...data, geometry: {...data.geometry, coordinates: [coordinates]}}} style={{color: 'red', weight: 1, fillOpacity: 0.2}} coordsToLatLng={coords => new L.LatLng(coords[0], coords[1])} onEachFeature={onEachFeature} />
             )
           })
       }
