@@ -6,12 +6,10 @@ import { Container, CircularProgress, TableCell, InputLabel, FormControl, Select
 import { useDispatch, useSelector } from "react-redux";
 import { Provider, lightTheme } from '@adobe/react-spectrum';
 import { DateRangePicker } from '@react-spectrum/datepicker';
-import { fetchProvinceByCountry, fetchDataForBubble, fetchDataPoint } from '../reducers/dashboardSlice';
+import { fetchProvinceByCountry, fetchBurntDataTable, fetchBurntChart } from '../reducers/dashboardSlice';
 import { Form } from '@react-spectrum/form';
 import {parseDate} from '@internationalized/date';
 import { format } from 'date-fns';
-
-import BubbleChart from './../components/BubbleChart';
 import LineChart from './../components/LineChart';
 
 
@@ -19,15 +17,20 @@ import LineChart from './../components/LineChart';
 function BurntScar() {
   const dispatch = useDispatch();
   const dataProvince = useSelector((state) => state.dashboard.dataProvince ?? []);
-  const dataPoint = useSelector((state) => state.dashboard.dataPoint ?? []);
+  const dataBurntTable = useSelector((state) => state.dashboard.dataBurntTable ?? []);
   const [country, setCountry] = useState("ALL");
   const [province, setProvince] = useState("ALL");
   const [totalPoint, setTotalPoint] = useState(0);
-  const [peek, setPeek] = useState(0);
+  const [dataShow, setDataShow] = useState([]);
   const [tableData, setTableData] = useState([]);
 
   const [countryText, setCountryText] = useState("All");
   const [provinceText, setProvinceText] = useState("All");
+
+
+
+
+  
 
   let [dateValue, setDateValue] = useState({
     start: parseDate(format(new Date().setFullYear(new Date().getFullYear() - 1),'yyyy-MM-dd')),
@@ -45,31 +48,56 @@ function BurntScar() {
     if (country) {
       dispatch(fetchProvinceByCountry(country));
     }
-    dispatch(fetchDataForBubble(obj));
-    dispatch(fetchDataPoint(obj));
+    dispatch(fetchBurntChart(obj));
+    dispatch(fetchBurntDataTable(obj));
     
   }, [dispatch, country, province, dateValue]);
 
   // Update chart data when dataHotspotC changes
   useEffect(() => {
-    if (dataPoint) {
+    if (dataBurntTable) {
+
+      const dataWithNumericSumArea = dataBurntTable.map(item => ({
+        ...item,
+        SUM_AREA: Number(item.SUM_AREA)
+      }));
       
-      const newTableData = [...dataPoint.map((item) => [item['YEAR(FIRE_DATE)'], item.total_rows])];
-      const totalRowsSum = dataPoint.reduce((sum, item) => sum + item.total_rows, 0);
-      const maxTotalRows = Math.max(...dataPoint.map((item) => item.total_rows));
-      setTableData(newTableData);
-      setTotalPoint(totalRowsSum);
-      setPeek(maxTotalRows)
+      const newTableData = [...dataWithNumericSumArea.map((item) => [item.NAME_LIST, item.SUM_AREA])];
+      let dataShow = []
+      if(country == 'ALL' && province=='ALL'){
+        dataShow = [...dataWithNumericSumArea.map((item) => [item.ISO3, item.SUM_AREA])];
+      }else{
+        dataShow = [...dataWithNumericSumArea.map((item) => [item.NAME_LIST, item.SUM_AREA])];
+      }
+      const dataShowNewFormat = dataShow.map((item, index) => [index+1, ...item]);
+      const newTableDataNewFormat = newTableData.map((item, index) => [index+1, ...item]);
+      const totalRowsSum = dataWithNumericSumArea.reduce((sum, item) => sum + item.SUM_AREA, 0);
+      const formattedSum = new Intl.NumberFormat('en-US').format(totalRowsSum);
+      setTableData(newTableDataNewFormat);
+      setTotalPoint(formattedSum);
+      setDataShow(dataShowNewFormat)
     }
-  }, [dataPoint]);
-
-
+  }, [dataBurntTable]);
 
 
   //table
   const columns = [
+
     {
-      name: "Year",
+      name: "No.",
+      options: {
+        customHeadRender: ({ index, ...column }) => {
+          return (
+            <TableCell key={index} style={{  fontWeight: 600 }}>
+              {column.name}
+            </TableCell>
+          );
+        },
+      },
+    },
+    
+    {
+      name: "Name",
       options: {
         customHeadRender: ({ index, ...column }) => {
           return (
@@ -81,7 +109,7 @@ function BurntScar() {
       },
     },
     {
-      name: "Total point",
+      name: "Burnt Area total (sq m)",
       options: {
         customHeadRender: ({ index, ...column }) => {
           return (
@@ -89,6 +117,15 @@ function BurntScar() {
               {column.name}
             </TableCell>
           );
+        },
+        customBodyRender: (value) => {
+          // Format the numerical value with commas
+          const formattedValue = new Intl.NumberFormat('th-TH', {
+            useGrouping: true, // Enable commas for thousands
+            maximumFractionDigits: 2,
+          }).format(value);
+  
+          return formattedValue;
         },
       },
     },
@@ -109,6 +146,7 @@ function BurntScar() {
         },
       };
     },
+    
   };
 
   const handleChangeCountry = (event) => {
@@ -192,8 +230,8 @@ function BurntScar() {
               </CardContent>
             </Card>
           </Grid>
-          <Grid item xs={12} md={4}>
-            <Card sx={{ borderRadius: 3, overflow: "hidden" }} variant="outlined">
+          <Grid item xs={12} md={5}>
+            <Card sx={{ borderRadius: 3, overflow: "hidden", height:'400px' }} variant="outlined">
               <CardContent>
                 <Typography  variant="h4" component="div">
                   Burnt scar in {provinceText != 'ALL' ? provinceText : countryText}
@@ -201,42 +239,43 @@ function BurntScar() {
                 <Typography  variant="subtitle1" color="text.secondary">
                   {provinceText != 'ALL' ? provinceText +', '+ countryText : countryText}  burnt scar (  {format(new Date(dateValue.start),'MMM dd yyyy')} - {format(new Date(dateValue.end),'MMM dd yyyy')} )
                 </Typography>
-                <Box height={20}/>
+                <Box height={50}/>
                 <Typography  variant="h3" component="div">
-                  {totalPoint} Point
+                  {totalPoint} sq m
                 </Typography>
-                <Box height={20}/>
-                <Card sx={{ borderRadius: 3, overflow: "hidden", border:0, backgroundColor: '#F5F5F5' }} variant="outlined">
-                  <CardContent>
-                    <Typography  variant="subtitle1" color="text.secondary">
-                      Peek
-                    </Typography>
-                    <Typography  variant="h4" color="text.secondary">
-                      {peek}
-                    </Typography>
-                  </CardContent>
-                </Card>
+                <Box height={50}/>
+
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+                {dataShow.slice(0, 4).map((data, index) => (
+                  <Box key={index} sx={{ width: 'calc(25% - 8px)' }}> {/* ลบด้วย 8px เพื่อคำนวณ spacing */}
+                    <Card sx={{ borderRadius: 3, overflow: "hidden", border:0, backgroundColor: '#F5F5F5' }} variant="outlined">
+                      <CardContent>
+                        <Typography variant="subtitle1" >
+                          {data[1]}
+                        </Typography>
+                        <Typography variant="body1" color="text.secondary">
+                          {new Intl.NumberFormat('en-US').format(data[2])}
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  </Box>
+                ))}
+              </Box>
               </CardContent>
             </Card>
           </Grid>
-          <Grid item xs={12} md={8}>
+          <Grid item xs={12} md={7}>
             <Card sx={{ borderRadius: 3, overflow: "hidden" }} variant="outlined">
               <CardContent>
                 <LineChart/>              
               </CardContent>
             </Card>
           </Grid>
-          <Grid item xs={12} md={8}>
-            <Card sx={{ borderRadius: 3, overflow: "hidden" }} variant="outlined">
-              <CardContent>
-                <BubbleChart/>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} md={4}>
+         
+          <Grid item xs={12} md={12}>
             <Box sx={{ borderRadius: 3, overflow: "hidden", flex: 1}}>
                 <MUIDataTable
-                  title={<h3>Total point of burnt scar on {format(new Date(dateValue.start),'MMM dd yyyy')} - {format(new Date(dateValue.end),'MMM dd yyyy')}</h3>}
+                  title={<h3>Burnt Scar Area Ranking {format(new Date(dateValue.start),'MMM dd yyyy')} - {format(new Date(dateValue.end),'MMM dd yyyy')}</h3>}
                   data={tableData}
                   columns={columns}
                   options={options}

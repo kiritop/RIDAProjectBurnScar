@@ -185,9 +185,9 @@ const API = () => {
           <SwaggerUI spec={spec} />
         </Box>
 
-        <Box height={30} />
+        {/* <Box height={30} />
         <DataTable />
-        <Box height={30} />
+        <Box height={30} /> */}
       </Container>
     </>
   );

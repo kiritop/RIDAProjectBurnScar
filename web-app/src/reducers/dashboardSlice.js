@@ -22,9 +22,9 @@ export const fetchProvinceByCountry = createAsyncThunk("dashboard/fetchProvinceB
 
 });
 
-export const fetchDataForBubble = createAsyncThunk("dashboard/fetchDataForBubble", async (object) => {
+export const fetchBurntChart = createAsyncThunk("dashboard/fetchBurntChart", async (object) => {
   try{
-    const response = await fetch(`${CONFIG.API_URL}/get-data-for-bubble?country=${object.country}&province=${object.province}&fromDate=${object.startDate}&toDate=${object.endDate}`);
+    const response = await fetch(`${CONFIG.API_URL}/line-chart?country=${object.country}&province=${object.province}&startDate=${object.startDate}&endDate=${object.endDate}`);
     const data = await response.json();
     return data;
   }catch (error){
@@ -34,9 +34,9 @@ export const fetchDataForBubble = createAsyncThunk("dashboard/fetchDataForBubble
 
 });
 
-export const fetchDataPoint = createAsyncThunk("dashboard/fetchDataPoint", async (object) => {
+export const fetchBurntDataTable = createAsyncThunk("dashboard/fetchBurntDataTable", async (object) => {
   try{
-    const response = await fetch(`${CONFIG.API_URL}/get-data-for-point?country=${object.country}&province=${object.province}&fromDate=${object.startDate}&toDate=${object.endDate}`);
+    const response = await fetch(`${CONFIG.API_URL}/overview-table?country=${object.country}&province=${object.province}&fromDate=${object.startDate}&toDate=${object.endDate}`);
     const data = await response.json();
     return data;
   }catch (error){
@@ -164,8 +164,8 @@ export const DashboardSlice = createSlice({
     dataPM25: [], 
     loading: false,
     dataProvince:[],
-    dataBubble:[],
-    dataPoint:[]
+    dataBurntTable:[],
+    dataBurntChart:[]
   },
   reducers: {
     setFilter: (state, action) => {
@@ -202,18 +202,18 @@ export const DashboardSlice = createSlice({
         state.dataProvince = action.payload;
         state.loading = false;
       })
-      .addCase(fetchDataForBubble.pending, (state) => {
+      .addCase(fetchBurntChart.pending, (state) => {
         state.loading = true;
       })
-      .addCase(fetchDataForBubble.fulfilled, (state, action) => {
-        state.dataBubble = action.payload;
+      .addCase(fetchBurntChart.fulfilled, (state, action) => {
+        state.dataBurntChart = action.payload;
         state.loading = false;
       })
-      .addCase(fetchDataPoint.pending, (state) => {
+      .addCase(fetchBurntDataTable.pending, (state) => {
         state.loading = true;
       })
-      .addCase(fetchDataPoint.fulfilled, (state, action) => {
-        state.dataPoint = action.payload;
+      .addCase(fetchBurntDataTable.fulfilled, (state, action) => {
+        state.dataBurntTable = action.payload;
         state.loading = false;
       })
       

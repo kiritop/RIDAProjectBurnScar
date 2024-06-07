@@ -7,7 +7,7 @@ const app = express();
 
 app.get('/', (req, res) => {
     const rows = [];
-    fs.createReadStream('./data/Lao Burn Area Prediction 2024.csv')
+    fs.createReadStream('./data/Thailand Burn Area Prediction 2020.csv')
         .pipe(csv.parse({ headers: true }))
         .on('data', (row) => {
             rows.push(row);

@@ -22,7 +22,7 @@ function Map() {
         <ToggleButton isOpen={isOpen} toggleDrawer={toggleDrawer} />
         <MapContent z />
         <Sidebar isOpen={isOpen} toggleDrawer={toggleDrawer} />
-        {/* {burntScar && <Card
+        {burntScar && <Card
           sx={{
             position: "absolute",
             bottom: "10%",
@@ -35,7 +35,7 @@ function Map() {
           <CardContent>
             <ColorBar /> 
           </CardContent>
-        </Card> } */}
+        </Card> }
         {loadingMap && (
           <Box
             display="flex"

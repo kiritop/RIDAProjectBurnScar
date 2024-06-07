@@ -45,21 +45,27 @@ server.use(cors()); // ให้ server(express) ใช้งานการ cor
 
 
 server.get('/api/line-chart', (req, res) => {
-  const iso3 = req.query.iso3;
+  const country = req.query.country;
   const startDate = req.query.startDate;
   const endDate = req.query.endDate;
+  const province = req.query.province;
 
-  const firstQuery = `
-    SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR
-    FROM BURNT_SCAR_INFO
-    WHERE FIRE_DATE BETWEEN ? AND ?
-    ${iso3 ? 'AND ISO3 = ?' : ''}
-    GROUP BY COUNTRY, FIRE_YEAR;
-  `;
+  let firstQuery ='';
+
+  if(country=='ALL'&&province =='ALL'){
+    firstQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ? GROUP BY COUNTRY, FIRE_YEAR; `;
+  }else if (country!='ALL'&&province =='ALL'){
+    firstQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR, PV_EN FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ?  ${country ? 'AND ISO3 = ?' : ''} GROUP BY  COUNTRY, FIRE_YEAR, PV_EN; `;
+  }else if (country!='ALL'&&province !='ALL'){
+    firstQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR, AP_EN FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ?  ${country ? 'AND ISO3 = ?' : ''} ${province ? 'AND PV_EN = ?' : ''} GROUP BY  COUNTRY, FIRE_YEAR, AP_EN; `;
+  }
 
   const queryParameters = [startDate, endDate];
-  if (iso3) {
-    queryParameters.push(iso3);
+  if (country && country!='ALL') {
+    queryParameters.push(country);
+  }
+  if (province && province!='ALL') {
+    queryParameters.push(province);
   }
 
   db.query(firstQuery, queryParameters, (error, results) => {
@@ -69,20 +75,31 @@ server.get('/api/line-chart', (req, res) => {
       return;
     }
 
-    const secondQuery = `
-      SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR,
-        MONTH(FIRE_DATE) AS FIRE_MONTH, PV_EN, AP_EN
-      FROM BURNT_SCAR_INFO
-      WHERE YEAR(FIRE_DATE) IN (?) 
-      ${iso3 ? 'AND ISO3 = ?' : ''}
-      GROUP BY COUNTRY, FIRE_YEAR, FIRE_MONTH, PV_EN, AP_EN;
-    `;
+    let secondQuery ='';
+
+    if(country=='ALL'&&province =='ALL'){
+      secondQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR, MONTH(FIRE_DATE) AS FIRE_MONTH FROM BURNT_SCAR_INFO WHERE YEAR(FIRE_DATE) IN (?) GROUP BY COUNTRY, FIRE_YEAR, FIRE_MONTH; `;
+    }else if (country!='ALL'&&province =='ALL'){
+      secondQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR, MONTH(FIRE_DATE) AS FIRE_MONTH, PV_EN FROM BURNT_SCAR_INFO WHERE YEAR(FIRE_DATE) IN (?)  ${country ? 'AND ISO3 = ?' : ''} GROUP BY  COUNTRY, FIRE_YEAR, FIRE_MONTH, PV_EN; `;
+    }else if (country!='ALL'&&province !='ALL'){
+      secondQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR, MONTH(FIRE_DATE) AS FIRE_MONTH, AP_EN FROM BURNT_SCAR_INFO WHERE YEAR(FIRE_DATE) IN (?)  ${country ? 'AND ISO3 = ?' : ''} ${province ? 'AND PV_EN = ?' : ''} GROUP BY  COUNTRY, FIRE_YEAR, FIRE_MONTH, AP_EN; `;
+    }
+
 
     const fireYear = results.map((row) => row.FIRE_YEAR);
-    const secondQueryParameters = [fireYear];
-    if (iso3) {
-      secondQueryParameters.push(iso3);
+    const uniqueFireYear = fireYear.filter((year, index) => {
+      return fireYear.indexOf(year) === index;
+    });
+
+    const secondQueryParameters = [uniqueFireYear];
+    if (country && country!='ALL') {
+      secondQueryParameters.push(country);
     }
+    if (province && province!='ALL') {
+      secondQueryParameters.push(province);
+    }
+
+
 
     db.query(secondQuery, secondQueryParameters, (error, secondResults) => {
       if (error) {
@@ -95,9 +112,16 @@ server.get('/api/line-chart', (req, res) => {
       const transformedData = [];
 
       results.forEach((row) => {
-        const { FIRE_YEAR } = row;
+        const { FIRE_YEAR, COUNTRY, PV_EN, AP_EN } = row;
         const yearly = row; // directly use the current row for summary
-        const details = secondResults.filter((secondRow) => secondRow.FIRE_YEAR === FIRE_YEAR);
+        let details = []
+        if(country=='ALL'&&province =='ALL'){
+          details = secondResults.filter((secondRow) => secondRow.FIRE_YEAR === FIRE_YEAR && secondRow.COUNTRY === COUNTRY);
+        }else if(country!='ALL'&&province =='ALL'){
+          details = secondResults.filter((secondRow) => secondRow.FIRE_YEAR === FIRE_YEAR && secondRow.PV_EN === PV_EN);
+        }else if(country!='ALL'&&province !='ALL'){
+          details = secondResults.filter((secondRow) => secondRow.FIRE_YEAR === FIRE_YEAR && secondRow.AP_EN === AP_EN);
+        }
 
         const transformedYearData = {
           yearly,
@@ -112,6 +136,28 @@ server.get('/api/line-chart', (req, res) => {
     });
   });
 });
+
+server.get("/api/overview-table", async (req, res) => {
+  const { fromDate, toDate, country, province } = req.query;
+
+  let sql = '';
+
+  if(country=='ALL'&&province =='ALL'){
+    sql = `SELECT ROUND(SUM(AREA),2) as SUM_AREA, COUNTRY as NAME_LIST, ISO3 FROM RidaDB.BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN '${fromDate}' AND '${toDate}' GROUP BY COUNTRY, ISO3 ORDER BY SUM_AREA DESC `;
+  }else if (country!='ALL'&&province =='ALL'){
+    sql = `SELECT ROUND(SUM(AREA),2) as SUM_AREA, PV_EN as NAME_LIST, ISO3 FROM RidaDB.BURNT_SCAR_INFO WHERE ISO3 = '${country}' AND FIRE_DATE BETWEEN '${fromDate}' AND '${toDate}' GROUP BY PV_EN ORDER BY SUM_AREA DESC` ;
+  }else if (country!='ALL'&&province !='ALL'){
+    sql = `SELECT ROUND(SUM(AREA),2) as SUM_AREA, AP_EN as NAME_LIST, ISO3 FROM RidaDB.BURNT_SCAR_INFO WHERE ISO3 = '${country}' AND PV_EN='${province}' AND FIRE_DATE BETWEEN '${fromDate}' AND '${toDate}' GROUP BY AP_EN ORDER BY SUM_AREA DESC` ;
+  }
+
+
+  db.query(sql, [fromDate, toDate], (err, results) => {
+    if (err) throw err;
+    res.send(results);
+  });
+});
+
+
 
 
 
@@ -205,7 +251,6 @@ server.get('/api/get-burnt-from-date', (req, res) => {
   let country = req.query.country;
   let province = req.query.province;
 
-  console.log()
   // Construct the SQL query
   let sql = `SELECT BURNT_SCAR_ID, AP_EN, PV_EN, FIRE_DATE, AREA, COUNTRY, LATITUDE, LONGITUDE, REPLACE(REPLACE(GEOMETRY_DATA, '(', '['), ')', ']') AS GEOMETRY_DATA, GEOMETRY_TYPE FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN '${startDate}' AND '${endDate}'`;
 
@@ -216,7 +261,6 @@ server.get('/api/get-burnt-from-date', (req, res) => {
   if (province && province!='All') {
     sql += ` AND PV_EN = '${province}'`;
   }
-  console.log('sql', sql)
   db.query(sql, (err, results) => {
     if (err) throw err;
 
@@ -246,6 +290,7 @@ server.get('/api/get-burnt-from-date', (req, res) => {
     res.json(geojson);
   });
 });
+
 
 
 server.get("/api/process-shapefiles-demo", async (req, res) => {

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {GeoJSON} from "react-leaflet";
 import L from "leaflet"; // import Leaflet library
 import './custom.css';
@@ -6,6 +6,17 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchBurntScarPolygon } from '../reducers/burntScarSlice';
 import { setLoadingMap } from '../reducers/uiSlice';
 
+const colorIntensityArray = [
+  { fillOpacity: 0.2, color: '#FFCCCC' },
+  { fillOpacity: 0.3, color: '#FFB2B2' },
+  { fillOpacity: 0.4, color: '#FF9999' },
+  { fillOpacity: 0.5, color: '#FF7F7F' },
+  { fillOpacity: 0.6, color: '#FF6666' },
+  { fillOpacity: 0.7, color: '#FF4C4C' },
+  { fillOpacity: 0.8, color: '#FF3232' },
+  { fillOpacity: 0.9, color: '#FF1919' },
+  { fillOpacity: 1.0, color: '#FF0000' }
+];
 
 
 const MapBurnScar = () => {
@@ -23,12 +34,15 @@ const MapBurnScar = () => {
     
   }, [dispatch, sidebarForm]);
 
+  
+
 const percentToColor = (percent) => {
   const value = percent / 100;
   const red = Math.round(255);
   const green = Math.round(255 * (1 - value));
   const blue = 0;
-
+  
+  console.log("green", green)
   // Convert RGB to HEX
   const rgbToHex = (r, g, b) => '#' + [r, g, b].map(x => {
     const hex = x.toString(16);
@@ -38,28 +52,18 @@ const percentToColor = (percent) => {
   return rgbToHex(red, green, blue); // Only green component changes
 };
 
-  // define a custom pointToLayer function
-  const polygonToLayer = (feature, latlngs) => {
-    console.log("feature", feature)
-    // get the color based on the fire type
-    // const color = percentToColor(feature.properties.frequency);
-    // create a polygon marker
-    let marker = L.polygon(latlngs, { color: 'red', fillOpacity: 1 });
 
-    return marker;
+// 
+
+const style = (feature, index) => { // Include index as a parameter
+
+  return {
+    color: 'red', // Set color based on overlap percentage
+    weight: 0, // No border
+    fillOpacity: 0.2 // Semi-transparent fill
   };
+};
 
-  // const getReverseGeocodingData = async (lat, lon) => {
-  //   const apiKey = '65eddfd7b586a527220428jro7f022f'; // แทนที่ 'your_api_key' ด้วย API key ของคุณ
-  //   const url = `https://geocode.maps.co/reverse?lat=${lat}&lon=${lon}&api_key=${apiKey}`;
-
-  //   try {
-  //     const response = await axios.get(url);
-  //     return response.data; // ข้อมูลที่อยู่จะอยู่ใน response.data
-  //   } catch (error) {
-  //     console.error('Error fetching reverse geocoding data', error);
-  //   }
-  // };
 
   const onEachFeature = (feature, layer) => {
     // create a popup with the feature's properties
@@ -73,7 +77,7 @@ const percentToColor = (percent) => {
         <tr><td><strong>Area M :</strong></td><td style="text-align:right">${feature.properties.AREA}</td></tr>
       </table>
     </div>`;
-    // // ${feature.properties.year.map(item => `<tr><td><strong>Burnt year :</strong></td> <td style="text-align:right">${item}</td></tr>`).join('')}
+    
     layer.bindPopup(popupContent, { className: 'custom-popup' }); // add a custom class name
   };
 
@@ -89,7 +93,13 @@ const percentToColor = (percent) => {
 
           return (
             // Pass data to layer via props:
-            <GeoJSON key={index} data={{...data, geometry: {...data.geometry, coordinates: [coordinates]}}} style={{color: 'red', weight: 1, fillOpacity: 0.2}} coordsToLatLng={coords => new L.LatLng(coords[0], coords[1])} onEachFeature={onEachFeature} />
+            <GeoJSON
+              key={index}
+              data={{ ...data, geometry: { ...data.geometry, coordinates: [coordinates] } }}
+              style={style} // ใช้ฟังก์ชัน style ที่กำหนดไว้
+              coordsToLatLng={coords => new L.LatLng(coords[0], coords[1])}
+              onEachFeature={onEachFeature}
+            />
             )
           })
       }
