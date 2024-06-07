@@ -236,17 +236,8 @@ def find_best_n_clusters(result_burn_point, start=2, random_state=42):
         print(f"For Number of Clusters: {n_clusters}, Average Silhouette Score is {silhouette_avg}")
 
     # Display results (assuming you have the necessary libraries for visualization)
-    print('\033[1m'+"The number of clusters with the highest silhouette score is {best_n_clusters} with a silhouette score of {best_score}")
+    print(f"The number of clusters with the highest silhouette score is {best_n_clusters} with a silhouette score of {best_score}")
     print()  # This prints a blank line
-    
-    print('\033[1m'+"Result Graph for Silhouette Score for each Number of Clusters.")
-    plt.figure(figsize=(10, 6))
-    plt.plot(range(start, end), silhouette_list, '-o')
-    plt.xlabel('Number of Clusters')
-    plt.ylabel('Silhouette Score')
-    plt.title('Silhouette Score for each Number of Clusters')
-    plt.xticks(range(start, end, 2), fontsize=8, rotation=45)
-    plt.show()
 
     return best_n_clusters, best_score, silhouette_list
 
@@ -300,17 +291,8 @@ def find_best_eps(result_burn_point, eps_range=None, min_samples=10):
             best_eps = eps
     
     print() # Add Blank Line
-    print(f'\033[1m'+"The epsilon value with the highest silhouette score is {best_eps} with a silhouette score of {best_score}")
+    print(f"The epsilon value with the highest silhouette score is {best_eps} with a silhouette score of {best_score}")
     print() # Add Blank Line
-    
-    print('\033[1m'+"Graph of silhouette score each Epsilon value: ")
-    plt.figure(figsize=(10, 6))
-    plt.plot(eps_range, silhouette_scores, '-o')
-    plt.xlabel('Epsilon Value')
-    plt.ylabel('Silhouette Score')
-    plt.title('Silhouette Score for each Epsilon Value')
-    plt.xticks(eps_range, fontsize=8, rotation=45)
-    plt.show()
 
     return best_eps, best_score, silhouette_scores
 
@@ -365,17 +347,8 @@ def find_best_min_samples(result_burn_point, best_eps, best_n_clusters, min_samp
     # After the loop, prints the min_samples value that gives the same number of clusters as the best number of clusters from the KMeans algorithm.
     print('\033[1m'+"Display Minimum Samples Result based on number of clusters as the best number of clusters from the KMeans algorithm.")
     print() # Add Blank Line
-    print(f'\033[1m'+"The min_samples value with the same number of clusters as the best number of clusters from the KMeans algorithm is {best_min_samples}.")
+    print(f"The min_samples value with the same number of clusters as the best number of clusters from the KMeans algorithm is {best_min_samples}.")
     print() # Add Blank Line
-    
-    print('\033[1m'+"Graph of Number of Clusters for each Min Samples Value.")
-    plt.figure(figsize=(10, 6))
-    plt.plot(min_samples_range, num_clusters_list, '-o')
-    plt.xlabel('Min Samples')
-    plt.ylabel('Number of Clusters')
-    plt.title('Number of Clusters for each Min Samples Value')
-    plt.xticks(min_samples_range, fontsize=8, rotation=45)
-    plt.show()
 
     return best_min_samples, num_clusters_list
 
@@ -420,18 +393,7 @@ def perform_dbscan(result_burn_point, best_eps=None, best_min_samples=None):
     num_clusters = len(np.unique(db.labels_))
     print(f"Number of clusters: {num_clusters}")
     print(result_burn_scar['Cluster'].value_counts())
-
-    # Plot the clusters
-    print('\033[1m'+"Clustering Result Plot.")
-    plt.figure(figsize=(10, 10))
-    plt.scatter(result_burn_scar['LONGITUDE'], result_burn_scar['LATITUDE'], c=db.labels_, cmap='viridis')
-    plt.colorbar()
-
-    plt.title('DBSCAN Clustering of Burn Area Geographic Data')
-    plt.xlabel('Longitude')
-    plt.ylabel('Latitude')
-    plt.show()
-    
+ 
     return result_burn_scar
 
 def create_clusters_gdf(result_burn_scar, db_labels_column='Cluster'):
@@ -479,16 +441,6 @@ def calculate_area(result_gdf):
 
     # Display GeoDataFrame
     display(result_gdf)
-          
-    # Plot Polygon      
-    fig, ax = plt.subplots(1, 1)
-    result_gdf.plot(ax=ax, color='red', edgecolor='red')
-
-    # Plot the centroids
-    result_gdf['centroid'].plot(ax=ax, color='black', marker='o', markersize=5)
-    plt.xlabel('Longitude')
-    plt.ylabel('Latitude')
-    plt.show()
     
     return result_gdf
 
@@ -622,54 +574,61 @@ def save_result_to_database(result_gdf, connection_string, scar_table_name):
 
 def main():
 
-    # Perform Prerpocessing
-    data_path = (r"D:\Work\Code งาน\Lab-docker\RIDA\RIDA_CSV\Predict\04-06-2024\T47QNB_20240304T034641.csv") # Directory to Dataframe
-    df = pd.read_csv(data_path) # Read CSV in specify directory
-    scaler_path = (r'D:\Work\Code งาน\Lab-docker\RIDA\Export Model\04-06-2024\min_max_scaler.pkl') # Directory to Mormalization Pickle File
-    df_rename, lat, long, fire_date = preprocess(df, scaler_path) # Call Preprocessing Function
+    # Define the directory containing CSV files
+    data_dir = r"D:\Work\Code งาน\Lab-docker\RIDA\RIDA_CSV\Predict\All_Predict"
 
-    # Load Model
-    directory = (r'D:\Work\Code งาน\Lab-docker\RIDA\Export Model\04-06-2024') # Directory to Machine Learning Model Pickle File
-    loaded_model = load_models(directory) # Call Funtion to Load Model from Directory that specified
+    # Loop through all files in the directory
+    for filename in os.listdir(data_dir):
+        if filename.endswith(".csv"):
+        # Construct the full path to the CSV file
+            data_path = os.path.join(data_dir, filename)
 
-    # Perform Prediction
-    df_predicted = make_predictions(loaded_model, df_rename)
+            # Perform Prerpocessing
+            df = pd.read_csv(data_path) # Read CSV in specify directory
+            scaler_path = (r'D:\Work\Code งาน\Lab-docker\RIDA\Export Model\04-06-2024\min_max_scaler.pkl') # Directory to Mormalization Pickle File
+            df_rename, lat, long, fire_date = preprocess(df, scaler_path) # Call Preprocessing Function
+
+            # Load Model
+            directory = (r'D:\Work\Code งาน\Lab-docker\RIDA\Export Model\04-06-2024') # Directory to Machine Learning Model Pickle File
+            loaded_model = load_models(directory) # Call Funtion to Load Model from Directory that specified
+
+            # Perform Prediction
+            df_predicted = make_predictions(loaded_model, df_rename)
     
-    # Query only Row Predicted as Burn
-    result_burn_point = burn_query(df_predicted, lat, long, fire_date)
+            # Query only Row Predicted as Burn
+            result_burn_point = burn_query(df_predicted, lat, long, fire_date)
 
-    # Reverse Geocode for Burn Point
-    reverse_geocode_point(result_burn_point)
+            # Reverse Geocode for Burn Point
+            reverse_geocode_point(result_burn_point)
 
-    # Perform Clustering
-    best_n_clusters, best_score, silhouette_list = find_best_n_clusters(result_burn_point, start=2, random_state=42) # Find Best number of cluster
-    best_eps, best_score, silhouette_scores = find_best_eps(result_burn_point, eps_range=None, min_samples=10) # Find Best Epsilon
-    best_min_samples, num_clusters_list = find_best_min_samples(result_burn_point, best_eps, best_n_clusters, min_samples_range=None) # Find Best Minimum Sample
-    result_burn_scar = perform_dbscan(result_burn_point, best_eps=best_eps, best_min_samples=best_min_samples)
+            # Perform Clustering
+            best_n_clusters, best_score, silhouette_list = find_best_n_clusters(result_burn_point, start=2, random_state=42) # Find Best number of cluster
+            best_eps, best_score, silhouette_scores = find_best_eps(result_burn_point, eps_range=None, min_samples=10) # Find Best Epsilon
+            best_min_samples, num_clusters_list = find_best_min_samples(result_burn_point, best_eps, best_n_clusters, min_samples_range=None) # Find Best Minimum Sample
+            result_burn_scar = perform_dbscan(result_burn_point, best_eps=best_eps, best_min_samples=best_min_samples)
 
+            # Concat burn result with Fire Date
+            result_burn_scar = pd.concat([result_burn_scar, fire_date], axis=0)
 
-    # Concat burn result with Fire Date
-    result_burn_scar = pd.concat([result_burn_scar, fire_date], axis=0)
+            # Call the function to create the GeoDataFrame
+            print("Polygons Clustered Plotting and GeoDataFrame include Geometry, Centroid of Each Polygons and Area in Square Meters.")
+            result_gdf = create_clusters_gdf(result_burn_scar)
 
-    # Call the function to create the GeoDataFrame
-    print("Polygons Clustered Plotting and GeoDataFrame include Geometry, Centroid of Each Polygons and Area in Square Meters.")
-    result_gdf = create_clusters_gdf(result_burn_scar)
+            # Calculate Area of Polygon
+            result_gdf = calculate_area(result_gdf)
 
-    # Calculate Area of Polygon
-    result_gdf = calculate_area(result_gdf)
+            # Reverse Geocode for Burn Scar Polygon
+            print("Completely GeoDataFrame which have been reverse Geocoded. Contain District, Province, Country and Fire Date have been additional.")
+            result_gdf = reverse_geocode(result_gdf, fire_date)
 
-    # Reverse Geocode for Burn Scar Polygon
-    print("Completely GeoDataFrame which have been reverse Geocoded. Contain District, Province, Country and Fire Date have been additional.")
-    result_gdf = reverse_geocode(result_gdf, fire_date)
+            # Export Burn Coordinate to Database
+            connection_string = 'mysql+pymysql://root:gdkll,%40MFU2024@10.1.29.33:3306/RidaDB' # Connection to Dabase Engine
+            point_table_name = 'BURNT_SCAR_POINT'
+            save_coordinate_to_database(result_burn_point, connection_string, point_table_name)
 
-    # Export Burn Coordinate to Database
-    connection_string = 'mysql+pymysql://root:gdkll,%40MFU2024@10.1.29.33:3306/RidaDB' # Connection to Dabase Engine
-    point_table_name = 'BURNT_SCAR_POINT'
-    save_coordinate_to_database(result_burn_point, connection_string, point_table_name)
-
-    # Export Burn Scar to Database
-    scar_table_name = 'BURNT_SCAR_INFO'
-    save_result_to_database(result_gdf, connection_string, scar_table_name)
+            # Export Burn Scar to Database
+            scar_table_name = 'BURNT_SCAR_INFO'
+            save_result_to_database(result_gdf, connection_string, scar_table_name)
 
 # For running in a script mode
 if __name__ == "__main__":
