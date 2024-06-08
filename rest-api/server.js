@@ -9,6 +9,7 @@ const unzipper = require("unzipper");
 const archiver = require("archiver");
 const mysql = require("mysql2");
 const crypto = require("crypto");
+const stringify = require('csv-stringify');
 
 // Create connection to MySQL
 const db = mysql.createConnection({
@@ -290,6 +291,46 @@ server.get('/api/get-burnt-from-date', (req, res) => {
     res.json(geojson);
   });
 });
+
+
+server.get('/api/get-csv', (req, res) => {
+  let startDate = req.query.startDate; // Get the start date from the query parameter
+  let endDate = req.query.endDate; // Get the end date from the query parameter
+  let country = req.query.country;
+  let province = req.query.province;
+  const { stringify } = require('csv-stringify');
+
+  // Construct the SQL query
+  let sql = `SELECT BURNT_SCAR_ID, AP_EN, PV_EN, FIRE_DATE, AREA, COUNTRY, LATITUDE, LONGITUDE, REPLACE(REPLACE(GEOMETRY_DATA, '(', '['), ')', ']') AS GEOMETRY_DATA, GEOMETRY_TYPE FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN '${startDate}' AND '${endDate}'`;
+
+  // Add conditions for country and province if they are provided
+  if (country && country!='All') {
+    sql += ` AND ISO3 = '${country}'`;
+  }
+  if (province && province!='All') {
+    sql += ` AND PV_EN = '${province}'`;
+  }
+
+  db.query(sql, (err, results) => {
+    if (err) {
+      res.status(500).send('Server error');
+    } else {
+      // กำหนด headers สำหรับ response เพื่อบอก browser ว่าจะ download ไฟล์
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', 'attachment; filename=\"burnt_data.csv\"');
+
+      // ใช้ csv-stringify เพื่อแปลงข้อมูลเป็น CSV
+      stringify(results, { header: true }, (err, output) => {
+        if (err) {
+          res.status(500).send('Error converting data to CSV');
+        } else {
+          res.send(output);
+        }
+      });
+    }
+  });
+});
+
 
 
 

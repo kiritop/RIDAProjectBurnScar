@@ -34,6 +34,7 @@ export const fetchBurntChart = createAsyncThunk("dashboard/fetchBurntChart", asy
 
 });
 
+
 export const fetchBurntDataTable = createAsyncThunk("dashboard/fetchBurntDataTable", async (object) => {
   try{
     const response = await fetch(`${CONFIG.API_URL}/overview-table?country=${object.country}&province=${object.province}&fromDate=${object.startDate}&toDate=${object.endDate}`);

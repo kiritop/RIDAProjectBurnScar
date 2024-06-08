@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import MUIDataTable from "mui-datatables";
-import { Container, CircularProgress, TableCell, InputLabel, FormControl, Select, MenuItem, Grid, Card, CardContent } from "@mui/material";
+import { Container, CircularProgress, TableCell, InputLabel, FormControl, Select, MenuItem, Grid, Card, CardContent, Button } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { Provider, lightTheme } from '@adobe/react-spectrum';
 import { DateRangePicker } from '@react-spectrum/datepicker';
@@ -11,6 +11,7 @@ import { Form } from '@react-spectrum/form';
 import {parseDate} from '@internationalized/date';
 import { format } from 'date-fns';
 import LineChart from './../components/LineChart';
+import CONFIG from '../config';
 
 
 
@@ -174,6 +175,38 @@ function BurntScar() {
     setProvinceText(event.target.value);
   };
 
+  const handleDownloadClick = () => {
+    // Construct the GET request URL with query parameters
+
+    let obj = {
+      country: country,
+      province: province,
+      startDate: format(new Date(dateValue.start),'yyyy-MM-dd'),
+      endDate: format(new Date(dateValue.end),'yyyy-MM-dd')
+    }
+    const csvUrl = `${CONFIG.API_URL}/get-csv?startDate=${obj.startDate}&endDate=${obj.endDate}`
+    downloadCSV(csvUrl)
+  };
+
+  const downloadCSV = (csvUrl) => {
+    fetch(csvUrl)
+      .then(response => response.blob())
+      .then(blob => {
+        // สร้าง URL สำหรับ blob
+        const url = window.URL.createObjectURL(blob);
+        // สร้าง anchor tag และเซ็ต attribute สำหรับการดาวน์โหลด
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = 'data.csv'; // ตั้งชื่อไฟล์ที่จะดาวน์โหลด
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        a.remove();
+      })
+      .catch(error => console.error('Error:', error));
+  }
+
 
   return (
     <>
@@ -199,7 +232,7 @@ function BurntScar() {
                       </FormControl>
                     </Box>
                   </Grid>
-                  <Grid item xs={12} md={4}>
+                  <Grid item xs={12} md={2}>
                     <Box my={1} sx={{ minWidth: 120, display: "flex", justifyContent: "flex-start" }} >
                       <FormControl sx={{ m: 1, width: 300, borderRadius: 2 }} size="small">
                         <InputLabel id="province-select-label">Province</InputLabel>
@@ -226,6 +259,13 @@ function BurntScar() {
                       </Provider>
                     </Box>
                   </Grid>
+                  <Grid item xs={12} md={2}>
+                    <Box my={1} sx={{ minWidth: 120, display: 'flex', justifyContent: 'flex-end' }}>
+                      <Button variant="contained" onClick={handleDownloadClick}>
+                        Download to CSV
+                      </Button>
+                    </Box>
+                  </Grid>
                 </Grid>
               </CardContent>
             </Card>
@@ -234,7 +274,7 @@ function BurntScar() {
             <Card sx={{ borderRadius: 3, overflow: "hidden", height:'400px' }} variant="outlined">
               <CardContent>
                 <Typography  variant="h4" component="div">
-                  Burnt scar in {provinceText != 'ALL' ? provinceText : countryText}
+                  {provinceText != 'ALL' ? provinceText : countryText} burnt scar
                 </Typography>
                 <Typography  variant="subtitle1" color="text.secondary">
                   {provinceText != 'ALL' ? provinceText +', '+ countryText : countryText}  burnt scar (  {format(new Date(dateValue.start),'MMM dd yyyy')} - {format(new Date(dateValue.end),'MMM dd yyyy')} )

@@ -14,8 +14,14 @@ const spec = {
   info: {
     title: "BURNT SCAR API DOCUMENT",
   },
+  servers: [
+    {
+      url: "http://localhost:3000", // URL ใหม่ที่คุณต้องการให้ Swagger UI ใช้
+      description: "Production server"
+    }
+  ],
   paths: {
-    "/api/get-burnt-scar-geojson": {
+    "/api/get-burnt-from-date": {
       get: {
         tags: ["API LIST"],
         summary: "Get burnt scar GeoJSON data",
@@ -23,19 +29,19 @@ const spec = {
         parameters: [
           {
             in: "query",
-            name: "yearfrom",
+            name: "startDate",
             schema: {
-              type: "integer"
+              type: "date"
             },
-            description: "The starting year for the data."
+            description: "The starting date for the data format yyyy-mm-dd."
           },
           {
             in: "query",
-            name: "yearto",
+            name: "endDate",
             schema: {
-              type: "integer"
+              type: "date"
             },
-            description: "The ending year for the data."
+            description: "The ending date for the data format yyyy-mm-dd"
           },
           {
             in: "query",
@@ -43,15 +49,15 @@ const spec = {
             schema: {
               type: "string"
             },
-            description: "The country to filter the data."
+            description: "The country to filter the data. (Use ISO3)"
           },
           {
             in: "query",
-            name: "state",
+            name: "province",
             schema: {
               type: "string"
             },
-            description: "The state to filter the data."
+            description: "The province to filter the data."
           },
           {
             in: "query",

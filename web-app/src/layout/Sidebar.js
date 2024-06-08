@@ -285,7 +285,7 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
         </FormControl>
           
         {country !== 'All' && (<Typography level="title-md" fontWeight="bold" sx={{ mt: 2 }}>
-          State
+          Province
         </Typography>)}
         <FormControl orientation="horizontal">
           <Box sx={{ flex: 1, pr: 1 }}>
