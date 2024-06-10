@@ -13,15 +13,15 @@ const stringify = require('csv-stringify');
 
 // Create connection to MySQL
 const db = mysql.createConnection({
-  host: "10.1.29.33",
-  port: '3306',
-  user: "root",
-  password: "gdkll,@MFU2024",
-  database: "RidaDB",
-  // host: "localhost",
+  // host: "10.1.29.39",
+  // port: '3306',
   // user: "root",
-  // password: "root1234",
+  // password: "gdkll,@MFU2024",
   // database: "RidaDB",
+  host: "localhost",
+  user: "root",
+  password: "root1234",
+  database: "RidaDB",
 });
 
 // Connect to MySQL
@@ -292,6 +292,65 @@ server.get('/api/get-burnt-from-date', (req, res) => {
   });
 });
 
+server.get("/api/get-burnt-point-from-date", async (req, res) => {
+  const { startDate, endDate, country, province } = req.query;
+
+  let sqlQuery = `
+    SELECT *, CONCAT(latitude, ',', longitude) AS coordinates, FIRE_DATE
+    FROM burnt_scar_point
+    WHERE FIRE_DATE BETWEEN ? AND ?`;
+
+  if (country) {
+    sqlQuery += ` AND ISO3 LIKE ?`;
+  }
+
+  if (province) {
+    sqlQuery += ` AND pv_en LIKE ?`;
+  }
+
+  try {
+    db.query(sqlQuery, [startDate, endDate, `%${country}%`, `%${province}%`], (err, results) => {
+      if (err) throw err;
+      // ใช้ reduce เพื่อรวมข้อมูลที่มีพิกัดเดียวกัน
+      let reducedData = results.reduce((accumulator, current) => {
+        let key = current.coordinates;
+        if (!accumulator[key]) {
+          accumulator[key] = {
+            ...current,
+            count: 1,
+            frequency_date: [current.FIRE_DATE]
+          };
+        } else {
+          accumulator[key].count++;
+          accumulator[key].frequency_date.push(current.FIRE_DATE);
+        }
+        return accumulator;
+      }, {});
+
+      // แปลงข้อมูลที่รวมแล้วกลับเป็นอาร์เรย์
+      let finalData = Object.values(reducedData).map(item => {
+        return {
+          type: 'Feature',
+          coordinates: item.coordinates,
+          properties: {
+            ...item,
+            frequency: item.count,
+            frequency_date: item.frequency_date.join(', ')
+          },
+          geometry: {
+            type: 'Point',
+            coordinates: [item.LONGITUDE, item.LATITUDE]
+          }
+        };
+      });
+      res.json(finalData);
+    });
+    
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("An error occurred while processing the data.");
+  }
+});
 
 server.get('/api/get-csv', (req, res) => {
   let startDate = req.query.startDate; // Get the start date from the query parameter

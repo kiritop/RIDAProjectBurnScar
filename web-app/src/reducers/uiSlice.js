@@ -33,6 +33,7 @@ const uiSlice = createSlice({
     burntScar: true,
     aqi: false,
     hotSpot: false,
+    burntScarPoint: false,
     status: "idle",
     loadingMap: false,
     loadingSidebar: false,
@@ -71,6 +72,7 @@ const uiSlice = createSlice({
         state.burntScar = action.payload.burntScar;
         state.aqi = action.payload.aqi;
         state.hotSpot = action.payload.hotSpot;
+        state.burntScarPoint = action.payload.burntScarPoint;
         state.current_lat = action.payload.current_lat;
         state.current_lng = action.payload.current_lng;
       })

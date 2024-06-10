@@ -4,13 +4,14 @@ import BaseMap from "./layers/BaseMap";
 import MapLocation from "./MapLocation";
 import MapHotspot from "./MapHotspot";
 import MapBurnScar from "./MapBurnScar";
+import MapBurnScarPoint from "./MapBurnScarPoint";
 import { MapContainer } from "react-leaflet";
 import { useSelector } from 'react-redux';
 import ChangeView from './ChangeView'; // ต้องการ import uiSlice ที่มี saveLayerSettings.fulfilled
 
 
 const MapContent = () => {
-  const { burntScar, aqi, hotSpot } = useSelector(state => state.ui);
+  const { burntScar, aqi, hotSpot, burntScarPoint } = useSelector(state => state.ui);
 
   return (
     
@@ -27,6 +28,7 @@ const MapContent = () => {
         <ChangeView />
         <BaseMap />
         {burntScar && <MapBurnScar />}
+        {burntScarPoint && <MapBurnScarPoint />}
         {aqi && <MapLocation />} 
         {hotSpot && <MapHotspot />} 
       </MapContainer>

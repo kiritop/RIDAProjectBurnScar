@@ -1,0 +1,111 @@
+import React, { useEffect, useState } from "react";
+import {GeoJSON} from "react-leaflet";
+import L from "leaflet"; // import Leaflet library
+import './custom.css';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchBurntScarPolygon } from '../reducers/burntScarSlice';
+import { setLoadingMap } from '../reducers/uiSlice';
+
+const colorIntensityArray = [
+  { fillOpacity: 0.2, color: '#FFCCCC' },
+  { fillOpacity: 0.3, color: '#FFB2B2' },
+  { fillOpacity: 0.4, color: '#FF9999' },
+  { fillOpacity: 0.5, color: '#FF7F7F' },
+  { fillOpacity: 0.6, color: '#FF6666' },
+  { fillOpacity: 0.7, color: '#FF4C4C' },
+  { fillOpacity: 0.8, color: '#FF3232' },
+  { fillOpacity: 0.9, color: '#FF1919' },
+  { fillOpacity: 1.0, color: '#FF0000' }
+];
+
+
+const MapBurnScar = () => {
+  const dispatch = useDispatch();
+  const burntScarData = useSelector(state => state.burnScar.data);
+  // const loading = useSelector(state => state.burnScar.loading); 
+  const sidebarForm = useSelector(state => state.ui.sidebarForm);
+
+  useEffect(() => {
+    dispatch(setLoadingMap(true));
+    dispatch(fetchBurntScarPolygon(sidebarForm))
+    .finally(() => {
+      dispatch(setLoadingMap(false));
+    });
+    
+  }, [dispatch, sidebarForm]);
+
+  
+
+const percentToColor = (percent) => {
+  const value = percent / 100;
+  const red = Math.round(255);
+  const green = Math.round(255 * (1 - value));
+  const blue = 0;
+  
+  console.log("green", green)
+  // Convert RGB to HEX
+  const rgbToHex = (r, g, b) => '#' + [r, g, b].map(x => {
+    const hex = x.toString(16);
+    return hex.length === 1 ? '0' + hex : hex;
+  }).join('');
+
+  return rgbToHex(red, green, blue); // Only green component changes
+};
+
+
+// 
+
+const style = (feature, index) => { // Include index as a parameter
+
+  return {
+    color: 'red', // Set color based on overlap percentage
+    weight: 0, // No border
+    fillOpacity: 0.2 // Semi-transparent fill
+  };
+};
+
+
+  const onEachFeature = (feature, layer) => {
+    // create a popup with the feature's properties
+    let popupContent = ` <div style="font-family: Arial, sans-serif; padding: 10px; border-radius: 5px;">
+      <h4 style="text-align: center">${feature?.properties?.PV_EN}, ${feature?.properties?.AP_EN}, ${feature?.properties?.COUNTRY}</h4>
+      <table>
+        <h5 style="text-align: center">Centroid</h5>
+        <tr><td><strong>Latitude:</strong></td><td style="text-align:right">${feature.properties.LATITUDE}</td></tr>
+        <tr><td><strong>Longitude:</strong></td><td style="text-align:right">${feature.properties.LONGITUDE}</td></tr>
+        <tr><td><strong>Fire date :</strong></td><td style="text-align:right">${feature.properties.FIRE_DATE}</td></tr>
+        <tr><td><strong>Area M :</strong></td><td style="text-align:right">${feature.properties.AREA}</td></tr>
+      </table>
+    </div>`;
+    
+    layer.bindPopup(popupContent, { className: 'custom-popup' }); // add a custom class name
+  };
+
+
+  return (
+    <>
+     {
+          // Iterate the borderData with .map():
+          burntScarData.map((data, index) => {
+            // Convert the coordinates to a format that can be used by Leaflet
+            // Convert the coordinates to a format that can be used by Leaflet
+            const coordinates = data.geometry.coordinates.map(coordinate => [coordinate[1], coordinate[0]]);
+
+          return (
+            // Pass data to layer via props:
+            <GeoJSON
+              key={index}
+              data={{ ...data, geometry: { ...data.geometry, coordinates: [coordinates] } }}
+              style={style} // ใช้ฟังก์ชัน style ที่กำหนดไว้
+              coordsToLatLng={coords => new L.LatLng(coords[0], coords[1])}
+              onEachFeature={onEachFeature}
+            />
+            )
+          })
+      }
+      
+    </>
+  );
+};
+
+export default MapBurnScar;

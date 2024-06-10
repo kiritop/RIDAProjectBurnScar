@@ -15,6 +15,8 @@ import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import CONFIG from "../config";
+import { SvgIcon } from '@mui/material';
+import Logo from './m_burn_logo.png';
 
 const pages = [
   { name: "Map" },
@@ -82,10 +84,11 @@ export default function Header() {
       console.error(error); // log the error message
     }
   };
+
   return (
     <AppBar position="static" sx={{ backgroundColor: "#0077b6", color: "#fff" }}>
       <Toolbar variant="dense">
-        <MapIcon sx={{ mr: 1 }} />
+        <img src={Logo} alt="Logo" style={{ marginRight: '10px', width: '30px' }} />
         <Typography
           variant="h6"
           noWrap
@@ -101,7 +104,7 @@ export default function Header() {
             textDecoration: "none",
           }}
         >
-          RIDA - BURNT SCAR MAP PROJECT
+          M - BURNSCAR
         </Typography>
         <Box sx={{ flexGrow: 12, display: { xs: "none", md: "flex" } }} />
         {pages.map((page, index) => {

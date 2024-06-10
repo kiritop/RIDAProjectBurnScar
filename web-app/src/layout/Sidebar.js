@@ -75,6 +75,7 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
   const [burntScar, setBurntScar] = useState(ui.burntScar);
   const [aqi, setAqi] = useState(ui.aqi);
   const [hotSpot, setHotSpot] = useState(ui.hotSpot);
+  const [burntScarPoint, setBurntScarPoint] = useState(ui.burntScarPoint);
   const dispatch = useDispatch();
 
   const currentDate = new Date();
@@ -129,16 +130,25 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
         setBurntScar(event.target.checked);
         setAqi(false);
         setHotSpot(false);
+        setBurntScarPoint(false);
+        break;
+      case 'burntScarPoint':
+        setBurntScarPoint(event.target.checked);
+        setAqi(false);
+        setHotSpot(false);
+        setBurntScar(false);
         break;
       case 'aqi':
         setAqi(event.target.checked);
         setBurntScar(false);
         setHotSpot(false);
+        setBurntScarPoint(false);
         break;
       case 'hotSpot':
         setHotSpot(event.target.checked);
         setBurntScar(false);
         setAqi(false);
+        setBurntScarPoint(false);
         break;
       default:
         break;
@@ -220,14 +230,14 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
       <Divider sx={{ mt: 'auto' }} />
       <DialogContent sx={{ gap: 2 }}>
 
-      {burntScar === true && (<Typography level="title-md" fontWeight="bold" sx={{ mt: 2 }}>
+      {(burntScar === true || burntScarPoint === true) &&(<Typography level="title-md" fontWeight="bold" sx={{ mt: 2 }}>
           Date Range
         </Typography>)}
 
         <FormControl orientation="horizontal">
           <Box sx={{ flex: 1, pr: 1 }}>
             <Stack spacing={2}>
-            {burntScar === true && (
+            {(burntScar === true || burntScarPoint === true) &&(
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DemoContainer components={['DatePicker']}>
                 <DatePicker
@@ -247,7 +257,7 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
         <FormControl orientation="horizontal">
           <Box sx={{ flex: 1, pr: 1 }}>
             <Stack spacing={2}>
-            {burntScar === true && (
+            {(burntScar === true || burntScarPoint === true) &&(
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DemoContainer components={['DatePicker']}>
                   <DatePicker
@@ -304,13 +314,13 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
           </Box>
         </FormControl>
 
-        {burntScar === false && aqi === false &&(<Typography level="title-md" fontWeight="bold" sx={{ mt: 2 }}>
-          Date
+        {hotSpot === true &&(<Typography level="title-md" fontWeight="bold" sx={{ mt: 2 }}>
+          Datess
         </Typography>)}
         <FormControl orientation="horizontal">
           <Box sx={{ flex: 1, pr: 1 }}>
             <Stack spacing={2}>
-              {burntScar === false && aqi === false &&(
+              {hotSpot === true &&(
                  <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DemoContainer components={['DatePicker']}>
                     <DatePicker 
@@ -334,11 +344,15 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
         <FormControl orientation="horizontal">
           <Box sx={{ flex: 1, mt: 1, mr: 1  }}>
             <FormLabel sx={{ typography: 'title-sm' }}>Burnt Level Layer</FormLabel>
-            {/* <FormHelperText sx={{ typography: 'body-sm' }}>
-              Description for burnt level map
-            </FormHelperText> */}
           </Box>
           <Switch checked={burntScar} onChange={handleChange} name="burntScar" />
+        </FormControl>
+
+        <FormControl orientation="horizontal">
+          <Box sx={{ flex: 1, mt: 1, mr: 1  }}>
+            <FormLabel sx={{ typography: 'title-sm' }}>Burnt Level Point</FormLabel>
+          </Box>
+          <Switch checked={burntScarPoint} onChange={handleChange} name="burntScarPoint" />
         </FormControl>
 
         <FormControl orientation="horizontal">

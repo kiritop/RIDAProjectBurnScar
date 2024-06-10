@@ -4,11 +4,12 @@ import { Box, Card, CardContent, CircularProgress, Typography  } from "@mui/mate
 import ToggleButton from "../components/ToggleButton";
 import Sidebar from "../layout/Sidebar";
 import ColorBar from "../components/ColorBar";
+import ColorBarPoint from "../components/ColorBarPoint";
 import { useSelector } from 'react-redux';
 
 function Map() {
   const [isOpen, setIsOpen] = useState(false);
-  const { burntScar } = useSelector(state => state.ui);
+  const { burntScar, burntScarPoint } = useSelector(state => state.ui);
   const loadingMap = useSelector(state => state.ui.loadingMap);
 
   const toggleDrawer = () => {
@@ -34,6 +35,20 @@ function Map() {
         >
           <CardContent>
             <ColorBar /> 
+          </CardContent>
+        </Card> }
+        {burntScarPoint && <Card
+          sx={{
+            position: "absolute",
+            bottom: "10%",
+            left: 16,
+            maxWidth: "20%",
+            zIndex: 1050,
+            backgroundColor: "rgba(255, 255, 255, 0.2)",
+          }}
+        >
+          <CardContent>
+            <ColorBarPoint /> 
           </CardContent>
         </Card> }
         {loadingMap && (

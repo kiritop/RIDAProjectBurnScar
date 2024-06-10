@@ -3,7 +3,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import CONFIG from '../config';
 
 export const fetchBurntScarData = createAsyncThunk('burntScar/fetchBurntScarData', async (filter) => {
-    const response = await fetch(`${CONFIG.API_URL}/process-shapefiles-demo?yearfrom=${filter.yearRange[0]}&yearto=${filter.yearRange[1]}&country=${filter.country==='All'?'':filter.country}&state=${filter.province==='All'?'':filter.province}`);
+    const response = await fetch(`${CONFIG.API_URL}/get-burnt-point-from-date?yearfrom=${filter.startDate}&yearto=${filter.endDate}&country=${filter.country==='All'?'':filter.iso3}&state=${filter.city==='All'?'':filter.city}`);
     const data = await response.json();
     return data;
 });
