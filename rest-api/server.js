@@ -308,48 +308,53 @@ server.get("/api/get-burnt-point-from-date", async (req, res) => {
     sqlQuery += ` AND pv_en LIKE ?`;
   }
 
-  try {
-    db.query(sqlQuery, [startDate, endDate, `%${country}%`, `%${province}%`], (err, results) => {
-      if (err) throw err;
-      // ใช้ reduce เพื่อรวมข้อมูลที่มีพิกัดเดียวกัน
-      let reducedData = results.reduce((accumulator, current) => {
-        let key = current.coordinates;
-        if (!accumulator[key]) {
-          accumulator[key] = {
-            ...current,
-            count: 1,
-            frequency_date: [current.FIRE_DATE]
-          };
-        } else {
-          accumulator[key].count++;
-          accumulator[key].frequency_date.push(current.FIRE_DATE);
-        }
-        return accumulator;
-      }, {});
+  db.query(sqlQuery, [startDate, endDate, `%${country}%`, `%${province}%`], (err, results) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send("An error occurred while processing the data.");
+      return;
+    }
 
-      // แปลงข้อมูลที่รวมแล้วกลับเป็นอาร์เรย์
-      let finalData = Object.values(reducedData).map(item => {
-        return {
-          type: 'Feature',
-          coordinates: item.coordinates,
-          properties: {
-            ...item,
-            frequency: item.count,
-            frequency_date: item.frequency_date.join(', ')
-          },
-          geometry: {
-            type: 'Point',
-            coordinates: [item.LONGITUDE, item.LATITUDE]
-          }
+    // ใช้ reduce เพื่อรวมข้อมูลที่มีพิกัดเดียวกัน
+    let reducedData = results.reduce((accumulator, current) => {
+      let key = current.coordinates;
+      if (!accumulator[key]) {
+        accumulator[key] = {
+          ...current,
+          count: 1,
+          frequency_date: [current.FIRE_DATE]
         };
-      });
-      res.json(finalData);
+      } else {
+        accumulator[key].count++;
+        accumulator[key].frequency_date.push(current.FIRE_DATE);
+      }
+      return accumulator;
+    }, {});
+
+    // หาค่าสูงสุดของ count
+    let maxCount = Math.max(...Object.values(reducedData).map(item => item.count));
+
+    // แปลงข้อมูลที่รวมแล้วกลับเป็นอาร์เรย์และคำนวณเปอร์เซ็นต์
+    let finalData = Object.values(reducedData).map(item => {
+      let percent = ((item.count / maxCount) * 100).toFixed(2);
+      return {
+        type: 'Feature',
+        coordinates: item.coordinates,
+        properties: {
+          ...item,
+          frequency: item.count,
+          frequency_date: item.frequency_date.join(', '),
+          percent: percent // เพิ่มเปอร์เซ็นต์ลงใน properties
+        },
+        geometry: {
+          type: 'Point',
+          coordinates: [item.LONGITUDE, item.LATITUDE]
+        }
+      };
     });
-    
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("An error occurred while processing the data.");
-  }
+
+    res.json(finalData);
+  });
 });
 
 server.get('/api/get-csv', (req, res) => {

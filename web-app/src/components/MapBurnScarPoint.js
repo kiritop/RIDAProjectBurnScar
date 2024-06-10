@@ -1,48 +1,28 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import {GeoJSON} from "react-leaflet";
 import L from "leaflet"; // import Leaflet library
 import './custom.css';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchBurntScarPolygon } from '../reducers/burntScarSlice';
-import { setLoadingMap } from '../reducers/uiSlice';
-
-const colorIntensityArray = [
-  { fillOpacity: 0.2, color: '#FFCCCC' },
-  { fillOpacity: 0.3, color: '#FFB2B2' },
-  { fillOpacity: 0.4, color: '#FF9999' },
-  { fillOpacity: 0.5, color: '#FF7F7F' },
-  { fillOpacity: 0.6, color: '#FF6666' },
-  { fillOpacity: 0.7, color: '#FF4C4C' },
-  { fillOpacity: 0.8, color: '#FF3232' },
-  { fillOpacity: 0.9, color: '#FF1919' },
-  { fillOpacity: 1.0, color: '#FF0000' }
-];
+import { fetchBurntScarData } from '../reducers/burntScarSlice';
 
 
-const MapBurnScar = () => {
+
+const MapBurnScarPoint = () => {
+  // const [firmsData, setFirmsData] = useState([]);
   const dispatch = useDispatch();
   const burntScarData = useSelector(state => state.burnScar.data);
-  // const loading = useSelector(state => state.burnScar.loading); 
-  const sidebarForm = useSelector(state => state.ui.sidebarForm);
+  const loading = useSelector(state => state.burnScar.loading); 
 
   useEffect(() => {
-    dispatch(setLoadingMap(true));
-    dispatch(fetchBurntScarPolygon(sidebarForm))
-    .finally(() => {
-      dispatch(setLoadingMap(false));
-    });
-    
-  }, [dispatch, sidebarForm]);
-
-  
+    dispatch(fetchBurntScarData());
+  }, [dispatch]);
 
 const percentToColor = (percent) => {
   const value = percent / 100;
   const red = Math.round(255);
   const green = Math.round(255 * (1 - value));
   const blue = 0;
-  
-  console.log("green", green)
+
   // Convert RGB to HEX
   const rgbToHex = (r, g, b) => '#' + [r, g, b].map(x => {
     const hex = x.toString(16);
@@ -52,34 +32,49 @@ const percentToColor = (percent) => {
   return rgbToHex(red, green, blue); // Only green component changes
 };
 
+  // define a custom pointToLayer function
+  const pointToLayer = (feature, latlng) => {
+    // get the color based on the fire type
+    const color = percentToColor(feature.properties.percent);
+    // create a circle marker with a fixed pixel radius of 1
+    let marker = L.circleMarker(latlng, { radius: 1, color: color, fillOpacity: 1 });
 
-// 
-
-const style = (feature, index) => { // Include index as a parameter
-
-  return {
-    color: 'red', // Set color based on overlap percentage
-    weight: 0, // No border
-    fillOpacity: 0.2 // Semi-transparent fill
+    
+    
+    return marker;
   };
-};
 
+  // const getReverseGeocodingData = async (lat, lon) => {
+  //   const apiKey = '65eddfd7b586a527220428jro7f022f'; // แทนที่ 'your_api_key' ด้วย API key ของคุณ
+  //   const url = `https://geocode.maps.co/reverse?lat=${lat}&lon=${lon}&api_key=${apiKey}`;
+
+  //   try {
+  //     const response = await axios.get(url);
+  //     return response.data; // ข้อมูลที่อยู่จะอยู่ใน response.data
+  //   } catch (error) {
+  //     console.error('Error fetching reverse geocoding data', error);
+  //   }
+  // };
 
   const onEachFeature = (feature, layer) => {
     // create a popup with the feature's properties
     let popupContent = ` <div style="font-family: Arial, sans-serif; padding: 10px; border-radius: 5px;">
-      <h4 style="text-align: center">${feature?.properties?.PV_EN}, ${feature?.properties?.AP_EN}, ${feature?.properties?.COUNTRY}</h4>
+      <h4 style="text-align: center">Chiang Rai, Thailand</h4>
       <table>
-        <h5 style="text-align: center">Centroid</h5>
-        <tr><td><strong>Latitude:</strong></td><td style="text-align:right">${feature.properties.LATITUDE}</td></tr>
-        <tr><td><strong>Longitude:</strong></td><td style="text-align:right">${feature.properties.LONGITUDE}</td></tr>
-        <tr><td><strong>Fire date :</strong></td><td style="text-align:right">${feature.properties.FIRE_DATE}</td></tr>
-        <tr><td><strong>Area M :</strong></td><td style="text-align:right">${feature.properties.AREA}</td></tr>
+        <tr><td><strong>Latitude:</strong></td><td style="text-align:right">${feature.geometry.coordinates[1]}</td></tr>
+        <tr><td><strong>Longitude:</strong></td><td style="text-align:right">${feature.geometry.coordinates[0]}</td></tr>
+        <tr><td><strong>Burnt ratio :</strong></td><td style="background-color:${percentToColor(feature.properties.percent)};text-align:right;color:#000000;">${feature.properties.percent} % </td></tr>
+        <tr><td><strong>Burnt frequency (times) :</strong></td><td style="text-align:right">${feature.properties.count}</td></tr>
+        <tr><td><strong>Burnt year :</strong></td><td style="text-align:right">${feature.properties.frequency_date}</td></tr>
       </table>
     </div>`;
-    
+    // ${feature.properties.year.map(item => `<tr><td><strong>Burnt year :</strong></td> <td style="text-align:right">${item}</td></tr>`).join('')}
     layer.bindPopup(popupContent, { className: 'custom-popup' }); // add a custom class name
   };
+
+  if (loading) {
+    return <div>Loading...</div>; // แสดง loader ถ้าข้อมูล AQI กำลังโหลด
+  }
 
 
   return (
@@ -87,19 +82,12 @@ const style = (feature, index) => { // Include index as a parameter
      {
           // Iterate the borderData with .map():
           burntScarData.map((data, index) => {
-            // Convert the coordinates to a format that can be used by Leaflet
-            // Convert the coordinates to a format that can be used by Leaflet
-            const coordinates = data.geometry.coordinates.map(coordinate => [coordinate[1], coordinate[0]]);
 
-          return (
-            // Pass data to layer via props:
-            <GeoJSON
-              key={index}
-              data={{ ...data, geometry: { ...data.geometry, coordinates: [coordinates] } }}
-              style={style} // ใช้ฟังก์ชัน style ที่กำหนดไว้
-              coordsToLatLng={coords => new L.LatLng(coords[0], coords[1])}
-              onEachFeature={onEachFeature}
-            />
+            return (
+              // Pass data to layer via props:
+              <>
+                <GeoJSON key={index} data={data} pointToLayer={pointToLayer} onEachFeature={onEachFeature} />
+              </>
             )
           })
       }
@@ -108,4 +96,4 @@ const style = (feature, index) => { // Include index as a parameter
   );
 };
 
-export default MapBurnScar;
+export default MapBurnScarPoint;

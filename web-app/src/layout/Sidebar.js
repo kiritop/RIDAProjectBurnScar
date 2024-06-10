@@ -14,11 +14,10 @@ import FormHelperText from '@mui/joy/FormHelperText';
 import Stack from '@mui/joy/Stack';
 import Sheet from '@mui/joy/Sheet';
 import Typography from '@mui/joy/Typography';
-import Slider from "@mui/material/Slider";
 import { Select, Switch, MenuItem } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { saveLayerSettings, setLoadingMap, getCities } from '../reducers/uiSlice';
-import { fetchBurntScarPolygon } from '../reducers/burntScarSlice';
+import { fetchBurntScarPolygon, fetchBurntScarData } from '../reducers/burntScarSlice';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -69,7 +68,6 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
 
   const ui = useSelector(state => state.ui);
 
-  const [yearRange, setYearRange] = useState(ui.sidebarForm.yearRange);
   const [country, setCountry] = useState(ui.sidebarForm.country);
   const [city, setCity] = useState(ui.sidebarForm.city);
   const [burntScar, setBurntScar] = useState(ui.burntScar);
@@ -109,11 +107,6 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
 
   const handleCityChange = (event) => {
     setCity(event.target.value);
-  };
-
-  //set year range 
-  const handleYearChange = (event, newValue) => {
-    setYearRange(newValue);
   };
 
   useEffect(() => {
@@ -175,19 +168,26 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
       let current_lat = filteredCountries[0].lat
       let current_lng = filteredCountries[0].lng
       // Dispatch the save action with the current state
-      dispatch(saveLayerSettings({ sidebarForm, burntScar, aqi, hotSpot, current_lat, current_lng}));
+      dispatch(saveLayerSettings({ sidebarForm, burntScar, aqi, hotSpot, burntScarPoint, current_lat, current_lng}));
     }else{
       let valueToFilter = city
       let filteredCountries = cities.filter(city => city.city === valueToFilter);
       let current_lat = filteredCountries[0].lat
       let current_lng = filteredCountries[0].lng
       // Dispatch the save action with the current state
-      dispatch(saveLayerSettings({ sidebarForm, burntScar, aqi, hotSpot, current_lat, current_lng}));
+      dispatch(saveLayerSettings({ sidebarForm, burntScar, aqi, hotSpot, burntScarPoint, current_lat, current_lng}));
     }
     
     if(burntScar){
       dispatch(setLoadingMap(true));
       dispatch(fetchBurntScarPolygon(sidebarForm))
+      .finally(() => {
+        dispatch(setLoadingMap(false));
+      });
+    }
+    if(burntScarPoint){
+      dispatch(setLoadingMap(true));
+      dispatch(fetchBurntScarData(sidebarForm))
       .finally(() => {
         dispatch(setLoadingMap(false));
       });
