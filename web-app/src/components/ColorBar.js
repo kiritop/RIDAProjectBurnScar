@@ -33,9 +33,11 @@ const ColorBar = () => {
             bgcolor={item.color}
           >
             {index === 0 || index === colorIntensityArray.length - 1 ? (
+              <center>
               <Typography fontWeight="bold" variant="body2">
-                {index+1} times
+                {index+1} {index === 0 ? 'time': 'times +'}
               </Typography>
+              </center>
             ) : null}
           </Box>
         ))}

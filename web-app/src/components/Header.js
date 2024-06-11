@@ -104,7 +104,7 @@ export default function Header() {
             textDecoration: "none",
           }}
         >
-          M - BURNSCAR
+          M-BurnScar 
         </Typography>
         <Box sx={{ flexGrow: 12, display: { xs: "none", md: "flex" } }} />
         {pages.map((page, index) => {

@@ -37,7 +37,7 @@ const percentToColor = (percent) => {
     // get the color based on the fire type
     const color = percentToColor(feature.properties.percent);
     // create a circle marker with a fixed pixel radius of 1
-    let marker = L.circleMarker(latlng, { radius: 1, color: color, fillOpacity: 1 });
+    let marker = L.circleMarker(latlng, { radius: 0.5, color: color, fillOpacity: 1 });
 
     
     
@@ -65,7 +65,7 @@ const percentToColor = (percent) => {
         <tr><td><strong>Longitude:</strong></td><td style="text-align:right">${feature.geometry.coordinates[0]}</td></tr>
         <tr><td><strong>Burnt ratio :</strong></td><td style="background-color:${percentToColor(feature.properties.percent)};text-align:right;color:#000000;">${feature.properties.percent} % </td></tr>
         <tr><td><strong>Burnt frequency (times) :</strong></td><td style="text-align:right">${feature.properties.count}</td></tr>
-        <tr><td><strong>Burnt year :</strong></td><td style="text-align:right">${feature.properties.frequency_date}</td></tr>
+        <tr><td><strong>Burnt Date :</strong></td><td style="text-align:right">${feature.properties.frequency_date}</td></tr>
       </table>
     </div>`;
     // ${feature.properties.year.map(item => `<tr><td><strong>Burnt year :</strong></td> <td style="text-align:right">${item}</td></tr>`).join('')}

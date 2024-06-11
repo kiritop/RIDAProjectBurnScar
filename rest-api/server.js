@@ -292,6 +292,143 @@ server.get('/api/get-burnt-from-date', (req, res) => {
   });
 });
 
+//use api_key
+server.get('/api/get-burnt-scar-polygon', (req, res) => {
+  let startDate = req.query.startDate; // Get the start date from the query parameter
+  let endDate = req.query.endDate; // Get the end date from the query parameter
+  let country = req.query.country;
+  let province = req.query.province;
+  let api_key = req.query.api_key;
+
+  let sql = "SELECT * FROM users WHERE api_key = ?";
+  db.query(sql, [api_key], (err, results) => {
+    if (err) {
+      throw err;
+    } else if (results.length === 0) {
+      // If no user with the provided API key is found, send a 404 or 500 response
+      res.status(404).send("Invalid API key");
+    } else {
+
+      // Construct the SQL query
+      let sql = `SELECT BURNT_SCAR_ID, AP_EN, PV_EN, FIRE_DATE, AREA, COUNTRY, LATITUDE, LONGITUDE, REPLACE(REPLACE(GEOMETRY_DATA, '(', '['), ')', ']') AS GEOMETRY_DATA, GEOMETRY_TYPE FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN '${startDate}' AND '${endDate}'`;
+
+      // Add conditions for country and province if they are provided
+      if (country && country!='All') {
+        sql += ` AND ISO3 = '${country}'`;
+      }
+      if (province && province!='All') {
+        sql += ` AND PV_EN = '${province}'`;
+      }
+      db.query(sql, (err, results) => {
+        if (err) throw err;
+
+        // Convert data to GeoJSON format
+        let geojson = {
+          type: "FeatureCollection",
+          features: results.map(item => ({
+            type: "Feature",
+            properties: {
+              BURNT_SCAR_ID: item.BURNT_SCAR_ID,
+              AP_EN: item.AP_EN,
+              PV_EN: item.PV_EN,
+              COUNTRY: item.COUNTRY,
+              AREA: item.AREA,
+              FIRE_DATE: item.FIRE_DATE,
+              LATITUDE: item.LATITUDE,
+              LONGITUDE: item.LONGITUDE,
+            },
+            geometry: {
+              type: item.GEOMETRY_TYPE,
+              coordinates: JSON.parse(item.GEOMETRY_DATA)
+            }
+          }))
+        };
+
+        // Send the data back to the client
+        res.json(geojson);
+      });
+    }
+  })
+});
+
+
+
+//use api_key
+server.get("/api/get-burnt-scar-point", async (req, res) => {
+  const { startDate, endDate, country, province, api_key } = req.query;
+
+  let sql = "SELECT * FROM users WHERE api_key = ?";
+  db.query(sql, [api_key], (err, results) => {
+    if (err) {
+      throw err;
+    } else if (results.length === 0) {
+      // If no user with the provided API key is found, send a 404 or 500 response
+      res.status(404).send("Invalid API key");
+    } else {
+
+      let sqlQuery = `
+        SELECT *, CONCAT(latitude, ',', longitude) AS coordinates, FIRE_DATE
+        FROM burnt_scar_point
+        WHERE FIRE_DATE BETWEEN ? AND ?`;
+
+      if (country) {
+        sqlQuery += ` AND ISO3 LIKE ?`;
+      }
+
+      if (province) {
+        sqlQuery += ` AND pv_en LIKE ?`;
+      }
+
+      db.query(sqlQuery, [startDate, endDate, `%${country}%`, `%${province}%`], (err, results) => {
+        if (err) {
+          console.error(err);
+          res.status(500).send("An error occurred while processing the data.");
+          return;
+        }
+
+        // ใช้ reduce เพื่อรวมข้อมูลที่มีพิกัดเดียวกัน
+        let reducedData = results.reduce((accumulator, current) => {
+          let key = current.coordinates;
+          if (!accumulator[key]) {
+            accumulator[key] = {
+              ...current,
+              count: 1,
+              frequency_date: [current.FIRE_DATE]
+            };
+          } else {
+            accumulator[key].count++;
+            accumulator[key].frequency_date.push(current.FIRE_DATE);
+          }
+          return accumulator;
+        }, {});
+
+        // หาค่าสูงสุดของ count
+        let maxCount = Math.max(...Object.values(reducedData).map(item => item.count));
+
+        // แปลงข้อมูลที่รวมแล้วกลับเป็นอาร์เรย์และคำนวณเปอร์เซ็นต์
+        let finalData = Object.values(reducedData).map(item => {
+          let percent = ((item.count / maxCount) * 100).toFixed(2);
+          return {
+            type: 'Feature',
+            coordinates: item.coordinates,
+            properties: {
+              ...item,
+              frequency: item.count,
+              frequency_date: item.frequency_date.join(', '),
+              percent: percent // เพิ่มเปอร์เซ็นต์ลงใน properties
+            },
+            geometry: {
+              type: 'Point',
+              coordinates: [item.LONGITUDE, item.LATITUDE]
+            }
+          };
+        });
+
+        res.json(finalData);
+      });
+    }
+  })
+});
 server.get("/api/get-burnt-point-from-date", async (req, res) => {
   const { startDate, endDate, country, province } = req.query;
 

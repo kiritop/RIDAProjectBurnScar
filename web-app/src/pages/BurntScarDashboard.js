@@ -10,12 +10,17 @@ import { fetchProvinceByCountry, fetchBurntDataTable, fetchBurntChart } from '..
 import { Form } from '@react-spectrum/form';
 import {parseDate} from '@internationalized/date';
 import { format } from 'date-fns';
-import LineChart from './../components/LineChart';
+import LineChart from '../components/LineChart';
 import CONFIG from '../config';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs from 'dayjs';
 
 
 
-function BurntScar() {
+function BurntScarDashboard() {
   const dispatch = useDispatch();
   const dataProvince = useSelector((state) => state.dashboard.dataProvince ?? []);
   const dataBurntTable = useSelector((state) => state.dashboard.dataBurntTable ?? []);
@@ -29,22 +34,30 @@ function BurntScar() {
   const [provinceText, setProvinceText] = useState("All");
 
 
+  const [startDate, setStartDate] = useState(dayjs(new Date().setFullYear(new Date().getFullYear() - 1)).format('YYYY-MM-DD'));
+  const [endDate, setEndDate] = useState(dayjs(new Date()).format('YYYY-MM-DD'));
 
 
-  
+  const handleStartDateChange = (date) => {
+    setStartDate(date.format('YYYY-MM-DD'));
+  };
 
-  let [dateValue, setDateValue] = useState({
-    start: parseDate(format(new Date().setFullYear(new Date().getFullYear() - 1),'yyyy-MM-dd')),
-    end: parseDate(format(new Date(),'yyyy-MM-dd'))
-  });
+  const handleEndDateChange = (date) => {
+    if (startDate && date < startDate) {
+      // Validate end date not less than start date
+      console.error('End date cannot be less than start date');
+      return;
+    }
+    setEndDate(date.format('YYYY-MM-DD'));
+  };
 
 
   useEffect(() => {
     let obj = {
       country: country,
       province: province,
-      startDate: format(new Date(dateValue.start),'yyyy-MM-dd'),
-      endDate: format(new Date(dateValue.end),'yyyy-MM-dd')
+      startDate: startDate,
+      endDate: endDate
     }
     if (country) {
       dispatch(fetchProvinceByCountry(country));
@@ -52,7 +65,7 @@ function BurntScar() {
     dispatch(fetchBurntChart(obj));
     dispatch(fetchBurntDataTable(obj));
     
-  }, [dispatch, country, province, dateValue]);
+  }, [dispatch, country, province, startDate, endDate]);
 
   // Update chart data when dataHotspotC changes
   useEffect(() => {
@@ -181,8 +194,8 @@ function BurntScar() {
     let obj = {
       country: country,
       province: province,
-      startDate: format(new Date(dateValue.start),'yyyy-MM-dd'),
-      endDate: format(new Date(dateValue.end),'yyyy-MM-dd')
+      startDate: startDate,
+      endDate: endDate
     }
     const csvUrl = `${CONFIG.API_URL}/get-csv?startDate=${obj.startDate}&endDate=${obj.endDate}`
     downloadCSV(csvUrl)
@@ -247,22 +260,44 @@ function BurntScar() {
                       </FormControl>
                     </Box>
                   </Grid>
-                  <Grid item xs={12} md={5.5}>
-                    <Box my={1} sx={{ minWidth: 120, display: "flex", justifyContent: "flex-end" }} >
-                      <Provider theme={lightTheme} colorScheme="light" scale="large">
-                        <Form >
-                            <DateRangePicker 
-                              value={dateValue}
-                              onChange={setDateValue}
+                  <Grid item xs={12} md={2}/>
+                  <Grid item xs={12} md={2}>
+                    <Box my={1} sx={{ minWidth: 120, display: "flex", justifyContent: "flex-start" }} >
+                      <FormControl sx={{ m: 1, width: 300, borderRadius: 2 }} size="small">
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                          <DemoContainer components={['DatePicker']}>
+                            <DatePicker
+                              label="Start Date"
+                              value={dayjs(startDate)}
+                              onChange={handleStartDateChange}
+                              slotProps={{ textField: { size: 'small' } }}
                             />
-                        </Form>
-                      </Provider>
+                          </DemoContainer>
+                        </LocalizationProvider>
+                      </FormControl>
                     </Box>
                   </Grid>
                   <Grid item xs={12} md={2}>
+                    <Box my={1} sx={{ minWidth: 120, display: "flex", justifyContent: "flex-start" }} >
+                      <FormControl sx={{ m: 1, width: 300, borderRadius: 2 }} size="small">
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                          <DemoContainer components={['DatePicker']}>
+                            <DatePicker
+                              label="End Date"
+                              value={dayjs(endDate)}
+                              onChange={handleEndDateChange}
+                              slotProps={{ textField: { size: 'small' } }}
+                              minDate={dayjs(startDate)} // Set minimum date for end date
+                            />
+                          </DemoContainer>
+                        </LocalizationProvider>
+                      </FormControl>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12} md={1}>
                     <Box my={1} sx={{ minWidth: 120, display: 'flex', justifyContent: 'flex-end' }}>
                       <Button variant="contained" onClick={handleDownloadClick}>
-                        Download to CSV
+                        Export CSV
                       </Button>
                     </Box>
                   </Grid>
@@ -277,7 +312,7 @@ function BurntScar() {
                   {provinceText != 'ALL' ? provinceText : countryText} burnt scar
                 </Typography>
                 <Typography  variant="subtitle1" color="text.secondary">
-                  {provinceText != 'ALL' ? provinceText +', '+ countryText : countryText}  burnt scar (  {format(new Date(dateValue.start),'MMM dd yyyy')} - {format(new Date(dateValue.end),'MMM dd yyyy')} )
+                  {provinceText != 'ALL' ? provinceText +', '+ countryText : countryText}  burnt scar (  {format(new Date(startDate),'MMM dd yyyy')} - {format(new Date(endDate),'MMM dd yyyy')} )
                 </Typography>
                 <Box height={50}/>
                 <Typography  variant="h3" component="div">
@@ -315,7 +350,7 @@ function BurntScar() {
           <Grid item xs={12} md={12}>
             <Box sx={{ borderRadius: 3, overflow: "hidden", flex: 1}}>
                 <MUIDataTable
-                  title={<h3>Burnt Scar Area Ranking {format(new Date(dateValue.start),'MMM dd yyyy')} - {format(new Date(dateValue.end),'MMM dd yyyy')}</h3>}
+                  title={<h3>Burnt Scar Area Ranking {format(new Date(startDate),'MMM dd yyyy')} - {format(new Date(endDate),'MMM dd yyyy')}</h3>}
                   data={tableData}
                   columns={columns}
                   options={options}
@@ -328,4 +363,4 @@ function BurntScar() {
   );
 }
 
-export default BurntScar;
+export default BurntScarDashboard;

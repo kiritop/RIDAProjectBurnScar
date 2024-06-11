@@ -59,13 +59,11 @@ const LineChart = () => {
       }, {});
 
       
-      console.log('groupedData', groupedData)
       const series = Object.keys(groupedData).map(country => ({
         name: country,
         data: groupedData[country].sort((a, b) => a.x - b.x) // Sort by date
       }));
 
-      console.log("groupedData", groupedData)
 
       setSeriesData(series);
     };

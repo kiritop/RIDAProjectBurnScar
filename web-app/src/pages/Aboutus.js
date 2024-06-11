@@ -140,9 +140,29 @@ function AboutUS() {
           </Typography>
         </Grid>
 
+        <center>
+        
+          <Box
+            my={3}
+            sx={{
+              width: 300,
+              height: 300,
+              backgroundImage: "url('logo_m.png')",
+              borderRadius: "50%",
+              overflow: "hidden",
+            }}
+          />
+          
+        </center>
+
         <Typography variant="body1">
           Project to develop a burn area detection and analysis system from satellite images as well Academic learning
           technology To increase the efficiency of forest management planning and the risks of forest fire
+
+          ****รอเกลา 
+          ชื่อโปรเจค Temporal-based burnt scar profiling for modeling risk of forest fires in ASEAN mainland
+          ทุนวิจัย Research and Innovation for
+          Development in ASEAN (RIDA)
         </Typography>
 
         <Grid
@@ -189,7 +209,7 @@ function AboutUS() {
           sx={{ backgroundColor: "#023e8a", padding: 1, borderRadius: 3, boxShadow: 1 }}
         >
           <Typography variant="h3" color="#fff" sx={{ fontFamily: "monospace" }}>
-            About US
+            About Us
           </Typography>
         </Grid>
         <Grid container spacing={3} mt={4}>

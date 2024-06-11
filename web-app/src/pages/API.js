@@ -21,11 +21,278 @@ const spec = {
     }
   ],
   paths: {
-    "/api/get-burnt-from-date": {
+    "/api/get-burnt-scar-polygon": {
       get: {
         tags: ["API LIST"],
-        summary: "Get burnt scar GeoJSON data",
-        description: "This API endpoint returns GeoJSON data for burnt scars based on the provided query parameters.",
+        summary: "Get burnt scar GeoJSON data (polygon)",
+        description: "This API endpoint returns GeoJSON data for burnt scars polygon based on the provided query parameters.",
+        parameters: [
+          {
+            in: "query",
+            name: "startDate",
+            schema: {
+              type: "date"
+            },
+            description: "The starting date for the data format yyyy-mm-dd."
+          },
+          {
+            in: "query",
+            name: "endDate",
+            schema: {
+              type: "date"
+            },
+            description: "The ending date for the data format yyyy-mm-dd"
+          },
+          {
+            in: "query",
+            name: "country",
+            schema: {
+              type: "string"
+            },
+            description: "The country to filter the data. (Use ISO3)"
+          },
+          {
+            in: "query",
+            name: "province",
+            schema: {
+              type: "string"
+            },
+            description: "The province to filter the data."
+          },
+          {
+            in: "query",
+            name: "api_key",
+            schema: {
+              type: "string"
+            },
+            description: "The API key for the user."
+          }
+        ],
+        responses: {
+          '200': {
+            description: "Successful operation",
+            content: {
+              'application/json': {
+                schema: {
+                  type: "object",
+                  properties: {
+                    type: {
+                      type: "string"
+                    },
+                    coordinates: {
+                      type: "string"
+                    },
+                    properties: {
+                      type: "object",
+                      properties: {
+                        count: {
+                          type: "integer"
+                        },
+                        year: {
+                          type: "array",
+                          items: {
+                            type: "string"
+                          }
+                        }
+                      }
+                    },
+                    geometry: {
+                      type: "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          '404': {
+            description: "Invalid API key"
+          }
+        }
+      }
+    },
+    "/api/get-burnt-scar-point": {
+      get: {
+        tags: ["API LIST"],
+        summary: "Get burnt scar GeoJSON data (point)",
+        description: "This API endpoint returns GeoJSON data for burnt scars point based on the provided query parameters.",
+        parameters: [
+          {
+            in: "query",
+            name: "startDate",
+            schema: {
+              type: "date"
+            },
+            description: "The starting date for the data format yyyy-mm-dd."
+          },
+          {
+            in: "query",
+            name: "endDate",
+            schema: {
+              type: "date"
+            },
+            description: "The ending date for the data format yyyy-mm-dd"
+          },
+          {
+            in: "query",
+            name: "country",
+            schema: {
+              type: "string"
+            },
+            description: "The country to filter the data. (Use ISO3)"
+          },
+          {
+            in: "query",
+            name: "province",
+            schema: {
+              type: "string"
+            },
+            description: "The province to filter the data."
+          },
+          {
+            in: "query",
+            name: "api_key",
+            schema: {
+              type: "string"
+            },
+            description: "The API key for the user."
+          }
+        ],
+        responses: {
+          '200': {
+            description: "Successful operation",
+            content: {
+              'application/json': {
+                schema: {
+                  type: "object",
+                  properties: {
+                    type: {
+                      type: "string"
+                    },
+                    coordinates: {
+                      type: "string"
+                    },
+                    properties: {
+                      type: "object",
+                      properties: {
+                        count: {
+                          type: "integer"
+                        },
+                        year: {
+                          type: "array",
+                          items: {
+                            type: "string"
+                          }
+                        }
+                      }
+                    },
+                    geometry: {
+                      type: "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          '404': {
+            description: "Invalid API key"
+          }
+        }
+      }
+    },
+    "/api/get-air-quality": {
+      get: {
+        tags: ["API LIST"],
+        summary: "Get air quality data",
+        description: "This API endpoint returns json data for air quality on the provided query parameters.",
+        parameters: [
+          {
+            in: "query",
+            name: "startDate",
+            schema: {
+              type: "date"
+            },
+            description: "The starting date for the data format yyyy-mm-dd."
+          },
+          {
+            in: "query",
+            name: "endDate",
+            schema: {
+              type: "date"
+            },
+            description: "The ending date for the data format yyyy-mm-dd"
+          },
+          {
+            in: "query",
+            name: "country",
+            schema: {
+              type: "string"
+            },
+            description: "The country to filter the data. (Use ISO3)"
+          },
+          {
+            in: "query",
+            name: "province",
+            schema: {
+              type: "string"
+            },
+            description: "The province to filter the data."
+          },
+          {
+            in: "query",
+            name: "api_key",
+            schema: {
+              type: "string"
+            },
+            description: "The API key for the user."
+          }
+        ],
+        responses: {
+          '200': {
+            description: "Successful operation",
+            content: {
+              'application/json': {
+                schema: {
+                  type: "object",
+                  properties: {
+                    type: {
+                      type: "string"
+                    },
+                    coordinates: {
+                      type: "string"
+                    },
+                    properties: {
+                      type: "object",
+                      properties: {
+                        count: {
+                          type: "integer"
+                        },
+                        year: {
+                          type: "array",
+                          items: {
+                            type: "string"
+                          }
+                        }
+                      }
+                    },
+                    geometry: {
+                      type: "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          '404': {
+            description: "Invalid API key"
+          }
+        }
+      }
+    },
+    "/api/get-hotspot": {
+      get: {
+        tags: ["API LIST"],
+        summary: "Get hotspot data",
+        description: "This API endpoint returns json data for hot spot on the provided query parameters.",
         parameters: [
           {
             in: "query",
