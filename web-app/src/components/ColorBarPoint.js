@@ -7,7 +7,7 @@ const ColorBarPoint = () => {
 
  const GradientBar = styled('div')(({ theme }) => ({
     height: '30vh', // ความสูงเป็น 50% ของ viewport height
-    background: 'linear-gradient(0deg, #fde835 0%, #ff3d00 100%)',
+    background: 'linear-gradient(0deg, #FFCCCC 0%, #FF0000 100%)',
     display: 'flex',
     flexDirection: 'column-reverse',
     justifyContent: 'space-between',

@@ -315,7 +315,7 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
         </FormControl>
 
         {hotSpot === true &&(<Typography level="title-md" fontWeight="bold" sx={{ mt: 2 }}>
-          Datess
+          Date
         </Typography>)}
         <FormControl orientation="horizontal">
           <Box sx={{ flex: 1, pr: 1 }}>
@@ -343,21 +343,21 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
         </Typography>
         <FormControl orientation="horizontal">
           <Box sx={{ flex: 1, mt: 1, mr: 1  }}>
-            <FormLabel sx={{ typography: 'title-sm' }}>Burnt Level Layer</FormLabel>
+            <FormLabel sx={{ typography: 'title-sm' }}>Burnt Level Layer (Polygon based)</FormLabel>
           </Box>
           <Switch checked={burntScar} onChange={handleChange} name="burntScar" />
         </FormControl>
 
         <FormControl orientation="horizontal">
           <Box sx={{ flex: 1, mt: 1, mr: 1  }}>
-            <FormLabel sx={{ typography: 'title-sm' }}>Burnt Level Point</FormLabel>
+            <FormLabel sx={{ typography: 'title-sm' }}>Burnt Level Layer (Point based)</FormLabel>
           </Box>
           <Switch checked={burntScarPoint} onChange={handleChange} name="burntScarPoint" />
         </FormControl>
 
         <FormControl orientation="horizontal">
           <Box sx={{ flex: 1, mt: 1, mr: 1 }}>
-            <FormLabel sx={{ typography: 'title-sm' }}>PM 2.5 layer</FormLabel>
+            <FormLabel sx={{ typography: 'title-sm' }}>Air quality layer</FormLabel>
             <FormHelperText sx={{ typography: 'body-sm' }}>
               On {month}/{day}/{year}
             </FormHelperText>
