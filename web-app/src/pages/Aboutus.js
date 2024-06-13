@@ -91,19 +91,19 @@ function AboutUS() {
       name: "Prof.Qiang Shen",
       role: "Researcher",
       institution: "Aberystwyth University",
-      imageUrl: "",
+      imageUrl: "Prof_Qiang_Shen.jpg",
     },
     {
       name: "Prof.Reyer Zwiggelaar",
       role: "Researcher",
       institution: "Aberystwyth University",
-      imageUrl: "",
+      imageUrl: "Prof_Reyer_Zwiggelaar.jpg",
     },
     {
       name: "Dr.Changjing Shang",
       role: "Researcher",
       institution: "Aberystwyth University",
-      imageUrl: "",
+      imageUrl: "Dr_Changjing_Shang.jpg",
     },
     {
       name: "Dr.Kampanat Deeudomchan",
@@ -115,7 +115,7 @@ function AboutUS() {
       name: "Jittisak Yodcum",
       role: "Specialist",
       institution: "Forest Fire Control Division, Forest Protection and Fire Control Bureau, Department of Forestry",
-      imageUrl: "",
+      imageUrl: "p_yok.jpg",
     },
 
     // Add more items as needed
@@ -154,14 +154,15 @@ function AboutUS() {
           />
           
         </center>
+        <Typography variant="h4">
+          Temporal-based burnt scar profiling for modeling risk of forest fires in ASEAN mainland
+          
+        </Typography>
 
-        <Typography variant="body1">
+        <Typography variant="h5">
+          
           Project to develop a burn area detection and analysis system from satellite images as well Academic learning
-          technology To increase the efficiency of forest management planning and the risks of forest fire
-
-          ****รอเกลา 
-          ชื่อโปรเจค Temporal-based burnt scar profiling for modeling risk of forest fires in ASEAN mainland
-          ทุนวิจัย Research and Innovation for
+          technology To increase the efficiency of forest management planning and the risks of forest fire , funding by Research and Innovation for
           Development in ASEAN (RIDA)
         </Typography>
 
@@ -180,21 +181,28 @@ function AboutUS() {
             Purpose
           </Typography>
         </Grid>
-        <Typography variant="body1">
+        <Typography variant="h5">
           <p>
-            1. Develop a deep learning technology research network with Aberystwyth University, Agxio Company Ltd. and
-            Northumbria University. It is supported by national research institutes such as GISTDA and DTI, which
-            emphasize its use in remote sensing data analysis.
+            1. The prototype of the burnt scar profiling system and associated libraries of programs implementing:
+            data loading, data pre-processing, burnt scar detection, aggregation of temporal-based detection
+            results, risk assessment and visualisation (as a spatial layer of measurement that complies with the
+            specification of GISTDA’s online map platform).
           </p>
-          <p>2. Develop a network of users/stakeholders to leverage the analysis results.</p>
-          <p> 3. Develop a prototype data management and analysis system.</p>
-          <p> 4. Develop knowledge sharing resources for the research community.</p>
-          <p> 5. Organize technical workshops to share knowledge/experience with the public.</p>
-          <p>
-            6. Train research staff and students on technological advances. Deep learning by international academic and
-            industry partners.
+          <p>2. The prototype of a new method to improve the performance of the previous detection model,
+            with a report of experiments on datasets purposefully collected by GISTDA for this project.
           </p>
-          <p> 7. Publish research results in high-impact journals.</p>
+          <p>3. The demonstration and assessment of GISTDA’s online map with the visualisation of risk metric
+            obtained in 1., by experts of GISTDA, DoF and representatives of other ASEAN countries. This is to
+            be carried out using data and case studies specific to the scope of study (covering northern Thailand
+            and areas of neighbouring countries).
+          </p>
+          <p>4. Two technical workshops (at GISTDA and MFU) for other user organisations (governmental and
+            industrial), community representatives, researchers, and the public. These will promote the applicability
+            of this system as well as the dissemination of knowledge and tools within the community of practice.
+          </p>
+          <p>5. Publication of the techniques and system developed in this project: one draft of a journal article and
+            another draft for international conference presentation
+          </p>
         </Typography>
 
         <Grid

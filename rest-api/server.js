@@ -2,14 +2,8 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const morgan = require("morgan");
 const cors = require("cors");
-const shapefile = require("shapefile");
-const fs = require("fs");
-const path = require("path");
-const unzipper = require("unzipper");
-const archiver = require("archiver");
 const mysql = require("mysql2");
 const crypto = require("crypto");
-const stringify = require('csv-stringify');
 
 // Create connection to MySQL
 const db = mysql.createConnection({
@@ -441,52 +435,6 @@ server.get("/api/get-province", async (req, res) => {
   });
 });
 
-
-server.get("/api/get-data-for-bubble", async (req, res) => {
-  const { fromDate, toDate, country, province } = req.query;
-  let sql = `SELECT ISO3 AS COUNTRY_ISO3, PV_EN, YEAR(FIRE_DATE) AS FIRE_YEAR, MONTH(FIRE_DATE) AS FIRE_MONTH, SUM(AREA) as SUM_AREA FROM RidaDB.BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN '${fromDate}' AND '${toDate}'`;
-
-  if (country && country!='ALL') {
-    sql += ` AND ISO3 = '${country}'`;
-  }
-  if (province && province!='ALL') {
-    sql += ` AND PV_EN = '${province}'`;
-  }
-
-  sql += ` GROUP BY COUNTRY, ISO3, FIRE_YEAR, FIRE_MONTH, PV_EN `;
-  db.query(sql, [fromDate, toDate], (err, results) => {
-    if (err) throw err;
-    res.send(results);
-  });
-});
-
-// SELECT
-//     bsi.BURNT_SCAR_ID,
-//     bsi.AP_EN,
-//     bsi.PV_EN,
-//     bsi.FIRE_DATE,
-//     bsi.AREA,
-//     bsi.COUNTRY,
-//     bsi.LATITUDE,
-//     bsi.LONGITUDE,
-//     REPLACE(REPLACE(bsi.GEOMETRY_DATA, '(', '['), ')', ']') AS GEOMETRY_DATA,
-//     bsi.GEOMETRY_TYPE,
-//     subquery.max_count
-// FROM
-//     BURNT_SCAR_INFO bsi,
-//     (
-//         SELECT MAX(count) AS max_count
-//         FROM (
-//             SELECT COUNT(*) AS count
-//             FROM burnt_scar_point
-//             WHERE ISO3 = 'THA'
-//               AND PV_EN = 'Chiang Mai'
-//               AND FIRE_DATE BETWEEN '2020-01-01' AND '2024-12-31'
-//             GROUP BY LATITUDE, LONGITUDE
-//         ) AS count_subquery
-//     ) AS subquery
-// WHERE
-//     bsi.FIRE_DATE BETWEEN '2020-01-01' AND '2024-12-31' and bsi.ISO3 = 'THA' AND bsi.PV_EN = 'Chiang Mai'; 
 
 server.get("/api/get-max-freq", async (req, res) => {
   const { startDate, endDate, country, province } = req.query;
@@ -1100,6 +1048,6 @@ server.post("/api/generate", (req, res) => {
 
 
 
-server.listen(3000, function () {
-  console.log("Server Listen at http://localhost:3000");
+server.listen(4000, function () {
+  console.log("Server Listen at http://localhost:4000");
 });

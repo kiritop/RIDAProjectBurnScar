@@ -120,7 +120,7 @@ function AirQualityDashboard() {
       },
     },
     {
-      name: "Max of PM2.5",
+      name: "Max of PM2.5 (µg/m^3)",
       options: {
         customHeadRender: ({ index, ...column }) => {
           return (
@@ -313,7 +313,7 @@ function AirQualityDashboard() {
                 </Typography>
                 <Box height={50}/>
                 <Typography  variant="h3" component="div">
-                  PM2.5 average {totalPoint} 
+                  Average {totalPoint} µg/m^3
                 </Typography>
                 <Box height={50}/>
 

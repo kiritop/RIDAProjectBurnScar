@@ -21,8 +21,8 @@ import Logo from './m_burn_logo.png';
 const pages = [
   { name: "Map" },
   {
-    name: "Dash Board",
-    subMenu: ["Hotspot", "Burnt scar", "PM2.5"],
+    name: "DashBoard",
+    subMenu: ["Burnt Level", "Hot Spot", "Air Quality"],
   },
   { name: "Learning Material" },
   { name: "APIs" },
@@ -45,11 +45,11 @@ export default function Header() {
     switch (page) {
       case "Map":
         return "/";
-      case "Hotspot":
+      case "Hot Spot":
         return "/hot_spot";
-      case "PM2.5":
+      case "Air Quality":
         return "/pm_25";
-      case "Burnt scar":
+      case "Burnt Level":
         return "/burn_scar";
       case "Learning Material":
         return "/learning_material";
