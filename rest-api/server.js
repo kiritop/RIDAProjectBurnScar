@@ -414,6 +414,7 @@ server.get("/api/get-burnt-scar-point", async (req, res) => {
             properties: {
               ...item,
               frequency: item.count,
+              max_count: maxCount,
               frequency_date: item.frequency_date.join(', '),
               percent: percent // เพิ่มเปอร์เซ็นต์ลงใน properties
             },
@@ -481,6 +482,7 @@ server.get("/api/get-burnt-point-from-date", async (req, res) => {
           ...item,
           frequency: item.count,
           frequency_date: item.frequency_date.join(', '),
+          max_count: maxCount,
           percent: percent // เพิ่มเปอร์เซ็นต์ลงใน properties
         },
         geometry: {

@@ -68,12 +68,11 @@ const style = (feature, index) => { // Include index as a parameter
   const onEachFeature = (feature, layer) => {
     // create a popup with the feature's properties
     let popupContent = ` <div style="font-family: Arial, sans-serif; padding: 10px; border-radius: 5px;">
-      <h4 style="text-align: center">${feature?.properties?.PV_EN}, ${feature?.properties?.AP_EN}, ${feature?.properties?.COUNTRY}</h4>
+      <h4 style="text-align: center">${feature?.properties?.AP_EN}, ${feature?.properties?.PV_EN}, ${feature?.properties?.COUNTRY}</h4>
       <table>
-        <h5 style="text-align: center">Centroid</h5>
         <tr><td><strong>Latitude:</strong></td><td style="text-align:right">${feature.properties.LATITUDE}</td></tr>
         <tr><td><strong>Longitude:</strong></td><td style="text-align:right">${feature.properties.LONGITUDE}</td></tr>
-        <tr><td><strong>Fire date :</strong></td><td style="text-align:right">${feature.properties.FIRE_DATE}</td></tr>
+        <tr><td><strong>Burnt date :</strong></td><td style="text-align:right">${feature.properties.FIRE_DATE}</td></tr>
         <tr><td><strong>Area M :</strong></td><td style="text-align:right">${feature.properties.AREA}</td></tr>
       </table>
     </div>`;
