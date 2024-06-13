@@ -56,7 +56,7 @@ function BurntScarDashboard() {
       endDate: endDate
     }
     if (country) {
-      dispatch(fetchProvinceByCountry(country));
+      dispatch(fetchProvinceByCountry({country: country, module:'burnscar'}));
     }
     dispatch(fetchBurntChart(obj));
     dispatch(fetchBurntDataTable(obj));

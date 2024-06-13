@@ -4,9 +4,9 @@ import Typography from "@mui/material/Typography";
 import MUIDataTable from "mui-datatables";
 import { Container, CircularProgress, TableCell, InputLabel, FormControl, Select, MenuItem, Grid, Card, CardContent, Button } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProvinceByCountry, fetchBurntDataTable, fetchBurntChart } from '../reducers/dashboardSlice';
+import { fetchProvinceByCountry, fetchHotspotDataTable, fetchHotspotChart } from '../reducers/dashboardSlice';
 import { format } from 'date-fns';
-import LineChart from '../components/LineChart';
+import LineChartHotspot from '../components/LineChartHotspot';
 import CONFIG from '../config';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -19,7 +19,7 @@ import dayjs from 'dayjs';
 function HotSpotDashboard() {
   const dispatch = useDispatch();
   const dataProvince = useSelector((state) => state.dashboard.dataProvince ?? []);
-  const dataBurntTable = useSelector((state) => state.dashboard.dataBurntTable ?? []);
+  const dataHotspotTable = useSelector((state) => state.dashboard.dataHotspotTable ?? []);
   const [country, setCountry] = useState("ALL");
   const [province, setProvince] = useState("ALL");
   const [totalPoint, setTotalPoint] = useState(0);
@@ -56,38 +56,38 @@ function HotSpotDashboard() {
       endDate: endDate
     }
     if (country) {
-      dispatch(fetchProvinceByCountry(country));
+      dispatch(fetchProvinceByCountry({country: country, module:'hotspot'}));
     }
-    dispatch(fetchBurntChart(obj));
-    dispatch(fetchBurntDataTable(obj));
+    dispatch(fetchHotspotChart(obj));
+    dispatch(fetchHotspotDataTable(obj));
     
   }, [dispatch, country, province, startDate, endDate]);
 
   // Update chart data when dataHotspotC changes
   useEffect(() => {
-    if (dataBurntTable) {
+    if (dataHotspotTable) {
 
-      const dataWithNumericSumArea = dataBurntTable.map(item => ({
+      const dataWithNumericSumArea = dataHotspotTable.map(item => ({
         ...item,
-        SUM_AREA: Number(item.SUM_AREA)
+        COUNT_ROWS: Number(item.COUNT_ROWS)
       }));
       
-      const newTableData = [...dataWithNumericSumArea.map((item) => [item.NAME_LIST, item.SUM_AREA])];
+      const newTableData = [...dataWithNumericSumArea.map((item) => [item.NAME_LIST, item.COUNT_ROWS])];
       let dataShow = []
       if(country == 'ALL' && province=='ALL'){
-        dataShow = [...dataWithNumericSumArea.map((item) => [item.ISO3, item.SUM_AREA])];
+        dataShow = [...dataWithNumericSumArea.map((item) => [item.ISO3, item.COUNT_ROWS])];
       }else{
-        dataShow = [...dataWithNumericSumArea.map((item) => [item.NAME_LIST, item.SUM_AREA])];
+        dataShow = [...dataWithNumericSumArea.map((item) => [item.NAME_LIST, item.COUNT_ROWS])];
       }
       const dataShowNewFormat = dataShow.map((item, index) => [index+1, ...item]);
       const newTableDataNewFormat = newTableData.map((item, index) => [index+1, ...item]);
-      const totalRowsSum = dataWithNumericSumArea.reduce((sum, item) => sum + item.SUM_AREA, 0);
+      const totalRowsSum = dataWithNumericSumArea.reduce((sum, item) => sum + item.COUNT_ROWS, 0);
       const formattedSum = new Intl.NumberFormat('en-US').format(totalRowsSum);
       setTableData(newTableDataNewFormat);
       setTotalPoint(formattedSum);
       setDataShow(dataShowNewFormat)
     }
-  }, [dataBurntTable]);
+  }, [dataHotspotTable]);
 
 
   //table
@@ -119,7 +119,7 @@ function HotSpotDashboard() {
       },
     },
     {
-      name: "Burnt Area total (sq m)",
+      name: "Hot Spot total (Point)",
       options: {
         customHeadRender: ({ index, ...column }) => {
           return (
@@ -193,7 +193,7 @@ function HotSpotDashboard() {
       startDate: startDate,
       endDate: endDate
     }
-    const csvUrl = `${CONFIG.API_URL}/get-csv?startDate=${obj.startDate}&endDate=${obj.endDate}`
+    const csvUrl = `${CONFIG.API_URL}/get-csv-hot-spot?startDate=${obj.startDate}&endDate=${obj.endDate}`
     downloadCSV(csvUrl)
   };
 
@@ -305,14 +305,14 @@ function HotSpotDashboard() {
             <Card sx={{ borderRadius: 3, overflow: "hidden", height:'400px' }} variant="outlined">
               <CardContent>
                 <Typography  variant="h4" component="div">
-                  {provinceText != 'ALL' ? provinceText : countryText} burnt scar
+                  {provinceText != 'All' ? provinceText : countryText} Hot Spot
                 </Typography>
                 <Typography  variant="subtitle1" color="text.secondary">
-                  {provinceText != 'ALL' ? provinceText +', '+ countryText : countryText}  burnt scar (  {format(new Date(startDate),'MMM dd yyyy')} - {format(new Date(endDate),'MMM dd yyyy')} )
+                  {provinceText != 'All' ? provinceText +', '+ countryText : countryText} Hot Spot (  {format(new Date(startDate),'MMM dd yyyy')} - {format(new Date(endDate),'MMM dd yyyy')} )
                 </Typography>
                 <Box height={50}/>
                 <Typography  variant="h3" component="div">
-                  {totalPoint} sq m
+                  {totalPoint} Points
                 </Typography>
                 <Box height={50}/>
 
@@ -338,7 +338,7 @@ function HotSpotDashboard() {
           <Grid item xs={12} md={7}>
             <Card sx={{ borderRadius: 3, overflow: "hidden" }} variant="outlined">
               <CardContent>
-                <LineChart/>              
+                <LineChartHotspot/>              
               </CardContent>
             </Card>
           </Grid>
@@ -346,7 +346,7 @@ function HotSpotDashboard() {
           <Grid item xs={12} md={12}>
             <Box sx={{ borderRadius: 3, overflow: "hidden", flex: 1}}>
                 <MUIDataTable
-                  title={<h3>Burnt Scar Area Ranking {format(new Date(startDate),'MMM dd yyyy')} - {format(new Date(endDate),'MMM dd yyyy')}</h3>}
+                  title={<h3>Hot Spot Ranking {format(new Date(startDate),'MMM dd yyyy')} - {format(new Date(endDate),'MMM dd yyyy')}</h3>}
                   data={tableData}
                   columns={columns}
                   options={options}

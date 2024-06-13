@@ -3,7 +3,7 @@ import {GeoJSON} from "react-leaflet";
 import L from "leaflet"; // import Leaflet library
 import './custom.css';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchBurntScarPolygon } from '../reducers/burntScarSlice';
+import { fetchBurntScarPolygon, getMax } from '../reducers/burntScarSlice';
 import { setLoadingMap } from '../reducers/uiSlice';
 
 const colorIntensityArray = [
@@ -22,16 +22,19 @@ const colorIntensityArray = [
 const MapBurnScar = () => {
   const dispatch = useDispatch();
   const burntScarData = useSelector(state => state.burnScar.data);
+  const max_freq = useSelector(state => state.burnScar.max);
   // const loading = useSelector(state => state.burnScar.loading); 
   const sidebarForm = useSelector(state => state.ui.sidebarForm);
 
   useEffect(() => {
     dispatch(setLoadingMap(true));
-    dispatch(fetchBurntScarPolygon(sidebarForm))
+    dispatch(getMax(sidebarForm))
     .finally(() => {
-      dispatch(setLoadingMap(false));
+      dispatch(fetchBurntScarPolygon(sidebarForm))
+      .finally(() => {
+        dispatch(setLoadingMap(false));
+      });
     });
-    
   }, [dispatch, sidebarForm]);
 
   
@@ -60,7 +63,7 @@ const style = (feature, index) => { // Include index as a parameter
   return {
     color: 'red', // Set color based on overlap percentage
     weight: 0, // No border
-    fillOpacity: 0.2 // Semi-transparent fill
+    fillOpacity: 1/max_freq // Semi-transparent fill
   };
 };
 

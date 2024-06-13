@@ -4,9 +4,9 @@ import Typography from "@mui/material/Typography";
 import MUIDataTable from "mui-datatables";
 import { Container, CircularProgress, TableCell, InputLabel, FormControl, Select, MenuItem, Grid, Card, CardContent, Button } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProvinceByCountry, fetchBurntDataTable, fetchBurntChart } from '../reducers/dashboardSlice';
+import { fetchProvinceByCountry, fetchAqiDataTable, fetchAqiChart } from '../reducers/dashboardSlice';
 import { format } from 'date-fns';
-import LineChart from '../components/LineChart';
+import LineChartAqi from '../components/LineChartAqi';
 import CONFIG from '../config';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -19,7 +19,7 @@ import dayjs from 'dayjs';
 function AirQualityDashboard() {
   const dispatch = useDispatch();
   const dataProvince = useSelector((state) => state.dashboard.dataProvince ?? []);
-  const dataBurntTable = useSelector((state) => state.dashboard.dataBurntTable ?? []);
+  const dataAqiTable = useSelector((state) => state.dashboard.dataAqiTable ?? []);
   const [country, setCountry] = useState("ALL");
   const [province, setProvince] = useState("ALL");
   const [totalPoint, setTotalPoint] = useState(0);
@@ -56,38 +56,39 @@ function AirQualityDashboard() {
       endDate: endDate
     }
     if (country) {
-      dispatch(fetchProvinceByCountry(country));
+      dispatch(fetchProvinceByCountry({country: country, module:'aqi'}));
     }
-    dispatch(fetchBurntChart(obj));
-    dispatch(fetchBurntDataTable(obj));
+    dispatch(fetchAqiChart(obj));
+    dispatch(fetchAqiDataTable(obj));
     
   }, [dispatch, country, province, startDate, endDate]);
 
   // Update chart data when dataHotspotC changes
   useEffect(() => {
-    if (dataBurntTable) {
+    if (dataAqiTable) {
 
-      const dataWithNumericSumArea = dataBurntTable.map(item => ({
+      const dataWithNumericSumArea = dataAqiTable.map(item => ({
         ...item,
-        SUM_AREA: Number(item.SUM_AREA)
+        MAX_PM25: Number(item.MAX_PM25)
       }));
       
-      const newTableData = [...dataWithNumericSumArea.map((item) => [item.NAME_LIST, item.SUM_AREA])];
+      const newTableData = [...dataWithNumericSumArea.map((item) => [item.NAME_LIST, item.MAX_PM25])];
       let dataShow = []
       if(country == 'ALL' && province=='ALL'){
-        dataShow = [...dataWithNumericSumArea.map((item) => [item.ISO3, item.SUM_AREA])];
+        dataShow = [...dataWithNumericSumArea.map((item) => [item.ISO3, item.MAX_PM25])];
       }else{
-        dataShow = [...dataWithNumericSumArea.map((item) => [item.NAME_LIST, item.SUM_AREA])];
+        dataShow = [...dataWithNumericSumArea.map((item) => [item.NAME_LIST, item.MAX_PM25])];
       }
       const dataShowNewFormat = dataShow.map((item, index) => [index+1, ...item]);
       const newTableDataNewFormat = newTableData.map((item, index) => [index+1, ...item]);
-      const totalRowsSum = dataWithNumericSumArea.reduce((sum, item) => sum + item.SUM_AREA, 0);
-      const formattedSum = new Intl.NumberFormat('en-US').format(totalRowsSum);
+      const totalRowsSum = dataWithNumericSumArea.reduce((sum, item) => sum + item.MAX_PM25, 0);
+      const avg = totalRowsSum/dataWithNumericSumArea.length
+      const formattedAvg = new Intl.NumberFormat('en-US').format(avg);
       setTableData(newTableDataNewFormat);
-      setTotalPoint(formattedSum);
+      setTotalPoint(formattedAvg);
       setDataShow(dataShowNewFormat)
     }
-  }, [dataBurntTable]);
+  }, [dataAqiTable]);
 
 
   //table
@@ -119,7 +120,7 @@ function AirQualityDashboard() {
       },
     },
     {
-      name: "Burnt Area total (sq m)",
+      name: "Max of PM2.5",
       options: {
         customHeadRender: ({ index, ...column }) => {
           return (
@@ -193,7 +194,7 @@ function AirQualityDashboard() {
       startDate: startDate,
       endDate: endDate
     }
-    const csvUrl = `${CONFIG.API_URL}/get-csv?startDate=${obj.startDate}&endDate=${obj.endDate}`
+    const csvUrl = `${CONFIG.API_URL}/get-csv-pm25?startDate=${obj.startDate}&endDate=${obj.endDate}`
     downloadCSV(csvUrl)
   };
 
@@ -305,14 +306,14 @@ function AirQualityDashboard() {
             <Card sx={{ borderRadius: 3, overflow: "hidden", height:'400px' }} variant="outlined">
               <CardContent>
                 <Typography  variant="h4" component="div">
-                  {provinceText != 'ALL' ? provinceText : countryText} burnt scar
+                  {provinceText != 'All' ? provinceText : countryText} air quality
                 </Typography>
                 <Typography  variant="subtitle1" color="text.secondary">
-                  {provinceText != 'ALL' ? provinceText +', '+ countryText : countryText}  burnt scar (  {format(new Date(startDate),'MMM dd yyyy')} - {format(new Date(endDate),'MMM dd yyyy')} )
+                  {provinceText != 'All' ? provinceText +', '+ countryText : countryText} air quality (  {format(new Date(startDate),'MMM dd yyyy')} - {format(new Date(endDate),'MMM dd yyyy')} )
                 </Typography>
                 <Box height={50}/>
                 <Typography  variant="h3" component="div">
-                  {totalPoint} sq m
+                  PM2.5 average {totalPoint} 
                 </Typography>
                 <Box height={50}/>
 
@@ -338,7 +339,7 @@ function AirQualityDashboard() {
           <Grid item xs={12} md={7}>
             <Card sx={{ borderRadius: 3, overflow: "hidden" }} variant="outlined">
               <CardContent>
-                <LineChart/>              
+                <LineChartAqi/>              
               </CardContent>
             </Card>
           </Grid>

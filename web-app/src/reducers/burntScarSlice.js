@@ -14,9 +14,17 @@ export const fetchBurntScarPolygon = createAsyncThunk('burntScar/fetchBurntScarP
   return data;
 });
 
+export const getMax = createAsyncThunk('burntScar/getMax', async (filter) => {
+  const response = await fetch(`${CONFIG.API_URL}/get-max-freq?startDate=${filter.startDate}&endDate=${filter.endDate}${filter.country==='All'?'': '&country='+filter.iso3}${(filter.city==="All")?'': '&province='+filter.city}`);
+  const data = await response.json();
+  return data;
+});
+
+
+
 const burntScarSlice = createSlice({
   name: 'burntScar',
-  initialState: { data: [], loading: false },
+  initialState: { data: [], loading: false, max:1 },
   extraReducers: (builder) => {
     builder
       .addCase(fetchBurntScarData.pending, (state) => {
@@ -33,6 +41,14 @@ const burntScarSlice = createSlice({
       })
       .addCase(fetchBurntScarPolygon.fulfilled, (state, action) => {
         state.data = action.payload.features;
+        state.loading = false;
+      })
+      .addCase(getMax.pending, (state) => {
+        state.max = 1;
+        state.loading = true;
+      })
+      .addCase(getMax.fulfilled, (state, action) => {
+        state.max = action.payload.features;
         state.loading = false;
       });
   },
