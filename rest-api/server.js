@@ -138,6 +138,135 @@ server.get('/api/line-chart', (req, res) => {
   });
 });
 
+server.get('/api/line-chart-hot-spot', (req, res) => {
+  const country = req.query.country;
+  const startDate = req.query.startDate;
+  const endDate = req.query.endDate;
+  const province = req.query.province;
+
+  let firstQuery ='';
+
+  if(country=='ALL'&&province =='ALL'){
+    firstQuery = `SELECT COUNT(*) AS SUM_HOTSPOT, COUNTRY, YEAR(HOT_SPOT_DATE) AS HOT_SPOT_YEAR FROM HOT_SPOT WHERE HOT_SPOT_DATE BETWEEN ? AND ? GROUP BY COUNTRY, HOT_SPOT_YEAR; `;
+  }else if (country!='ALL'&&province =='ALL'){
+    firstQuery = `SELECT COUNT(*) AS SUM_HOTSPOT, COUNTRY, YEAR(HOT_SPOT_DATE) AS HOT_SPOT_YEAR, PV_EN FROM HOT_SPOT WHERE HOT_SPOT_DATE BETWEEN ? AND ?  ${country ? 'AND ISO3 = ?' : ''} GROUP BY  COUNTRY, HOT_SPOT_YEAR, PV_EN; `;
+  }else if (country!='ALL'&&province !='ALL'){
+    firstQuery = `SELECT COUNT(*) AS SUM_HOTSPOT, COUNTRY, YEAR(HOT_SPOT_DATE) AS HOT_SPOT_YEAR, AP_EN FROM HOT_SPOT WHERE HOT_SPOT_DATE BETWEEN ? AND ?  ${country ? 'AND ISO3 = ?' : ''} ${province ? 'AND PV_EN = ?' : ''} GROUP BY  COUNTRY, HOT_SPOT_YEAR, AP_EN; `;
+  }
+
+  const queryParameters = [startDate, endDate];
+  if (country && country!='ALL') {
+    queryParameters.push(country);
+  }
+  if (province && province!='ALL') {
+    queryParameters.push(province);
+  }
+
+  db.query(firstQuery, queryParameters, (error, results) => {
+    if (error) {
+      console.error('Error executing first query:', error);
+      res.status(500).send('Internal server error');
+      return;
+    }
+
+    let secondQuery ='';
+
+    if(country=='ALL'&&province =='ALL'){
+      secondQuery = `SELECT COUNT(*) AS SUM_HOTSPOT, COUNTRY, YEAR(HOT_SPOT_DATE) AS HOT_SPOT_YEAR, MONTH(HOT_SPOT_DATE) AS HOT_SPOT_MONTH FROM HOT_SPOT WHERE YEAR(HOT_SPOT_DATE) IN (?) GROUP BY COUNTRY, HOT_SPOT_YEAR, HOT_SPOT_MONTH; `;
+    }else if (country!='ALL'&&province =='ALL'){
+      secondQuery = `SELECT COUNT(*) AS SUM_HOTSPOT, COUNTRY, YEAR(HOT_SPOT_DATE) AS HOT_SPOT_YEAR, MONTH(HOT_SPOT_DATE) AS HOT_SPOT_MONTH, PV_EN FROM HOT_SPOT WHERE YEAR(HOT_SPOT_DATE) IN (?)  ${country ? 'AND ISO3 = ?' : ''} GROUP BY  COUNTRY, HOT_SPOT_YEAR, HOT_SPOT_MONTH, PV_EN; `;
+    }else if (country!='ALL'&&province !='ALL'){
+      secondQuery = `SELECT COUNT(*) AS SUM_HOTSPOT, COUNTRY, YEAR(HOT_SPOT_DATE) AS HOT_SPOT_YEAR, MONTH(HOT_SPOT_DATE) AS HOT_SPOT_MONTH, AP_EN FROM HOT_SPOT WHERE YEAR(HOT_SPOT_DATE) IN (?)  ${country ? 'AND ISO3 = ?' : ''} ${province ? 'AND PV_EN = ?' : ''} GROUP BY  COUNTRY, HOT_SPOT_YEAR, HOT_SPOT_MONTH, AP_EN; `;
+    }
+
+
+    const hotspotYear = results.map((row) => row.HOT_SPOT_YEAR);
+    const uniqueHotspotYear = hotspotYear.filter((year, index) => {
+      return hotspotYear.indexOf(year) === index;
+    });
+
+    const secondQueryParameters = [uniqueHotspotYear];
+    if (country && country!='ALL') {
+      secondQueryParameters.push(country);
+    }
+    if (province && province!='ALL') {
+      secondQueryParameters.push(province);
+    }
+
+
+
+    db.query(secondQuery, secondQueryParameters, (error, secondResults) => {
+      if (error) {
+        console.error('Error executing second query:', error);
+        res.status(500).send('Internal server error');
+        return;
+      }
+
+
+      const transformedData = [];
+
+      results.forEach((row) => {
+        const { HOT_SPOT_YEAR, COUNTRY, PV_EN, AP_EN } = row;
+        const yearly = row; // directly use the current row for summary
+        let details = []
+        if(country=='ALL'&&province =='ALL'){
+          details = secondResults.filter((secondRow) => secondRow.HOT_SPOT_YEAR === HOT_SPOT_YEAR && secondRow.COUNTRY === COUNTRY);
+        }else if(country!='ALL'&&province =='ALL'){
+          details = secondResults.filter((secondRow) => secondRow.HOT_SPOT_YEAR === HOT_SPOT_YEAR && secondRow.PV_EN === PV_EN);
+        }else if(country!='ALL'&&province !='ALL'){
+          details = secondResults.filter((secondRow) => secondRow.HOT_SPOT_YEAR === HOT_SPOT_YEAR && secondRow.AP_EN === AP_EN);
+        }
+
+        const transformedYearData = {
+          yearly,
+          details
+        };
+        transformedData.push(transformedYearData)
+        
+
+      });
+
+      res.json(transformedData);
+    });
+  });
+});
+
+server.get("/api/overview-table-hot-spot", async (req, res) => {
+  const { fromDate, toDate, country, province } = req.query;
+
+  let sql = '';
+
+  if(country=='ALL'&&province =='ALL'){
+    sql = `SELECT COUNT as COUNT_ROWS, COUNTRY as NAME_LIST, ISO3 
+          FROM RidaDB.HOT_SPOT 
+          WHERE HOT_SPOT_DATE BETWEEN '${fromDate}' AND '${toDate}' 
+          GROUP BY COUNTRY, ISO3 
+          ORDER BY COUNT_ROWS DESC`;
+  }else if (country!='ALL'&&province =='ALL'){
+    sql = `SELECT COUNT as COUNT_ROWS, PV_EN as NAME_LIST, ISO3 
+          FROM RidaDB.HOT_SPOT 
+          WHERE ISO3 = '${country}' AND HOT_SPOT_DATE BETWEEN '${fromDate}' AND '${toDate}' 
+          GROUP BY PV_EN, ISO3 
+          ORDER BY COUNT_ROWS DESC`;
+  }else if (country!='ALL'&&province !='ALL'){
+    sql = `SELECT COUNT as COUNT_ROWS, AP_EN as NAME_LIST, ISO3 
+          FROM RidaDB.HOT_SPOT 
+          WHERE ISO3 = '${country}' AND PV_EN = '${province}' HOT_SPOT_DATE BETWEEN '${fromDate}' AND '${toDate}' 
+          GROUP BY AP_EN, ISO3 
+          ORDER BY COUNT_ROWS DESC`;
+  }
+
+
+  db.query(sql, [fromDate, toDate], (err, results) => {
+    if (err) throw err;
+    res.send(results);
+  });
+});
+
+
+
+
+
 server.get("/api/overview-table", async (req, res) => {
   const { fromDate, toDate, country, province } = req.query;
 

@@ -256,10 +256,10 @@ function AirQualityDashboard() {
                       </FormControl>
                     </Box>
                   </Grid>
-                  <Grid item xs={12} md={2}/>
-                  <Grid item xs={12} md={2}>
-                    <Box my={1} sx={{ minWidth: 120, display: "flex", justifyContent: "flex-start" }} >
-                      <FormControl sx={{ m: 1, width: 300, borderRadius: 2 }} size="small">
+                  <Grid item xs={12} md={1}/>
+                  <Grid item xs={12} md={2.5}>
+                    <Box my={1} sx={{  display: "flex", justifyContent: "flex-start" }} >
+                      <FormControl sx={{ m: 1, borderRadius: 2 }} size="small">
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                           <DemoContainer components={['DatePicker']}>
                             <DatePicker
@@ -273,9 +273,9 @@ function AirQualityDashboard() {
                       </FormControl>
                     </Box>
                   </Grid>
-                  <Grid item xs={12} md={2}>
-                    <Box my={1} sx={{ minWidth: 120, display: "flex", justifyContent: "flex-start" }} >
-                      <FormControl sx={{ m: 1, width: 300, borderRadius: 2 }} size="small">
+                  <Grid item xs={12} md={2.5}>
+                    <Box my={1} sx={{  display: "flex", justifyContent: "flex-start" }} >
+                      <FormControl sx={{ m: 1, borderRadius: 2 }} size="small">
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                           <DemoContainer components={['DatePicker']}>
                             <DatePicker
