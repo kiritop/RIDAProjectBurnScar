@@ -57,6 +57,16 @@ const percentToColor = (percent) => {
   // };
 
   const onEachFeature = (feature, layer) => {
+
+    const formatDate = (dateString) => {
+      const date = new Date(dateString);
+      const options = { year: 'numeric', month: 'short', day: '2-digit' };
+      return date.toLocaleDateString('en-US', options);
+    };
+  
+    // Format the FIRE_DATE
+    const formattedFrequencyDates = feature.properties.frequency_date.split(', ').map(formatDate).join(', ');
+    
     // create a popup with the feature's properties
     let popupContent = ` <div style="font-family: Arial, sans-serif; padding: 10px; border-radius: 5px;">
       <h4 style="text-align: center">${feature?.properties?.AP_EN}, ${feature?.properties?.PV_EN}, ${feature?.properties?.COUNTRY}</h4>
@@ -65,7 +75,7 @@ const percentToColor = (percent) => {
         <tr><td><strong>Longitude:</strong></td><td style="text-align:right">${feature.geometry.coordinates[0]}</td></tr>
         <tr><td><strong>Burnt ratio :</strong></td><td style="background-color:${percentToColor(feature.properties.percent)};text-align:right;color:#000000;">${feature.properties.percent} % </td></tr>
         <tr><td><strong>Burnt times/max :</strong></td><td style="text-align:right">${feature.properties.count} / ${feature.properties.max_count}</td></tr>
-        <tr><td><strong>Burnt Date :</strong></td><td style="text-align:right">${feature.properties.frequency_date}</td></tr>
+        <tr><td><strong>Burnt Date :</strong></td><td style="text-align:right">${formattedFrequencyDates}</td></tr>
       </table>
     </div>`;
     // ${feature.properties.year.map(item => `<tr><td><strong>Burnt year :</strong></td> <td style="text-align:right">${item}</td></tr>`).join('')}

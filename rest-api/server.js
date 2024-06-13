@@ -13,15 +13,15 @@ const stringify = require('csv-stringify');
 
 // Create connection to MySQL
 const db = mysql.createConnection({
-  // host: "10.1.29.39",
-  // port: '3306',
-  // user: "root",
-  // password: "gdkll,@MFU2024",
-  // database: "RidaDB",
-  host: "localhost",
+  host: "10.1.29.33",
+  port: '3306',
   user: "root",
-  password: "root1234",
+  password: "gdkll,@MFU2024",
   database: "RidaDB",
+  // host: "localhost",
+  // user: "root",
+  // password: "root1234",
+  // database: "RidaDB",
 });
 
 // Connect to MySQL
@@ -229,7 +229,7 @@ server.get("/api/get-data-for-bubble", async (req, res) => {
 
 server.get("/api/get-data-for-point", async (req, res) => {
   const { fromDate, toDate, country, province } = req.query;
-  let sql = `SELECT ISO3 AS COUNTRY_ISO3, PV_EN, COUNTRY, COUNT(*) AS total_rows,  MONTH(FIRE_DATE),  YEAR(FIRE_DATE) FROM RidaDB.burnt_scar_point WHERE FIRE_DATE BETWEEN '${fromDate}' AND '${toDate}'`;
+  let sql = `SELECT ISO3 AS COUNTRY_ISO3, PV_EN, COUNTRY, COUNT(*) AS total_rows,  MONTH(FIRE_DATE),  YEAR(FIRE_DATE) FROM RidaDB.BURNT_SCAR_POINT WHERE FIRE_DATE BETWEEN '${fromDate}' AND '${toDate}'`;
 
   if (country && country!='ALL') {
     sql += ` AND ISO3 = '${country}'`;
@@ -368,45 +368,57 @@ server.get("/api/get-burnt-scar-point", async (req, res) => {
 
       let sqlQuery = `
         SELECT *, CONCAT(latitude, ',', longitude) AS coordinates, FIRE_DATE
-        FROM burnt_scar_point
+        FROM BURNT_SCAR_POINT
         WHERE FIRE_DATE BETWEEN ? AND ?`;
+
+      const queryParams = [startDate, endDate];
 
       if (country) {
         sqlQuery += ` AND ISO3 LIKE ?`;
+        queryParams.push(`%${country}%`);
       }
 
       if (province) {
         sqlQuery += ` AND pv_en LIKE ?`;
+        queryParams.push(`%${province}%`);
       }
 
-      db.query(sqlQuery, [startDate, endDate, `%${country}%`, `%${province}%`], (err, results) => {
+      db.query(sqlQuery, queryParams, (err, results) => {
         if (err) {
           console.error(err);
           res.status(500).send("An error occurred while processing the data.");
           return;
         }
 
-        // ใช้ reduce เพื่อรวมข้อมูลที่มีพิกัดเดียวกัน
-        let reducedData = results.reduce((accumulator, current) => {
+        // Use a Map to reduce data
+        let reducedData = new Map();
+
+        results.forEach(current => {
           let key = current.coordinates;
-          if (!accumulator[key]) {
-            accumulator[key] = {
+          if (!reducedData.has(key)) {
+            reducedData.set(key, {
               ...current,
               count: 1,
               frequency_date: [current.FIRE_DATE]
-            };
+            });
           } else {
-            accumulator[key].count++;
-            accumulator[key].frequency_date.push(current.FIRE_DATE);
+            let existing = reducedData.get(key);
+            existing.count++;
+            existing.frequency_date.push(current.FIRE_DATE);
+            reducedData.set(key, existing);
           }
-          return accumulator;
-        }, {});
+        });
 
-        // หาค่าสูงสุดของ count
-        let maxCount = Math.max(...Object.values(reducedData).map(item => item.count));
+        // Find max count
+        let maxCount = 0;
+        reducedData.forEach(item => {
+          if (item.count > maxCount) {
+            maxCount = item.count;
+          }
+        });
 
-        // แปลงข้อมูลที่รวมแล้วกลับเป็นอาร์เรย์และคำนวณเปอร์เซ็นต์
-        let finalData = Object.values(reducedData).map(item => {
+        // Transform reduced data to final format
+        let finalData = Array.from(reducedData.values()).map(item => {
           let percent = ((item.count / maxCount) * 100).toFixed(2);
           return {
             type: 'Feature',
@@ -414,13 +426,13 @@ server.get("/api/get-burnt-scar-point", async (req, res) => {
             properties: {
               ...item,
               frequency: item.count,
-              max_count: maxCount,
               frequency_date: item.frequency_date.join(', '),
-              percent: percent // เพิ่มเปอร์เซ็นต์ลงใน properties
+              max_count: maxCount,
+              percent: percent // Add percent to properties
             },
             geometry: {
               type: 'Point',
-              coordinates: [item.LONGITUDE, item.LATITUDE]
+              coordinates: [parseFloat(item.LONGITUDE), parseFloat(item.LATITUDE)]
             }
           };
         });
@@ -435,45 +447,57 @@ server.get("/api/get-burnt-point-from-date", async (req, res) => {
 
   let sqlQuery = `
     SELECT *, CONCAT(latitude, ',', longitude) AS coordinates, FIRE_DATE
-    FROM burnt_scar_point
+    FROM BURNT_SCAR_POINT
     WHERE FIRE_DATE BETWEEN ? AND ?`;
+
+  const queryParams = [startDate, endDate];
 
   if (country) {
     sqlQuery += ` AND ISO3 LIKE ?`;
+    queryParams.push(`%${country}%`);
   }
 
   if (province) {
     sqlQuery += ` AND pv_en LIKE ?`;
+    queryParams.push(`%${province}%`);
   }
 
-  db.query(sqlQuery, [startDate, endDate, `%${country}%`, `%${province}%`], (err, results) => {
+  db.query(sqlQuery, queryParams, (err, results) => {
     if (err) {
       console.error(err);
       res.status(500).send("An error occurred while processing the data.");
       return;
     }
 
-    // ใช้ reduce เพื่อรวมข้อมูลที่มีพิกัดเดียวกัน
-    let reducedData = results.reduce((accumulator, current) => {
+    // Use a Map to reduce data
+    let reducedData = new Map();
+
+    results.forEach(current => {
       let key = current.coordinates;
-      if (!accumulator[key]) {
-        accumulator[key] = {
+      if (!reducedData.has(key)) {
+        reducedData.set(key, {
           ...current,
           count: 1,
           frequency_date: [current.FIRE_DATE]
-        };
+        });
       } else {
-        accumulator[key].count++;
-        accumulator[key].frequency_date.push(current.FIRE_DATE);
+        let existing = reducedData.get(key);
+        existing.count++;
+        existing.frequency_date.push(current.FIRE_DATE);
+        reducedData.set(key, existing);
       }
-      return accumulator;
-    }, {});
+    });
 
-    // หาค่าสูงสุดของ count
-    let maxCount = Math.max(...Object.values(reducedData).map(item => item.count));
+    // Find max count
+    let maxCount = 0;
+    reducedData.forEach(item => {
+      if (item.count > maxCount) {
+        maxCount = item.count;
+      }
+    });
 
-    // แปลงข้อมูลที่รวมแล้วกลับเป็นอาร์เรย์และคำนวณเปอร์เซ็นต์
-    let finalData = Object.values(reducedData).map(item => {
+    // Transform reduced data to final format
+    let finalData = Array.from(reducedData.values()).map(item => {
       let percent = ((item.count / maxCount) * 100).toFixed(2);
       return {
         type: 'Feature',
@@ -483,11 +507,11 @@ server.get("/api/get-burnt-point-from-date", async (req, res) => {
           frequency: item.count,
           frequency_date: item.frequency_date.join(', '),
           max_count: maxCount,
-          percent: percent // เพิ่มเปอร์เซ็นต์ลงใน properties
+          percent: percent // Add percent to properties
         },
         geometry: {
           type: 'Point',
-          coordinates: [item.LONGITUDE, item.LATITUDE]
+          coordinates: [parseFloat(item.LONGITUDE), parseFloat(item.LATITUDE)]
         }
       };
     });

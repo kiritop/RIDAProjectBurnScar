@@ -4,11 +4,7 @@ import Typography from "@mui/material/Typography";
 import MUIDataTable from "mui-datatables";
 import { Container, CircularProgress, TableCell, InputLabel, FormControl, Select, MenuItem, Grid, Card, CardContent, Button } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { Provider, lightTheme } from '@adobe/react-spectrum';
-import { DateRangePicker } from '@react-spectrum/datepicker';
 import { fetchProvinceByCountry, fetchBurntDataTable, fetchBurntChart } from '../reducers/dashboardSlice';
-import { Form } from '@react-spectrum/form';
-import {parseDate} from '@internationalized/date';
 import { format } from 'date-fns';
 import LineChart from '../components/LineChart';
 import CONFIG from '../config';
@@ -270,7 +266,7 @@ function BurntScarDashboard() {
                               label="Start Date"
                               value={dayjs(startDate)}
                               onChange={handleStartDateChange}
-                              slotProps={{ textField: { size: 'small' } }}
+                              slotProps={{ textField: { size: 'small' }, InputProps: { readOnly: true } }}
                             />
                           </DemoContainer>
                         </LocalizationProvider>
@@ -286,7 +282,7 @@ function BurntScarDashboard() {
                               label="End Date"
                               value={dayjs(endDate)}
                               onChange={handleEndDateChange}
-                              slotProps={{ textField: { size: 'small' } }}
+                              slotProps={{ textField: { size: 'small' }, InputProps: { readOnly: true } }}
                               minDate={dayjs(startDate)} // Set minimum date for end date
                             />
                           </DemoContainer>
