@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  db:
+    build: .
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: gdkll,@MFU2024
+      MYSQL_DATABASE: RidaDB
+      MYSQL_USER: user_rida
+      MYSQL_PASSWORD: gdkll,@MFU2024
+    ports:
+      - "3306:3306"
+
+volumes:
+  db_data:

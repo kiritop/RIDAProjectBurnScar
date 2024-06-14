@@ -4,6 +4,14 @@ import axios from 'axios';
 import data from './json/data_state_all.json';
 import CONFIG from '../config';
 
+
+
+export const fetchAqi = createAsyncThunk('aqi/fetchAqi', async (filter) => {
+  const response = await fetch(`${CONFIG.API_URL}/get-air-quality-from-date?date=${filter.date}${filter.country==='All'?'': '&country='+filter.iso3}${(filter.city==="All")?'': '&province='+filter.city}`);
+  const data = await response.json();
+  return data;
+});
+
 export const fetchAqiData = createAsyncThunk('aqi/fetchAqiData', async (filter) => {
     // โหลดข้อมูลจาก geo.json
     // const geoResponse = await axios.get('./json/geo.json');
@@ -59,7 +67,7 @@ export const fetchAqiData = createAsyncThunk('aqi/fetchAqiData', async (filter) 
 
 export const aqiSlice = createSlice({
   name: 'aqi',
-  initialState: { data: [], loading: false, filter: '' },
+  initialState: { data: [], loading: false, filter: '', aqiData: [] },
   reducers: {
     setFilter: (state, action) => { state.filter = action.payload; },
   },
@@ -70,6 +78,13 @@ export const aqiSlice = createSlice({
       })
       .addCase(fetchAqiData.fulfilled, (state, action) => {
         state.data = action.payload;
+        state.loading = false;
+      })
+      .addCase(fetchAqi.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchAqi.fulfilled, (state, action) => {
+        state.aqiData = action.payload;
         state.loading = false;
       });
   },

@@ -4,17 +4,17 @@ import L from "leaflet";
 import "../index.css";
 import "leaflet/dist/leaflet.css";
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchAqiData } from '../reducers/aqiSlice';
+import { fetchAqi } from '../reducers/aqiSlice';
 import { setLoadingMap } from '../reducers/uiSlice';
 
 const MapLocation = () => {
   const dispatch = useDispatch();
-  const aqiData = useSelector(state => state.aqi.data);
+  const aqiData = useSelector(state => state.aqi.aqiData);
   const sidebarForm = useSelector(state => state.ui.sidebarForm);
 
   useEffect(() => {
     dispatch(setLoadingMap(true));
-    dispatch(fetchAqiData(sidebarForm))
+    dispatch(fetchAqi(sidebarForm))
     .finally(() => {
       dispatch(setLoadingMap(false));
     });

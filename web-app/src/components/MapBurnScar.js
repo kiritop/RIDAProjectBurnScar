@@ -59,11 +59,10 @@ const percentToColor = (percent) => {
 // 
 
 const style = (feature, index) => { // Include index as a parameter
-
   return {
     color: 'red', // Set color based on overlap percentage
     weight: 0, // No border
-    fillOpacity: 1/max_freq // Semi-transparent fill
+    fillOpacity: max_freq == 1? 0.5 :1/max_freq // Semi-transparent fill
   };
 };
 

@@ -41,9 +41,15 @@ export const fetchHotSpotData = createAsyncThunk('hotSpot/fetchHotSpotData', asy
     
 });
 
+export const fetchHotSpot = createAsyncThunk('hotSpot/fetchHotSpot', async (filter) => {
+  const response = await fetch(`${CONFIG.API_URL}/get-hotspot-from-date?date=${filter.date}${filter.country==='All'?'': '&country='+filter.iso3}${(filter.city==="All")?'': '&province='+filter.city}`);
+  const data = await response.json();
+  return data;
+});
+
 const hotSpotSlice = createSlice({
   name: 'hotSpot',
-  initialState: { data: [], loading: false },
+  initialState: { data: [], loading: false, dataHotSpot: [] },
   reducers: {},
   extraReducers: (builder) => {
     builder
@@ -52,6 +58,13 @@ const hotSpotSlice = createSlice({
       })
       .addCase(fetchHotSpotData.fulfilled, (state, action) => {
         state.data = action.payload;
+        state.loading = false;
+      })
+      .addCase(fetchHotSpot.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchHotSpot.fulfilled, (state, action) => {
+        state.dataHotSpot = action.payload;
         state.loading = false;
       });
   },

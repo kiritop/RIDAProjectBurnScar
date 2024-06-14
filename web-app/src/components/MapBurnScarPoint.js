@@ -17,20 +17,20 @@ const MapBurnScarPoint = () => {
     dispatch(fetchBurntScarData());
   }, [dispatch]);
 
-const percentToColor = (percent) => {
-  const value = percent / 100;
-  const red = Math.round(255);
-  const green = Math.round(255 * (1 - value));
-  const blue = 0;
-
-  // Convert RGB to HEX
-  const rgbToHex = (r, g, b) => '#' + [r, g, b].map(x => {
-    const hex = x.toString(16);
-    return hex.length === 1 ? '0' + hex : hex;
-  }).join('');
-
-  return rgbToHex(red, green, blue); // Only green component changes
-};
+  const percentToColor = (percent) => {
+    const value = percent / 100;
+    const red = 255;
+    const green = Math.round(204 + (51 - 204) * value); // 204 is the green component of #FFCCCC
+    const blue = Math.round(204 * (1 - value)); // 204 is the blue component of #FFCCCC
+  
+    // Convert RGB to HEX
+    const rgbToHex = (r, g, b) => '#' + [r, g, b].map(x => {
+      const hex = x.toString(16);
+      return hex.length === 1 ? '0' + hex : hex;
+    }).join('');
+  
+    return rgbToHex(red, green, blue);
+  };
 
   // define a custom pointToLayer function
   const pointToLayer = (feature, latlng) => {

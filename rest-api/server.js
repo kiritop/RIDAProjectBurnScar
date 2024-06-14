@@ -5,6 +5,8 @@ const cors = require("cors");
 const mysql = require("mysql2");
 const crypto = require("crypto");
 
+const port = process.env.PORT || 4000;
+
 // Create connection to MySQL
 const db = mysql.createConnection({
   host: "10.1.29.33",
@@ -12,6 +14,11 @@ const db = mysql.createConnection({
   user: "root",
   password: "gdkll,@MFU2024",
   database: "RidaDB",
+  // host: process.env.DB_HOST || 'localhost',
+  // // port: process.env.DB_PORT || '3306',
+  // user: process.env.DB_USER || 'root',
+  // password: process.env.DB_PASSWORD || 'gdkll,@MFU2024',
+  // database: process.env.DB_NAME || 'RidaDB'
   // host: "localhost",
   // user: "root",
   // password: "root1234",
@@ -745,7 +752,7 @@ server.get("/api/get-burnt-point-from-date", async (req, res) => {
 
 
 server.get("/api/get-air-quality", async (req, res) => {
-  const { startDate, endDate, country, province, api_key } = req.query;
+  const { date, country, province, api_key } = req.query;
   let sql = "SELECT * FROM users WHERE api_key = ?";
   db.query(sql, [api_key], (err, results) => {
     if (err) {
@@ -755,9 +762,9 @@ server.get("/api/get-air-quality", async (req, res) => {
       res.status(404).send("Invalid API key");
     } else {
       let sqlQuery = `SELECT * FROM RidaDB.AIR_QUALITY 
-      WHERE AQI_DATE BETWEEN ? AND  ? `;
+      WHERE AQI_DATE = ? `;
 
-      const queryParams = [startDate, endDate];
+      const queryParams = [date];
 
       if (country) {
         sqlQuery += ` AND ISO3 LIKE ?`;
@@ -778,12 +785,12 @@ server.get("/api/get-air-quality", async (req, res) => {
 });
 
 server.get("/api/get-air-quality-from-date", async (req, res) => {
-  const { startDate, endDate, country, province } = req.query;
+  const { date, country, province } = req.query;
 
   let sqlQuery = `SELECT * FROM RidaDB.AIR_QUALITY 
-  WHERE AQI_DATE BETWEEN ? AND  ? `;
+  WHERE AQI_DATE = ? `;
 
-  const queryParams = [startDate, endDate];
+  const queryParams = [date];
 
   if (country) {
     sqlQuery += ` AND ISO3 LIKE ?`;
@@ -805,7 +812,7 @@ server.get("/api/get-air-quality-from-date", async (req, res) => {
 
 
 server.get("/api/get-hotspot", async (req, res) => {
-  const { startDate, endDate, country, province, api_key } = req.query;
+  const { date, country, province, api_key } = req.query;
   let sql = "SELECT * FROM users WHERE api_key = ?";
   db.query(sql, [api_key], (err, results) => {
     if (err) {
@@ -815,9 +822,9 @@ server.get("/api/get-hotspot", async (req, res) => {
       res.status(404).send("Invalid API key");
     } else {
       let sqlQuery = `SELECT * FROM RidaDB.HOT_SPOT 
-      WHERE HOT_SPOT_DATE BETWEEN ? AND  ? `;
+      WHERE HOT_SPOT_DATE = ? `;
 
-      const queryParams = [startDate, endDate];
+      const queryParams = [date];
 
       if (country) {
         sqlQuery += ` AND ISO3 LIKE ?`;
@@ -838,12 +845,12 @@ server.get("/api/get-hotspot", async (req, res) => {
 });
 
 server.get("/api/get-hotspot-from-date", async (req, res) => {
-  const { startDate, endDate, country, province } = req.query;
+  const { date, country, province } = req.query;
 
   let sqlQuery = `SELECT * FROM RidaDB.HOT_SPOT 
-  WHERE HOT_SPOT_DATE BETWEEN ? AND  ? `;
+  WHERE HOT_SPOT_DATE = ? `;
 
-  const queryParams = [startDate, endDate];
+  const queryParams = [date];
 
   if (country) {
     sqlQuery += ` AND ISO3 LIKE ?`;
@@ -1048,6 +1055,6 @@ server.post("/api/generate", (req, res) => {
 
 
 
-server.listen(3000, function () {
-  console.log("Server Listen at http://localhost:3000");
+server.listen(port, function () {
+  console.log(`Server is running on port ${port}`);
 });

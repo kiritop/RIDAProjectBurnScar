@@ -48,7 +48,7 @@ const burntScarSlice = createSlice({
         state.loading = true;
       })
       .addCase(getMax.fulfilled, (state, action) => {
-        state.max = action.payload.features;
+        state.max = action.payload.max_count;
         state.loading = false;
       });
   },

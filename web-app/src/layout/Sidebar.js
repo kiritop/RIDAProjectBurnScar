@@ -275,6 +275,30 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
           </Box>
         </FormControl>
 
+        {(hotSpot === true || aqi === true) &&(<Typography level="title-md" fontWeight="bold" sx={{ mt: 2 }}>
+          Date
+        </Typography>)}
+        <FormControl orientation="horizontal">
+          <Box sx={{ flex: 1, pr: 1 }}>
+            <Stack spacing={2}>
+              {(hotSpot === true || aqi === true)  &&(
+                 <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DemoContainer components={['DatePicker']}>
+                    <DatePicker 
+                      label="Choose Date" 
+                      value={dayjs(date)}  
+                      sx={{ flexGrow: 1 }} 
+                      onChange={(newValue) => setDate(newValue.format('YYYY-MM-DD'))}
+                    />
+                  </DemoContainer>
+                </LocalizationProvider>
+              )}
+            </Stack>
+          </Box>
+        </FormControl>
+
+        
+
 
         
         <Typography level="title-md" fontWeight="bold" sx={{ mt: 2 }}>
@@ -314,27 +338,9 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
           </Box>
         </FormControl>
 
-        {hotSpot === true &&(<Typography level="title-md" fontWeight="bold" sx={{ mt: 2 }}>
-          Date
-        </Typography>)}
-        <FormControl orientation="horizontal">
-          <Box sx={{ flex: 1, pr: 1 }}>
-            <Stack spacing={2}>
-              {hotSpot === true &&(
-                 <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DemoContainer components={['DatePicker']}>
-                    <DatePicker 
-                      label="Choose Date" 
-                      value={dayjs(date)}  
-                      sx={{ flexGrow: 1 }} 
-                      onChange={(newValue) => setDate(newValue.format('YYYY-MM-DD'))}
-                    />
-                  </DemoContainer>
-                </LocalizationProvider>
-              )}
-            </Stack>
-          </Box>
-        </FormControl>
+        
+
+        
 
         
 
@@ -359,7 +365,7 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
           <Box sx={{ flex: 1, mt: 1, mr: 1 }}>
             <FormLabel sx={{ typography: 'title-sm' }}>Air quality layer</FormLabel>
             <FormHelperText sx={{ typography: 'body-sm' }}>
-              On {month}/{day}/{year}
+              On {dayjs(date).format('MM/DD/YYYY')}
             </FormHelperText>
           </Box>
           <Switch checked={aqi} onChange={handleChange} name="aqi" />

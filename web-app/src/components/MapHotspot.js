@@ -1,18 +1,18 @@
 import React, { useEffect } from "react";
 import {CircleMarker} from "react-leaflet";
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchHotSpotData } from '../reducers/hotSpotSlice';
+import { fetchHotSpot } from '../reducers/hotSpotSlice';
 import { setLoadingMap } from '../reducers/uiSlice';
 
 const MapHotspot = () => {
-  const hotSpotData = useSelector(state => state.hotSpot.data);
+  const hotSpotData = useSelector(state => state.hotSpot.dataHotSpot);
   const dispatch = useDispatch();
   const sidebarForm = useSelector(state => state.ui.sidebarForm);
 
 
   useEffect(() => {
     dispatch(setLoadingMap(true));
-    dispatch(fetchHotSpotData(sidebarForm))
+    dispatch(fetchHotSpot(sidebarForm))
     .finally(() => {
       dispatch(setLoadingMap(false));
     });
@@ -27,7 +27,7 @@ const MapHotspot = () => {
         return (
             <CircleMarker 
                 key={index} 
-                center={[feature?.latitude, feature?.longitude]}
+                center={[feature?.LATITUDE, feature?.LONGITUDE]}
                 radius={1}
                 color="red"
                 fillOpacity={0.8}

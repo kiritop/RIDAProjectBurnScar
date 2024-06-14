@@ -207,19 +207,11 @@ const spec = {
         parameters: [
           {
             in: "query",
-            name: "startDate",
+            name: "date",
             schema: {
               type: "date"
             },
-            description: "The starting date for the data format yyyy-mm-dd."
-          },
-          {
-            in: "query",
-            name: "endDate",
-            schema: {
-              type: "date"
-            },
-            description: "The ending date for the data format yyyy-mm-dd"
+            description: "The date for the data format yyyy-mm-dd."
           },
           {
             in: "query",

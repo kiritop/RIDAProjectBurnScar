@@ -24,7 +24,7 @@ const uiSlice = createSlice({
       country : 'All',
       city : 'All',
       date: dayjs(currentDate).format('YYYY-MM-DD'),
-      startDate : dayjs(startDate.setFullYear(startDate.getFullYear() - 5)).format('YYYY-MM-DD'),
+      startDate : dayjs(startDate.setFullYear(startDate.getFullYear() - 1)).format('YYYY-MM-DD'),
       endDate : dayjs(currentDate).format('YYYY-MM-DD'),
       iso3: null
     },
