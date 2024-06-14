@@ -991,7 +991,7 @@ server.get("/api/get-users", (req, res) => {
 });
 
 server.post("/api/login", (req, res) => {
-  const { username, first_name, last_name, email, picture_url, api_key } = req.body;
+  const { username, name, email } = req.body;
 
   let sql = "SELECT * FROM users WHERE email = ?";
   db.query(sql, [email], (err, results) => {
@@ -1004,9 +1004,9 @@ server.post("/api/login", (req, res) => {
     if (results.length > 0) {
       res.send("Logged in successfully");
     } else {
-      sql = "INSERT INTO users (username, first_name, last_name, email, picture_url, api_key) VALUES (?, ?, ?, ?, ?)";
+      sql = "INSERT INTO users (username, name, email) VALUES (?, ?, ?)";
 
-      db.query(sql, [username, first_name, last_name, email, picture_url, api_key], (err, results) => {
+      db.query(sql, [username, name, email], (err, results) => {
         if (err) {
           console.error(err);
           res.status(500).send("Server error");
@@ -1048,6 +1048,6 @@ server.post("/api/generate", (req, res) => {
 
 
 
-server.listen(4000, function () {
-  console.log("Server Listen at http://localhost:4000");
+server.listen(3000, function () {
+  console.log("Server Listen at http://localhost:3000");
 });

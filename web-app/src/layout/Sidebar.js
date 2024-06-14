@@ -343,14 +343,14 @@ export default function Sidebar({ isOpen , toggleDrawer}) {
         </Typography>
         <FormControl orientation="horizontal">
           <Box sx={{ flex: 1, mt: 1, mr: 1  }}>
-            <FormLabel sx={{ typography: 'title-sm' }}>Burnt Level Layer (Polygon based)</FormLabel>
+            <FormLabel sx={{ typography: 'title-sm' }}>Burnt Level Layer (Area-based)</FormLabel>
           </Box>
           <Switch checked={burntScar} onChange={handleChange} name="burntScar" />
         </FormControl>
 
         <FormControl orientation="horizontal">
           <Box sx={{ flex: 1, mt: 1, mr: 1  }}>
-            <FormLabel sx={{ typography: 'title-sm' }}>Burnt Level Layer (Point based)</FormLabel>
+            <FormLabel sx={{ typography: 'title-sm' }}>Burnt Level Layer (Point-based)</FormLabel>
           </Box>
           <Switch checked={burntScarPoint} onChange={handleChange} name="burntScarPoint" />
         </FormControl>
