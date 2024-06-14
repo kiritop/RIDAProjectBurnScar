@@ -4,7 +4,7 @@ import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
 
 const Carddetail = [
   {
-    img: "unit1.png",
+    img: "unit1.PNG",
     id: 1,
     title: "Types and Characteristics of Satellites ",
     links: [
@@ -23,7 +23,7 @@ const Carddetail = [
     ],
   },
   {
-    img: "unit2.png",
+    img: "unit2.PNG",
     id: 2,
     title: "Interpretation and Analysis of Satellite Data",
     links: [
@@ -33,7 +33,7 @@ const Carddetail = [
     ],
   },
   {
-    img: "unit3.png",
+    img: "unit3.PNG",
     id: 3,
     title: "Application of Satellite Data",
     links: [
@@ -43,7 +43,7 @@ const Carddetail = [
     ],
   },
   {
-    img: "unit4.png",
+    img: "unit4.PNG",
     id: 4,
     title: "Machine Learning",
     links: [

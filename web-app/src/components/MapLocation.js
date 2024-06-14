@@ -22,7 +22,8 @@ const MapLocation = () => {
   }, [dispatch, sidebarForm]);
 
   const circleIcon = (index) => {
-    const aqi = (aqiData && aqiData?.[index]?.aqi?.pm25 ? aqiData?.[index]?.aqi.pm25.v : null)
+    // const aqi = (aqiData && aqiData?.[index]?.aqi?.pm25 ? aqiData?.[index]?.aqi.pm25.v : null)
+    const aqi = (aqiData && aqiData?.[index]?.PM25 ? aqiData?.[index]?.PM25 : null) 
     let backgroundColor;
 
     if (aqi >= 0 && aqi <= 50) {
@@ -47,7 +48,7 @@ const MapLocation = () => {
         border-radius: 50%;
         background-color: ${backgroundColor};
         color: white;
-        font-size: 16px;
+        font-size: 14px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -68,20 +69,20 @@ const MapLocation = () => {
       {aqiData?.map((item, index) => (
         <Marker
           key={index}
-          position={[item?.lat, item?.lng]}
+          position={[item?.LATITUDE, item?.LONGITUDE]}
           icon={circleIcon(index)}
         >
           <Popup>
             <div className="mx-auto w-full">
               <h2 className="font-semibold capitalize text-lg">
-                {item?.city} 
+                {item?.AP_EN} 
               </h2>
               <h3 className="font-semibold">
-                {"AQI: " + (item?.aqi && item?.aqi?.pm25 ? item.aqi.pm25.v : 'N/A')}
+                {"AQI: " + (item?.PM25 && item?.PM25 ? item.PM25 : 'N/A')}
               </h3>
               <div className="mt-3 flex space-x-2">
-                <h3>{item?.admin_name}</h3>
-                <h3>{item?.country}</h3>
+                <h3>{item?.PV_EN}</h3>
+                <h3>{item?.COUNTRY}</h3>
               </div>
             </div>
           </Popup>

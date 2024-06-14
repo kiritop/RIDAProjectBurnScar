@@ -9,16 +9,16 @@ const port = process.env.PORT || 4000;
 
 // Create connection to MySQL
 const db = mysql.createConnection({
-  // host: "10.1.29.33",
-  // port: '3306',
-  // user: "root",
-  // password: "gdkll,@MFU2024",
-  // database: "RidaDB",
-  host: process.env.DB_HOST || 'localhost',
-  port: process.env.DB_PORT || '3306',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || 'gdkll,@MFU2024',
-  database: process.env.DB_NAME || 'RidaDB'
+  host: "10.1.29.33",
+  port: '3306',
+  user: "root",
+  password: "gdkll,@MFU2024",
+  database: "RidaDB",
+  // host: process.env.DB_HOST || 'localhost',
+  // port: process.env.DB_PORT || '3306',
+  // user: process.env.DB_USER || 'root',
+  // password: process.env.DB_PASSWORD || 'gdkll,@MFU2024',
+  // database: process.env.DB_NAME || 'RidaDB'
   // host: "localhost",
   // user: "root",
   // password: "root1234",
@@ -878,7 +878,7 @@ server.get('/api/get-csv', (req, res) => {
   const { stringify } = require('csv-stringify');
 
   // Construct the SQL query
-  let sql = `SELECT BURNT_SCAR_ID, AP_EN, PV_EN, FIRE_DATE, AREA, COUNTRY, LATITUDE, LONGITUDE, REPLACE(REPLACE(GEOMETRY_DATA, '(', '['), ')', ']') AS GEOMETRY_DATA, GEOMETRY_TYPE FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN '${startDate}' AND '${endDate}'`;
+  let sql = `SELECT DATE_FORMAT(FIRE_DATE, '%d-%m-%Y') as FIRE_DATE, AP_EN, PV_EN, COUNTRY, AREA, LATITUDE, LONGITUDE, REPLACE(REPLACE(GEOMETRY_DATA, '(', '['), ')', ']') AS GEOMETRY_DATA, GEOMETRY_TYPE FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN '${startDate}' AND '${endDate}'`;
 
   // Add conditions for country and province if they are provided
   if (country && country!='All') {
@@ -916,7 +916,7 @@ server.get('/api/get-csv-hot-spot', (req, res) => {
   const { stringify } = require('csv-stringify');
 
   // Construct the SQL query
-  let sql = `SELECT * FROM HOT_SPOT WHERE HOT_SPOT_DATE BETWEEN '${startDate}' AND '${endDate}'`;
+  let sql = `SELECT DATE_FORMAT(HOT_SPOT_DATE, '%d-%m-%Y') as HOT_SPOT_DATE, AP_EN, PV_EN, COUNTRY, ISO3, LATITUDE, LONGITUDE FROM HOT_SPOT WHERE HOT_SPOT_DATE BETWEEN '${startDate}' AND '${endDate}'`;
 
   // Add conditions for country and province if they are provided
   if (country && country!='All') {
@@ -932,7 +932,7 @@ server.get('/api/get-csv-hot-spot', (req, res) => {
     } else {
       // กำหนด headers สำหรับ response เพื่อบอก browser ว่าจะ download ไฟล์
       res.setHeader('Content-Type', 'text/csv');
-      res.setHeader('Content-Disposition', 'attachment; filename=\"burnt_data.csv\"');
+      res.setHeader('Content-Disposition', 'attachment; filename=\"hotspot_data.csv\"');
 
       // ใช้ csv-stringify เพื่อแปลงข้อมูลเป็น CSV
       stringify(results, { header: true }, (err, output) => {
@@ -955,7 +955,7 @@ server.get('/api/get-csv-pm25', (req, res) => {
   const { stringify } = require('csv-stringify');
 
   // Construct the SQL query
-  let sql = `SELECT * FROM AIR_QUALITY WHERE AQI_DATE BETWEEN '${startDate}' AND '${endDate}'`;
+  let sql = `SELECT DATE_FORMAT(AQI_DATE, '%d-%m-%Y') as AQI_DATE, AP_EN, PV_EN, COUNTRY, ISO3, LATITUDE, LONGITUDE, PM25 FROM AIR_QUALITY WHERE AQI_DATE BETWEEN '${startDate}' AND '${endDate}'`;
 
   // Add conditions for country and province if they are provided
   if (country && country!='All') {
@@ -971,7 +971,7 @@ server.get('/api/get-csv-pm25', (req, res) => {
     } else {
       // กำหนด headers สำหรับ response เพื่อบอก browser ว่าจะ download ไฟล์
       res.setHeader('Content-Type', 'text/csv');
-      res.setHeader('Content-Disposition', 'attachment; filename=\"burnt_data.csv\"');
+      res.setHeader('Content-Disposition', 'attachment; filename=\"aqi_data.csv\"');
 
       // ใช้ csv-stringify เพื่อแปลงข้อมูลเป็น CSV
       stringify(results, { header: true }, (err, output) => {

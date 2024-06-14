@@ -4,6 +4,7 @@ import { Box, Card, CardContent, CircularProgress, Typography  } from "@mui/mate
 import ToggleButton from "../components/ToggleButton";
 import Sidebar from "../layout/Sidebar";
 import ColorBar from "../components/ColorBar";
+import FilterBar from "../components/filterBar";
 import ColorBarPoint from "../components/ColorBarPoint";
 import { useSelector } from 'react-redux';
 
@@ -23,6 +24,20 @@ function Map() {
         <ToggleButton isOpen={isOpen} toggleDrawer={toggleDrawer} />
         <MapContent z />
         <Sidebar isOpen={isOpen} toggleDrawer={toggleDrawer} />
+        <Card
+          sx={{
+            position: "absolute",
+            top: "30%",
+            left: 16,
+            maxWidth: "20%",
+            zIndex: 1050,
+            backgroundColor: "rgba(255, 255, 255, 0.5)",
+          }}
+        >
+          <CardContent>
+            <FilterBar/>
+          </CardContent>
+        </Card>
         {burntScar && <Card
           sx={{
             position: "absolute",
