@@ -1,10 +1,13 @@
 version: '3'
-
 services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+  nodejs-app:
+    build: .
     restart: always
     ports:
-      - "4000:4001"
+      - "4000:4000"
+    environment:
+      - DB_HOST=rida_db_db_1
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=gdkll,@MFU2024
+      - DB_NAME=RidaDB

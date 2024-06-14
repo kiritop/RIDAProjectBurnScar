@@ -2,6 +2,7 @@
   "name": "web-app",
   "version": "0.1.0",
   "private": true,
+  "homepage": "http://datascience.mfu.ac.th/rida-project/",
   "dependencies": {
     "@adobe/react-spectrum": "^3.35.1",
     "@babel/core": "^7.16.0",
