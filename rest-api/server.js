@@ -9,16 +9,16 @@ const port = process.env.PORT || 4000;
 
 // Create connection to MySQL
 const db = mysql.createConnection({
-  host: "10.1.29.33",
-  port: '3306',
-  user: "root",
-  password: "gdkll,@MFU2024",
-  database: "RidaDB",
-  // host: process.env.DB_HOST || 'localhost',
-  // port: process.env.DB_PORT || '3306',
-  // user: process.env.DB_USER || 'root',
-  // password: process.env.DB_PASSWORD || 'gdkll,@MFU2024',
-  // database: process.env.DB_NAME || 'RidaDB'
+  // host: "10.1.29.33",
+  // port: '3306',
+  // user: "root",
+  // password: "gdkll,@MFU2024",
+  // database: "RidaDB",
+  host: process.env.DB_HOST || 'localhost',
+  port: process.env.DB_PORT || '3306',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || 'gdkll,@MFU2024',
+  database: process.env.DB_NAME || 'RidaDB'
   // host: "localhost",
   // user: "root",
   // password: "root1234",
@@ -38,7 +38,7 @@ server.use(cors()); // ให้ server(express) ใช้งานการ cor
 
 
 
-server.get('/api/line-chart', (req, res) => {
+server.get('/rida-api/api/line-chart', (req, res) => {
   const country = req.query.country;
   const startDate = req.query.startDate;
   const endDate = req.query.endDate;
@@ -131,7 +131,7 @@ server.get('/api/line-chart', (req, res) => {
   });
 });
 
-server.get('/api/line-chart-pm25', (req, res) => {
+server.get('/rida-api/api/line-chart-pm25', (req, res) => {
   const country = req.query.country;
   const startDate = req.query.startDate;
   const endDate = req.query.endDate;
@@ -224,7 +224,7 @@ server.get('/api/line-chart-pm25', (req, res) => {
   });
 });
 
-server.get('/api/line-chart-hot-spot', (req, res) => {
+server.get('/rida-api/api/line-chart-hot-spot', (req, res) => {
   const country = req.query.country;
   const startDate = req.query.startDate;
   const endDate = req.query.endDate;
@@ -475,7 +475,7 @@ server.get("/api/get-max-freq", async (req, res) => {
 
 
 // สร้าง endpoint สำหรับ query ข้อมูลตามช่วงวันที่
-server.get('/api/get-burnt-from-date', (req, res) => {
+server.get('/rida-api/api/get-burnt-from-date', (req, res) => {
   let startDate = req.query.startDate; // Get the start date from the query parameter
   let endDate = req.query.endDate; // Get the end date from the query parameter
   let country = req.query.country;
@@ -522,7 +522,7 @@ server.get('/api/get-burnt-from-date', (req, res) => {
 });
 
 //use api_key
-server.get('/api/get-burnt-scar-polygon', (req, res) => {
+server.get('/rida-api/api/get-burnt-scar-polygon', (req, res) => {
   let startDate = req.query.startDate; // Get the start date from the query parameter
   let endDate = req.query.endDate; // Get the end date from the query parameter
   let country = req.query.country;
@@ -870,7 +870,7 @@ server.get("/api/get-hotspot-from-date", async (req, res) => {
 });
 
 
-server.get('/api/get-csv', (req, res) => {
+server.get('/rida-api/api/get-csv', (req, res) => {
   let startDate = req.query.startDate; // Get the start date from the query parameter
   let endDate = req.query.endDate; // Get the end date from the query parameter
   let country = req.query.country;
@@ -908,7 +908,7 @@ server.get('/api/get-csv', (req, res) => {
   });
 });
 
-server.get('/api/get-csv-hot-spot', (req, res) => {
+server.get('/rida-api/api/get-csv-hot-spot', (req, res) => {
   let startDate = req.query.startDate; // Get the start date from the query parameter
   let endDate = req.query.endDate; // Get the end date from the query parameter
   let country = req.query.country;
@@ -947,7 +947,7 @@ server.get('/api/get-csv-hot-spot', (req, res) => {
 });
 
 
-server.get('/api/get-csv-pm25', (req, res) => {
+server.get('/rida-api/api/get-csv-pm25', (req, res) => {
   let startDate = req.query.startDate; // Get the start date from the query parameter
   let endDate = req.query.endDate; // Get the end date from the query parameter
   let country = req.query.country;

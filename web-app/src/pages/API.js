@@ -16,7 +16,7 @@ const spec = {
   },
   servers: [
     {
-      url: "http://10.1.29.33:4000", // URL ใหม่ที่คุณต้องการให้ Swagger UI ใช้
+      url: "http://datascience.mfu.ac.th/rida-api", // URL ใหม่ที่คุณต้องการให้ Swagger UI ใช้
       description: "Production server"
     }
   ],
