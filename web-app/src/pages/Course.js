@@ -6,18 +6,18 @@ const Carddetail = [
   {
     img: "unit1.PNG",
     id: 1,
-    title: "Types and Characteristics of Satellites ",
+    title: "Types and Characteristics of Satellites",
     links: [
-      { EP: "EP 01 วงโคจรคืออะไร", yt: "https://www.youtube.com/watch?v=unTeFqxys7w" },
-      { EP: "EP 02 วงโคจรของดาวเทียม (Satellite orbit)", yt: "https://www.youtube.com/watch?v=NocgY3d7Ngo" },
-      { EP: "EP 03 ระดับวงโคจรของดาวเทียม", yt: "https://www.youtube.com/watch?v=SIKS17tIcy0" },
-      { EP: "EP 04 ดาวเทียมระบบ Passive และ Active", yt: "https://www.youtube.com/watch?v=kdiO_fnSE2Y" },
+      { EP: "EP 01 What is an orbit?", yt: "https://www.youtube.com/watch?v=unTeFqxys7w" },
+      { EP: "EP 02 Satellite orbit", yt: "https://www.youtube.com/watch?v=NocgY3d7Ngo" },
+      { EP: "EP 03 Satellite orbital levels", yt: "https://www.youtube.com/watch?v=SIKS17tIcy0" },
+      { EP: "EP 04 Passive and Active satellite systems", yt: "https://www.youtube.com/watch?v=kdiO_fnSE2Y" },
       {
-        EP: "EP 05 ความรู้เกี่ยวกับดาวเทียม (Landsat-8,Sentinel-1,Sentinel-2 )",
+        EP: "EP 05 Knowledge about satellites (Landsat-8, Sentinel-1, Sentinel-2)",
         yt: "https://www.youtube.com/watch?v=6W4_L0RueLY",
       },
       {
-        EP: "EP 06 ตัวอย่างภาพถ่ายดาวเทียม (Landsat-8,Sentinel-1,Sentinel-2 )",
+        EP: "EP 06 Examples of satellite images (Landsat-8, Sentinel-1, Sentinel-2)",
         yt: "https://www.youtube.com/watch?v=DhWIf1vDh9Y",
       },
     ],
@@ -27,9 +27,9 @@ const Carddetail = [
     id: 2,
     title: "Interpretation and Analysis of Satellite Data",
     links: [
-      { EP: "EP 01 สถานีภาคพื้นสามารถสื่อสารกับดาวเทียมได้อย่างไร", yt: "https://www.youtube.com/watch?v=_u_E3XCxUrQ" },
-      { EP: "EP 02 ลักษณะของข้อมูลจากภาพถ่ายดาวเทียม", yt: "https://www.youtube.com/watch?v=KkaXCU2QqC0" },
-      { EP: "EP 03 การนำภาพดาวเทียมมาวิเคราะห์โดยใช้ดัชนี", yt: "https://www.youtube.com/watch?v=97vVaI1qV1A" },
+      { EP: "EP 01 How can ground stations communicate with satellites?", yt: "https://www.youtube.com/watch?v=_u_E3XCxUrQ" },
+      { EP: "EP 02 Characteristics of data from satellite images", yt: "https://www.youtube.com/watch?v=KkaXCU2QqC0" },
+      { EP: "EP 03 Analyzing satellite images using indices", yt: "https://www.youtube.com/watch?v=97vVaI1qV1A" },
     ],
   },
   {
@@ -37,9 +37,9 @@ const Carddetail = [
     id: 3,
     title: "Application of Satellite Data",
     links: [
-      { EP: "EP 01 เทคโนโลยีสารสนเทศ Geo-Informatics", yt: "https://www.youtube.com/watch?v=SF3xTIOFMYk" },
-      { EP: "EP 02 การสำรวจระยะไกล หรือ รีโมทเซนซิ่ง (Remote Sensing)", yt: "https://www.youtube.com/watch?v=0YTgEarG_Eo  " },
-      { EP: "EP 03 ระบบกำหนดตำแหน่งบนโลก", yt: "https://www.youtube.com/watch?v=2wsc97KvH40" },
+      { EP: "EP 01 Geo-Informatics technology", yt: "https://www.youtube.com/watch?v=SF3xTIOFMYk" },
+      { EP: "EP 02 Remote Sensing", yt: "https://www.youtube.com/watch?v=0YTgEarG_Eo  " },
+      { EP: "EP 03 Global Positioning System", yt: "https://www.youtube.com/watch?v=2wsc97KvH40" },
     ],
   },
   {
@@ -47,11 +47,11 @@ const Carddetail = [
     id: 4,
     title: "Machine Learning",
     links: [
-      { EP: "EP 01 Machine Learning คืออะไร?", yt: "https://www.youtube.com/watch?v=grHroUVZwgQ" },
-      { EP: "EP 02 คอนเซปของ Machine Learning", yt: "https://www.youtube.com/watch?v=l8r-VWJJL3g" },
-      { EP: "EP 03 ชนิดของ Machine learning", yt: "https://www.youtube.com/watch?v=e4SW5T8o58g" },
-      { EP: "EP 04 โมเดลและอัลกอริทึมของ Machine learning", yt: "https://www.youtube.com/watch?v=4hqhGBntsqA" },
-      { EP: "EP 05 งานของ Machine learning", yt: "https://www.youtube.com/watch?v=Y4afzOWGDic" },
+      { EP: "EP 01 What is Machine Learning?", yt: "https://www.youtube.com/watch?v=grHroUVZwgQ" },
+      { EP: "EP 02 Machine Learning concepts", yt: "https://www.youtube.com/watch?v=l8r-VWJJL3g" },
+      { EP: "EP 03 Types of Machine Learning", yt: "https://www.youtube.com/watch?v=e4SW5T8o58g" },
+      { EP: "EP 04 Models and Algorithms of Machine Learning", yt: "https://www.youtube.com/watch?v=4hqhGBntsqA" },
+      { EP: "EP 05 Applications of Machine Learning", yt: "https://www.youtube.com/watch?v=Y4afzOWGDic" },
     ],
   },
 ];
@@ -111,15 +111,15 @@ function Course() {
                   <CardContent>
                     {e.links.map((link, index) => (
                       <div key={index}>
-                          <Button
-                            variant="text"
-                            href={link.yt}
-                            target="_blank"
-                            sx={{ fontSize: "12px" }}
-                            startIcon={<PlayCircleOutlineIcon />}
-                          >
-                            {link.EP}
-                          </Button>
+                        <Button
+                          variant="text"
+                          href={link.yt}
+                          target="_blank"
+                          sx={{ fontSize: "12px" }}
+                          startIcon={<PlayCircleOutlineIcon />}
+                        >
+                          {link.EP}
+                        </Button>
                       </div>
                     ))}
                   </CardContent>

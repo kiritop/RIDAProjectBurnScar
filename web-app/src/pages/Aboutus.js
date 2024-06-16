@@ -109,7 +109,7 @@ function AboutUS() {
       name: "Dr.Kampanat Deeudomchan",
       role: "Specialist",
       institution: "Chief of Division, Geo-Informatics Management and Solutions Office, GISTDA",
-      imageUrl: "",
+      imageUrl: "p_pepsi.jpeg",
     },
     {
       name: "Jittisak Yodcum",
@@ -181,7 +181,7 @@ function AboutUS() {
             Purpose
           </Typography>
         </Grid>
-        <Typography variant="h5">
+        <Typography variant="h6">
           <p>
             1. The prototype of the burnt scar profiling system and associated libraries of programs implementing:
             data loading, data pre-processing, burnt scar detection, aggregation of temporal-based detection
