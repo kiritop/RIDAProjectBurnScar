@@ -1,10 +1,13 @@
 version: '3'
 services:
   nodejs-app:
+    # image: nginx
     build: .
     restart: always
     ports:
       - "4000:4000"
+    # volumes:
+    #   - ./build:/usr/share/nginx/html/rida-api:ro
     environment:
       - DB_HOST=rida_db_db_1
       - DB_PORT=3306
