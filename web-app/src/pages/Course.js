@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Container, Card, CardContent, Grid, Typography, CardMedia, CardActionArea, Button } from "@mui/material";
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
+import { useNavigate } from "react-router-dom";
 
 const Carddetail = [
   {
@@ -57,11 +58,21 @@ const Carddetail = [
 ];
 
 function Course() {
-  const pdfLinks = {
-    1: "/CH1_.pdf",
-    2: "/CH2_.pdf",
-    3: "/CH3_.pdf",
-    4: "/CH4_.pdf",
+  const navigate = useNavigate();
+
+  const handlePdfClick = (id) => {
+    // This function will open the PDF file when the card is clicked
+    // You can replace 'your-pdf-file.pdf' with the actual path to your PDF file
+    const pdfLinks = {
+      1: "/CH1_.pdf",
+      2: "/CH2_.pdf",
+      3: "/CH3_.pdf",
+      4: "/CH4_.pdf",
+    };
+    const pdfLink = pdfLinks[id];
+    if (pdfLink) {
+      window.open(pdfLink, "_blank");
+    }
   };
 
   return (
@@ -86,7 +97,7 @@ function Course() {
         {Carddetail.map((e, index) => (
           <Grid item xs={3} key={index}>
             <Card sx={{ maxWidth: 500, padding: "6px", borderRadius: 5, paddingBottom: 3 }}>
-              <CardActionArea href={pdfLinks[e.id]} target="_blank">
+              <CardActionArea onClick={() => handlePdfClick(e.id)}>
                 <CardMedia
                   component="img"
                   height="200"
