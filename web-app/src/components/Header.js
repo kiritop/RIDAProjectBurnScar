@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import * as React from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -9,7 +8,6 @@ import AccountCircle from "@mui/icons-material/AccountCircle";
 import GoogleIcon from "@mui/icons-material/Google";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
-import MapIcon from "@mui/icons-material/Map";
 import { Button } from "@mui/material";
 import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
@@ -17,6 +15,7 @@ import axios from "axios";
 import CONFIG from "../config";
 import { SvgIcon } from '@mui/material';
 import Logo from './m_burn_logo.png';
+import { useNavigate } from "react-router-dom"; // เพิ่มการนำเข้า useNavigate
 
 const pages = [
   { name: "Map" },
@@ -28,12 +27,12 @@ const pages = [
   { name: "APIs" },
   { name: "About US" },
 ];
-// const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 export default function Header() {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [anchorElSignIn, setAnchorElSignIn] = React.useState(null);
   const [anchorElSignOut, setAnchorElSignOut] = React.useState(null);
+  const navigate = useNavigate(); // ใช้ useNavigate
 
   const [userInfo, setUserInfo] = React.useState(JSON.parse(localStorage.getItem("myData")) || "");
 
@@ -61,6 +60,11 @@ export default function Header() {
         return "/";
     }
   }
+
+  const handleNavigation = (page) => {
+    const url = getPageUrl(page);
+    navigate(url);
+  };
 
   const handleOpen = (setter) => (event) => {
     setter(event.currentTarget);
@@ -99,7 +103,6 @@ export default function Header() {
             display: "flex",
             fontFamily: "monospace",
             fontWeight: 700,
-            // letterSpacing: ".3rem",
             color: "inherit",
             textDecoration: "none",
           }}
@@ -115,7 +118,7 @@ export default function Header() {
                 onClick={(event) => {
                   event.preventDefault();
                   if (!page.subMenu) {
-                    window.location.href = getPageUrl(page.name);
+                    handleNavigation(page.name);
                   } else {
                     handleOpen(setAnchorEl)(event);
                   }
@@ -132,7 +135,7 @@ export default function Header() {
                       onClick={(event) => {
                         event.preventDefault();
                         handleClose(setAnchorEl)();
-                        window.location.href = getPageUrl(subPage);
+                        handleNavigation(subPage);
                       }}
                     >
                       {subPage}

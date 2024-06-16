@@ -38,7 +38,7 @@ const Carddetail = [
     title: "Application of Satellite Data",
     links: [
       { EP: "EP 01 Geo-Informatics technology", yt: "https://www.youtube.com/watch?v=SF3xTIOFMYk" },
-      { EP: "EP 02 Remote Sensing", yt: "https://www.youtube.com/watch?v=0YTgEarG_Eo  " },
+      { EP: "EP 02 Remote Sensing", yt: "https://www.youtube.com/watch?v=0YTgEarG_Eo" },
       { EP: "EP 03 Global Positioning System", yt: "https://www.youtube.com/watch?v=2wsc97KvH40" },
     ],
   },
@@ -57,79 +57,70 @@ const Carddetail = [
 ];
 
 function Course() {
-  const handlePdfClick = (id) => {
-    // This function will open the PDF file when the card is clicked
-    // You can replace 'your-pdf-file.pdf' with the actual path to your PDF file
-    if (id === 1) {
-      window.open("/CH1_.pdf", "_blank");
-    } else if (id === 2) {
-      window.open("/CH2_.pdf", "_blank");
-    } else if (id === 3) {
-      window.open("/CH3_.pdf", "_blank");
-    } else if (id === 4) {
-      window.open("/CH4_.pdf", "_blank");
-    }
+  const pdfLinks = {
+    1: "/CH1_.pdf",
+    2: "/CH2_.pdf",
+    3: "/CH3_.pdf",
+    4: "/CH4_.pdf",
   };
-  return (
-    <>
-      <Container maxWidth="xl">
-        <Grid
-          container
-          spacing={1}
-          direction="row"
-          justifyContent="center"
-          alignItems="center"
-          alignContent="center"
-          wrap="wrap"
-          my={5}
-          sx={{ backgroundColor: "#023e8a", padding: 3, borderRadius: 3, boxShadow: 1 }}
-        >
-          <Typography variant="h3" color="#fff" sx={{ fontFamily: "monospace" }}>
-            Learning Material
-          </Typography>
-        </Grid>
 
-        <Grid container spacing={3}>
-          {Carddetail.map((e, index) => (
-            <Grid item xs={3} key={index}>
-              <Card sx={{ maxWidth: 500, padding: "6px", borderRadius: 5, paddingBottom: 3 }}>
-                <CardActionArea>
-                  <CardMedia
-                    component="img"
-                    height="200"
-                    image={e.img}
-                    alt="unit1"
-                    sx={{ borderRadius: 5 }}
-                    onClick={() => handlePdfClick(e.id)}
-                  />
-                  <CardContent sx={{ height: "5vh" }}>
-                    <Typography variant="h6">Unit {index + 1}</Typography>
-                    <Typography variant="body2" color={"text.secondary"}>
-                      {e.title}
-                    </Typography>
-                  </CardContent>
-                  <CardContent>
-                    {e.links.map((link, index) => (
-                      <div key={index}>
-                        <Button
-                          variant="text"
-                          href={link.yt}
-                          target="_blank"
-                          sx={{ fontSize: "12px" }}
-                          startIcon={<PlayCircleOutlineIcon />}
-                        >
-                          {link.EP}
-                        </Button>
-                      </div>
-                    ))}
-                  </CardContent>
-                </CardActionArea>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-      </Container>
-    </>
+  return (
+    <Container maxWidth="xl">
+      <Grid
+        container
+        spacing={1}
+        direction="row"
+        justifyContent="center"
+        alignItems="center"
+        alignContent="center"
+        wrap="wrap"
+        my={5}
+        sx={{ backgroundColor: "#023e8a", padding: 3, borderRadius: 3, boxShadow: 1 }}
+      >
+        <Typography variant="h3" color="#fff" sx={{ fontFamily: "monospace" }}>
+          Learning Material
+        </Typography>
+      </Grid>
+
+      <Grid container spacing={3}>
+        {Carddetail.map((e, index) => (
+          <Grid item xs={3} key={index}>
+            <Card sx={{ maxWidth: 500, padding: "6px", borderRadius: 5, paddingBottom: 3 }}>
+              <CardActionArea href={pdfLinks[e.id]} target="_blank">
+                <CardMedia
+                  component="img"
+                  height="200"
+                  image={process.env.PUBLIC_URL + '/' + e.img}
+                  alt={`unit${index + 1}`}
+                  sx={{ borderRadius: 5 }}
+                />
+                <CardContent sx={{ height: "5vh" }}>
+                  <Typography variant="h6">Unit {index + 1}</Typography>
+                  <Typography variant="body2" color={"text.secondary"}>
+                    {e.title}
+                  </Typography>
+                </CardContent>
+                <CardContent>
+                  {e.links.map((link, index) => (
+                    <div key={index}>
+                      <Button
+                        variant="text"
+                        href={link.yt}
+                        target="_blank"
+                        sx={{ fontSize: "12px" }}
+                        startIcon={<PlayCircleOutlineIcon />}
+                      >
+                        {link.EP}
+                      </Button>
+                    </div>
+                  ))}
+                </CardContent>
+              </CardActionArea>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+    </Container>
   );
 }
 
