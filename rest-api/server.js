@@ -38,7 +38,7 @@ server.use(cors()); // ให้ server(express) ใช้งานการ cor
 
 
 
-server.get('/api/line-chart', (req, res) => {
+server.get('/rida-api/api/line-chart', (req, res) => {
   const country = req.query.country;
   const startDate = req.query.startDate;
   const endDate = req.query.endDate;
@@ -131,7 +131,7 @@ server.get('/api/line-chart', (req, res) => {
   });
 });
 
-server.get('/api/line-chart-pm25', (req, res) => {
+server.get('/rida-api/api/line-chart-pm25', (req, res) => {
   const country = req.query.country;
   const startDate = req.query.startDate;
   const endDate = req.query.endDate;
@@ -224,7 +224,7 @@ server.get('/api/line-chart-pm25', (req, res) => {
   });
 });
 
-server.get('/api/line-chart-hot-spot', (req, res) => {
+server.get('/rida-api/api/line-chart-hot-spot', (req, res) => {
   const country = req.query.country;
   const startDate = req.query.startDate;
   const endDate = req.query.endDate;
@@ -317,7 +317,7 @@ server.get('/api/line-chart-hot-spot', (req, res) => {
   });
 });
 
-server.get("/api/overview-table-hot-spot", async (req, res) => {
+server.get("/rida-api/api/overview-table-hot-spot", async (req, res) => {
   const { fromDate, toDate, country, province } = req.query;
 
   let sql = '';
@@ -350,7 +350,7 @@ server.get("/api/overview-table-hot-spot", async (req, res) => {
 });
 
 
-server.get("/api/overview-table-pm25", async (req, res) => {
+server.get("/rida-api/api/overview-table-pm25", async (req, res) => {
   const { fromDate, toDate, country, province } = req.query;
 
   let sql = '';
@@ -384,7 +384,7 @@ server.get("/api/overview-table-pm25", async (req, res) => {
 
 
 
-server.get("/api/overview-table", async (req, res) => {
+server.get("/rida-api/api/overview-table", async (req, res) => {
   const { fromDate, toDate, country, province } = req.query;
 
   let sql = '';
@@ -408,7 +408,7 @@ server.get("/api/overview-table", async (req, res) => {
 
 
 
-server.get("/api/overview-chart", async (req, res) => {
+server.get("/rida-api/api/overview-chart", async (req, res) => {
   const { fromDate, toDate, country, province } = req.query;
   let sql = `SELECT ROUND(SUM(AREA),2) as SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR, PV_EN, AP_EN FROM RidaDB.BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN '${fromDate}' AND '${toDate}' `;
 
@@ -427,7 +427,7 @@ server.get("/api/overview-chart", async (req, res) => {
 });
 
 
-server.get("/api/get-province", async (req, res) => {
+server.get("/rida-api/api/get-province", async (req, res) => {
   const { country, module } = req.query;
   let table = 'RidaDB.BURNT_SCAR_INFO' ;
   if(module === "aqi"){
@@ -443,7 +443,7 @@ server.get("/api/get-province", async (req, res) => {
 });
 
 
-server.get("/api/get-max-freq", async (req, res) => {
+server.get("/rida-api/api/get-max-freq", async (req, res) => {
   const { startDate, endDate, country, province } = req.query;
   let sql = `SELECT COALESCE(MAX(count), 1) AS max_count FROM ( SELECT COUNT(*) AS count FROM BURNT_SCAR_POINT WHERE FIRE_DATE BETWEEN '${startDate}' AND '${endDate}' `;
   
@@ -475,7 +475,7 @@ server.get("/api/get-max-freq", async (req, res) => {
 
 
 // สร้าง endpoint สำหรับ query ข้อมูลตามช่วงวันที่
-server.get('/api/get-burnt-from-date', (req, res) => {
+server.get('/rida-api/api/get-burnt-from-date', (req, res) => {
   let startDate = req.query.startDate; // Get the start date from the query parameter
   let endDate = req.query.endDate; // Get the end date from the query parameter
   let country = req.query.country;
@@ -522,7 +522,7 @@ server.get('/api/get-burnt-from-date', (req, res) => {
 });
 
 //use api_key
-server.get('/api/get-burnt-scar-polygon', (req, res) => {
+server.get('/rida-api/api/get-burnt-scar-polygon', (req, res) => {
   let startDate = req.query.startDate; // Get the start date from the query parameter
   let endDate = req.query.endDate; // Get the end date from the query parameter
   let country = req.query.country;
@@ -583,7 +583,7 @@ server.get('/api/get-burnt-scar-polygon', (req, res) => {
 
 
 //use api_key
-server.get("/api/get-burnt-scar-point", async (req, res) => {
+server.get("/rida-api/api/get-burnt-scar-point", async (req, res) => {
   const { startDate, endDate, country, province, api_key } = req.query;
 
   let sql = "SELECT * FROM users WHERE api_key = ?";
@@ -672,7 +672,7 @@ server.get("/api/get-burnt-scar-point", async (req, res) => {
   })
 });
 
-server.get("/api/get-burnt-point-from-date", async (req, res) => {
+server.get("/rida-api/api/get-burnt-point-from-date", async (req, res) => {
   const { startDate, endDate, country, province } = req.query;
 
   let sqlQuery = `
@@ -751,7 +751,7 @@ server.get("/api/get-burnt-point-from-date", async (req, res) => {
 });
 
 
-server.get("/api/get-air-quality", async (req, res) => {
+server.get("/rida-api/api/get-air-quality", async (req, res) => {
   const { date, country, province, api_key } = req.query;
   let sql = "SELECT * FROM users WHERE api_key = ?";
   db.query(sql, [api_key], (err, results) => {
@@ -784,7 +784,7 @@ server.get("/api/get-air-quality", async (req, res) => {
   })
 });
 
-server.get("/api/get-air-quality-from-date", async (req, res) => {
+server.get("/rida-api/api/get-air-quality-from-date", async (req, res) => {
   const { date, country, province } = req.query;
 
   let sqlQuery = `SELECT * FROM RidaDB.AIR_QUALITY 
@@ -811,7 +811,7 @@ server.get("/api/get-air-quality-from-date", async (req, res) => {
 
 
 
-server.get("/api/get-hotspot", async (req, res) => {
+server.get("/rida-api/api/get-hotspot", async (req, res) => {
   const { date, country, province, api_key } = req.query;
   let sql = "SELECT * FROM users WHERE api_key = ?";
   db.query(sql, [api_key], (err, results) => {
@@ -844,7 +844,7 @@ server.get("/api/get-hotspot", async (req, res) => {
   })
 });
 
-server.get("/api/get-hotspot-from-date", async (req, res) => {
+server.get("/rida-api/api/get-hotspot-from-date", async (req, res) => {
   const { date, country, province } = req.query;
 
   let sqlQuery = `SELECT * FROM RidaDB.HOT_SPOT 
@@ -870,7 +870,7 @@ server.get("/api/get-hotspot-from-date", async (req, res) => {
 });
 
 
-server.get('/api/get-csv', (req, res) => {
+server.get('/rida-api/api/get-csv', (req, res) => {
   let startDate = req.query.startDate; // Get the start date from the query parameter
   let endDate = req.query.endDate; // Get the end date from the query parameter
   let country = req.query.country;
@@ -908,7 +908,7 @@ server.get('/api/get-csv', (req, res) => {
   });
 });
 
-server.get('/api/get-csv-hot-spot', (req, res) => {
+server.get('/rida-api/api/get-csv-hot-spot', (req, res) => {
   let startDate = req.query.startDate; // Get the start date from the query parameter
   let endDate = req.query.endDate; // Get the end date from the query parameter
   let country = req.query.country;
@@ -947,7 +947,7 @@ server.get('/api/get-csv-hot-spot', (req, res) => {
 });
 
 
-server.get('/api/get-csv-pm25', (req, res) => {
+server.get('/rida-api/api/get-csv-pm25', (req, res) => {
   let startDate = req.query.startDate; // Get the start date from the query parameter
   let endDate = req.query.endDate; // Get the end date from the query parameter
   let country = req.query.country;
@@ -988,7 +988,7 @@ server.get('/api/get-csv-pm25', (req, res) => {
 
 
 
-server.get("/api/get-users", (req, res) => {
+server.get("/rida-api/api/get-users", (req, res) => {
   const { email } = req.query;
   let sql = "SELECT * FROM users WHERE email = ?";
   db.query(sql, [email], (err, results) => {
@@ -997,7 +997,7 @@ server.get("/api/get-users", (req, res) => {
   });
 });
 
-server.post("/api/login", (req, res) => {
+server.post("/rida-api/api/login", (req, res) => {
   const { username, name, email } = req.body;
 
   let sql = "SELECT * FROM users WHERE email = ?";
@@ -1026,7 +1026,7 @@ server.post("/api/login", (req, res) => {
 });
 
 // Generate API Key
-server.post("/api/generate", (req, res) => {
+server.post("/rida-api/api/generate", (req, res) => {
   const { email } = req.body;
   const apiKey = crypto.randomBytes(20).toString("hex");
   let sql = "SELECT api_key FROM users WHERE email = ?";

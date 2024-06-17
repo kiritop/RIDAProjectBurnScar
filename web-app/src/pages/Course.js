@@ -66,7 +66,7 @@ function Course() {
 
   const handlePdfClick = (pdfLink) => {
     if (pdfLink) {
-      window.open(pdfLink, "_blank");
+      window.open("/rida-project"+pdfLink, "_blank");
     }
   };
 

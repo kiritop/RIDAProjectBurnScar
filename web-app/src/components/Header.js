@@ -10,12 +10,11 @@ import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import { Button } from "@mui/material";
 import { GoogleLogin } from "@react-oauth/google";
-import { jwtDecode } from "jwt-decode";
+import { jwtDecode } from "jwt-decode"; // Import jwtDecode correctly as named import
 import axios from "axios";
 import CONFIG from "../config";
-import { SvgIcon } from '@mui/material';
 import Logo from './m_burn_logo.png';
-import { useNavigate } from "react-router-dom"; // เพิ่มการนำเข้า useNavigate
+import { useNavigate } from "react-router-dom";
 
 const pages = [
   { name: "Map" },
@@ -32,15 +31,21 @@ export default function Header() {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [anchorElSignIn, setAnchorElSignIn] = React.useState(null);
   const [anchorElSignOut, setAnchorElSignOut] = React.useState(null);
-  const navigate = useNavigate(); // ใช้ useNavigate
-
-  const [userInfo, setUserInfo] = React.useState(JSON.parse(localStorage.getItem("myData")) || "");
+  const [userInfo, setUserInfo] = React.useState(
+    JSON.parse(localStorage.getItem("myData")) || null
+  );
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     localStorage.setItem("myData", JSON.stringify(userInfo));
   }, [userInfo]);
 
-  function getPageUrl(page) {
+  const handleNavigation = (page) => {
+    const url = getPageUrl(page);
+    navigate(url);
+  };
+
+  const getPageUrl = (page) => {
     switch (page) {
       case "Map":
         return "/";
@@ -59,11 +64,6 @@ export default function Header() {
       default:
         return "/";
     }
-  }
-
-  const handleNavigation = (page) => {
-    const url = getPageUrl(page);
-    navigate(url);
   };
 
   const handleOpen = (setter) => (event) => {
@@ -83,9 +83,9 @@ export default function Header() {
 
     try {
       const response = await axios.post(CONFIG.API_URL + "/login", payload);
-      return response.data; // return the response data
+      return response.data; // Return the response data
     } catch (error) {
-      console.error(error); // log the error message
+      console.error(error); // Log the error message
     }
   };
 
@@ -110,43 +110,40 @@ export default function Header() {
           M-BurnScar 
         </Typography>
         <Box sx={{ flexGrow: 12, display: { xs: "none", md: "flex" } }} />
-        {pages.map((page, index) => {
-          return (
-            <div key={index}>
-              <Button
-                underline="none"
-                onClick={(event) => {
-                  event.preventDefault();
-                  if (!page.subMenu) {
-                    handleNavigation(page.name);
-                  } else {
-                    handleOpen(setAnchorEl)(event);
-                  }
-                }}
-                sx={{ my: 2, display: "block", color: "#fff", mx: 1, fontFamily: "monospace", fontWeight: 700 }}
-              >
-                <center>{page.name}</center>
-              </Button>
-              {page.subMenu && (
-                <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose(setAnchorEl)}>
-                  {page.subMenu.map((subPage) => (
-                    <MenuItem
-                      key={subPage}
-                      onClick={(event) => {
-                        event.preventDefault();
-                        handleClose(setAnchorEl)();
-                        handleNavigation(subPage);
-                      }}
-                    >
-                      {subPage}
-                    </MenuItem>
-                  ))}
-                </Menu>
-              )}
-            </div>
-          );
-        })}
-
+        {pages.map((page, index) => (
+          <div key={index}>
+            <Button
+              underline="none"
+              onClick={(event) => {
+                event.preventDefault();
+                if (!page.subMenu) {
+                  handleNavigation(page.name);
+                } else {
+                  handleOpen(setAnchorEl)(event);
+                }
+              }}
+              sx={{ my: 2, display: "block", color: "#fff", mx: 1, fontFamily: "monospace", fontWeight: 700 }}
+            >
+              <center>{page.name}</center>
+            </Button>
+            {page.subMenu && (
+              <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose(setAnchorEl)}>
+                {page.subMenu.map((subPage) => (
+                  <MenuItem
+                    key={subPage}
+                    onClick={(event) => {
+                      event.preventDefault();
+                      handleClose(setAnchorEl)();
+                      handleNavigation(subPage);
+                    }}
+                  >
+                    {subPage}
+                  </MenuItem>
+                ))}
+              </Menu>
+            )}
+          </div>
+        ))}
         <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "flex-end" }}>
           {!userInfo ? (
             <>
@@ -178,11 +175,11 @@ export default function Header() {
                 <MenuItem onClick={handleClose(setAnchorElSignIn)}>
                   <GoogleLogin
                     onSuccess={(credentialResponse) => {
-                      const decoded = jwtDecode(credentialResponse?.credential);
+                      const decoded = jwtDecode(credentialResponse?.credential); // Correctly using jwtDecode here
                       const name = decoded.given_name;
                       const email = decoded.email;
-                      setUserInfo(email);
-                      loginApi(name, email);
+                      setUserInfo(email); // Set user info to email (or to decoded if it has all info)
+                      loginApi(name, email); // Call login API
                       handleClose(setAnchorElSignIn)();
                     }}
                     onError={() => {}}
@@ -202,8 +199,9 @@ export default function Header() {
               >
                 <AccountCircle />
               </IconButton>
-              <p>{userInfo}</p>
-
+              <Typography variant="body1" sx={{ color: "#fff", mr: 2 }}>
+                {userInfo}
+              </Typography>
               <Menu
                 id="menu-appbar"
                 anchorEl={anchorElSignOut}

@@ -266,8 +266,11 @@ const spec = {
                         }
                       }
                     },
-                    geometry: {
-                      type: "object"
+                    latitude: {
+                      type: "string"
+                    },
+                    longitude: {
+                      type: "string"
                     }
                   }
                 }
@@ -355,8 +358,11 @@ const spec = {
                         }
                       }
                     },
-                    geometry: {
-                      type: "object"
+                    latitude: {
+                      type: "string"
+                    },
+                    longitude: {
+                      type: "string"
                     }
                   }
                 }
@@ -377,7 +383,7 @@ const API = () => {
   const dispatch = useDispatch();
   const users = useSelector((state) => state.users.data ?? []);
   const getfile = useSelector((state) => state.getfile);
-  const apikey = users[0]?.api_key ?? [];
+  const apikey = users[0]?.api_key ?? ["dddd54dab276fcd40937ad83f342a2200282f43b"];
   console.log(getfile);
 
   useEffect(() => {
@@ -440,7 +446,7 @@ const API = () => {
           />
         </Box>
 
-        <Button variant="contained" onClick={apiGen}>
+        <Button variant="contained" onClick={apiGen} disabled>
           Generate KEY
         </Button>
       </Box>

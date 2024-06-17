@@ -30,6 +30,8 @@ const countries = [
   { name: 'Vietnam', value: 'Vietnam', iso3: "VNM", lat: '21.028511', lng: '105.804817' }
 ];
 
+
+
 export default function Sidebar({ isOpen, toggleDrawer }) {
   const ui = useSelector(state => state.ui);
   const [country, setCountry] = useState(ui.sidebarForm.country);
@@ -107,10 +109,10 @@ export default function Sidebar({ isOpen, toggleDrawer }) {
   };
 
   const handleSave = () => {
-    if (burntScarPoint && city === 'All') {
-      alert('Please select a city');
-      return;
-    }
+        // if (burntScarPoint && city === 'All') {
+        //   alert('Please select a city');
+        //   return;
+        // }
 
     let valueFilter = country;
     const country_filter = countries.find((country) => country.value === valueFilter);
@@ -284,7 +286,7 @@ export default function Sidebar({ isOpen, toggleDrawer }) {
               <Stack spacing={2}>
                 {country !== 'All' && (
                   <Select value={city} onChange={handleCityChange}>
-                    <MenuItem value="All">{burntScarPoint ? 'Please select' : 'Select All'}</MenuItem>
+                    <MenuItem value="All">{burntScarPoint ? 'Please Select' : 'Select All'}</MenuItem>
                     {cities.map((city) => (
                       <MenuItem key={city.city} value={city.city}>
                         {city.city}
