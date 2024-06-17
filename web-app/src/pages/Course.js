@@ -8,6 +8,7 @@ const Carddetail = [
     img: "unit1.PNG",
     id: 1,
     title: "Types and Characteristics of Satellites",
+    pdf: "/CH1_.pdf",
     links: [
       { EP: "EP 01 What is an orbit?", yt: "https://www.youtube.com/watch?v=unTeFqxys7w" },
       { EP: "EP 02 Satellite orbit", yt: "https://www.youtube.com/watch?v=NocgY3d7Ngo" },
@@ -27,6 +28,7 @@ const Carddetail = [
     img: "unit2.PNG",
     id: 2,
     title: "Interpretation and Analysis of Satellite Data",
+    pdf: "/CH2_.pdf",
     links: [
       { EP: "EP 01 How can ground stations communicate with satellites?", yt: "https://www.youtube.com/watch?v=_u_E3XCxUrQ" },
       { EP: "EP 02 Characteristics of data from satellite images", yt: "https://www.youtube.com/watch?v=KkaXCU2QqC0" },
@@ -37,6 +39,7 @@ const Carddetail = [
     img: "unit3.PNG",
     id: 3,
     title: "Application of Satellite Data",
+    pdf: "/CH3_.pdf",
     links: [
       { EP: "EP 01 Geo-Informatics technology", yt: "https://www.youtube.com/watch?v=SF3xTIOFMYk" },
       { EP: "EP 02 Remote Sensing", yt: "https://www.youtube.com/watch?v=0YTgEarG_Eo" },
@@ -47,6 +50,7 @@ const Carddetail = [
     img: "unit4.PNG",
     id: 4,
     title: "Machine Learning",
+    pdf: "/CH4_.pdf",
     links: [
       { EP: "EP 01 What is Machine Learning?", yt: "https://www.youtube.com/watch?v=grHroUVZwgQ" },
       { EP: "EP 02 Machine Learning concepts", yt: "https://www.youtube.com/watch?v=l8r-VWJJL3g" },
@@ -60,19 +64,14 @@ const Carddetail = [
 function Course() {
   const navigate = useNavigate();
 
-  const handlePdfClick = (id) => {
-    // This function will open the PDF file when the card is clicked
-    // You can replace 'your-pdf-file.pdf' with the actual path to your PDF file
-    const pdfLinks = {
-      1: "/CH1_.pdf",
-      2: "/CH2_.pdf",
-      3: "/CH3_.pdf",
-      4: "/CH4_.pdf",
-    };
-    const pdfLink = pdfLinks[id];
+  const handlePdfClick = (pdfLink) => {
     if (pdfLink) {
       window.open(pdfLink, "_blank");
     }
+  };
+
+  const handleYoutubeClick = (youtubeLink) => {
+    window.open(youtubeLink, "_blank");
   };
 
   return (
@@ -97,7 +96,7 @@ function Course() {
         {Carddetail.map((e, index) => (
           <Grid item xs={3} key={index}>
             <Card sx={{ maxWidth: 500, padding: "6px", borderRadius: 5, paddingBottom: 3 }}>
-              <CardActionArea onClick={() => handlePdfClick(e.id)}>
+              <CardActionArea onClick={() => handlePdfClick(e.pdf)}>
                 <CardMedia
                   component="img"
                   height="200"
@@ -111,22 +110,21 @@ function Course() {
                     {e.title}
                   </Typography>
                 </CardContent>
-                <CardContent>
-                  {e.links.map((link, index) => (
-                    <div key={index}>
-                      <Button
-                        variant="text"
-                        href={link.yt}
-                        target="_blank"
-                        sx={{ fontSize: "12px" }}
-                        startIcon={<PlayCircleOutlineIcon />}
-                      >
-                        {link.EP}
-                      </Button>
-                    </div>
-                  ))}
-                </CardContent>
               </CardActionArea>
+              <CardContent>
+                {e.links.map((link, idx) => (
+                  <div key={idx}>
+                    <Button
+                      variant="text"
+                      onClick={() => handleYoutubeClick(link.yt)}
+                      sx={{ fontSize: "12px" }}
+                      startIcon={<PlayCircleOutlineIcon />}
+                    >
+                      {link.EP}
+                    </Button>
+                  </div>
+                ))}
+              </CardContent>
             </Card>
           </Grid>
         ))}
