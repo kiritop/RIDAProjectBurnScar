@@ -97,7 +97,7 @@ export default function Header() {
           variant="h6"
           noWrap
           component="a"
-          href="/"
+          href="/rida-project/"
           sx={{
             mr: 2,
             display: "flex",

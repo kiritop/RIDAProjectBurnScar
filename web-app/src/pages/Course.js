@@ -117,7 +117,7 @@ function Course() {
                     <Button
                       variant="text"
                       onClick={() => handleYoutubeClick(link.yt)}
-                      sx={{ fontSize: "12px" }}
+                      sx={{ fontSize: "12px", textAlign: 'left' }}
                       startIcon={<PlayCircleOutlineIcon />}
                     >
                       {link.EP}
