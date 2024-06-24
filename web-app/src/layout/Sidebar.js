@@ -151,11 +151,11 @@ export default function Sidebar({ isOpen, toggleDrawer }) {
       current_lat = '19.9094';
       current_lng = '99.8275';
     } else {
-      const filteredCity = cities.find(city => city.city === city);
+      const filteredCity = cities.find(item => item.city === city);
       current_lat = filteredCity ? filteredCity.lat : '19.9094';
       current_lng = filteredCity ? filteredCity.lng : '99.8275';
     }
-
+    
     dispatch(saveLayerSettings({ sidebarForm, burntScar, aqi, hotSpot, burntScarPoint, current_lat, current_lng }));
 
     if (burntScar) {
@@ -343,12 +343,12 @@ export default function Sidebar({ isOpen, toggleDrawer }) {
             <Switch checked={burntScar} onChange={handleChange} name="burntScar" />
           </FormControl>
 
-          <FormControl orientation="horizontal">
+          {/* <FormControl orientation="horizontal">
             <Box sx={{ flex: 1, mt: 1, mr: 1 }}>
               <FormLabel sx={{ typography: 'title-sm' }}>Burnt Level Layer (Point-based)</FormLabel>
             </Box>
             <Switch checked={burntScarPoint} onChange={handleChange} name="burntScarPoint" />
-          </FormControl>
+          </FormControl> */}
 
           <FormControl orientation="horizontal">
             <Box sx={{ flex: 1, mt: 1, mr: 1 }}>

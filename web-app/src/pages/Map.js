@@ -62,9 +62,9 @@ function Map() {
             backgroundColor: "rgba(255, 255, 255, 0.2)",
           }}
         >
-          <CardContent>
+          {/* <CardContent>
             <ColorBarPoint /> 
-          </CardContent>
+          </CardContent> */}
         </Card> }
         {loadingMap && (
           <Box

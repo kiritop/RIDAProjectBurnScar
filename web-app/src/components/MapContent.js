@@ -28,7 +28,7 @@ const MapContent = () => {
         <ChangeView />
         <BaseMap />
         {burntScar && <MapBurnScar />}
-        {burntScarPoint && <MapBurnScarPoint />}
+        {/* {burntScarPoint && <MapBurnScarPoint />} */}
         {aqi && <MapLocation />} 
         {hotSpot && <MapHotspot />} 
       </MapContainer>
