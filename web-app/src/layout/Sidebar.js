@@ -225,6 +225,7 @@ export default function Sidebar({ isOpen, toggleDrawer }) {
                         value={dayjs(startDate)}
                         onChange={handleStartDateChange}
                         sx={{ flexGrow: 1 }}
+                        maxDate={dayjs(new Date())}
                       />
                     </DemoContainer>
                   </LocalizationProvider>
@@ -245,6 +246,7 @@ export default function Sidebar({ isOpen, toggleDrawer }) {
                         onChange={handleEndDateChange}
                         sx={{ flexGrow: 1 }}
                         minDate={dayjs(startDate)}
+                        maxDate={dayjs(new Date())}
                       />
                     </DemoContainer>
                   </LocalizationProvider>

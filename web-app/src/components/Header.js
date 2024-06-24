@@ -90,61 +90,63 @@ export default function Header() {
   };
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: "#0077b6", color: "#fff" }}>
-      <Toolbar variant="dense">
-        <img src={Logo} alt="Logo" style={{ marginRight: '10px', width: '30px' }} />
-        <Typography
-          variant="h6"
-          noWrap
-          component="a"
-          href="/rida-project/"
-          sx={{
-            mr: 2,
-            display: "flex",
-            fontFamily: "monospace",
-            fontWeight: 700,
-            color: "inherit",
-            textDecoration: "none",
-          }}
-        >
-          M-BurnScar 
-        </Typography>
-        <Box sx={{ flexGrow: 12, display: { xs: "none", md: "flex" } }} />
-        {pages.map((page, index) => (
-          <div key={index}>
-            <Button
-              underline="none"
-              onClick={(event) => {
-                event.preventDefault();
-                if (!page.subMenu) {
-                  handleNavigation(page.name);
-                } else {
-                  handleOpen(setAnchorEl)(event);
-                }
-              }}
-              sx={{ my: 2, display: "block", color: "#fff", mx: 1, fontFamily: "monospace", fontWeight: 700 }}
-            >
-              <center>{page.name}</center>
-            </Button>
-            {page.subMenu && (
-              <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose(setAnchorEl)}>
-                {page.subMenu.map((subPage) => (
-                  <MenuItem
-                    key={subPage}
-                    onClick={(event) => {
-                      event.preventDefault();
-                      handleClose(setAnchorEl)();
-                      handleNavigation(subPage);
-                    }}
-                  >
-                    {subPage}
-                  </MenuItem>
-                ))}
-              </Menu>
-            )}
-          </div>
-        ))}
-        <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "flex-end" }}>
+    <AppBar position="static" sx={{ backgroundColor: "#0077b6", color: "#fff", height: 56, justifyContent: 'center' }}>
+      <Toolbar sx={{ minHeight: 56 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
+          <img src={Logo} alt="Logo" style={{ marginRight: '10px', width: '30px' }} />
+          <Typography
+            variant="h6"
+            noWrap
+            component="a"
+            href="/rida-project/"
+            sx={{
+              display: "flex",
+              fontFamily: "'Roboto', sans-serif",
+              fontWeight: 700,
+              color: "inherit",
+              textDecoration: "none",
+            }}
+          >
+            M-BurnScar 
+          </Typography>
+        </Box>
+        <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>
+          {pages.map((page, index) => (
+            <Box key={index} sx={{ mx: 2 }}>
+              <Button
+                underline="none"
+                onClick={(event) => {
+                  event.preventDefault();
+                  if (!page.subMenu) {
+                    handleNavigation(page.name);
+                  } else {
+                    handleOpen(setAnchorEl)(event);
+                  }
+                }}
+                sx={{ my: 2, display: "block", color: "#fff", textTransform: 'none', fontFamily: "'Roboto', sans-serif", fontWeight: 700 }}
+              >
+                {page.name}
+              </Button>
+              {page.subMenu && (
+                <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose(setAnchorEl)}>
+                  {page.subMenu.map((subPage) => (
+                    <MenuItem
+                      key={subPage}
+                      onClick={(event) => {
+                        event.preventDefault();
+                        handleClose(setAnchorEl)();
+                        handleNavigation(subPage);
+                      }}
+                    >
+                      {subPage}
+                    </MenuItem>
+                  ))}
+                </Menu>
+              )}
+            </Box>
+          ))}
+        </Box>
+        <Box sx={{ display: "flex", alignItems: "center" }}>
           {!userInfo ? (
             <>
               <IconButton
@@ -189,6 +191,9 @@ export default function Header() {
             </>
           ) : (
             <>
+              <Typography variant="body1" sx={{ color: "#fff", mr: 2 }}>
+                {userInfo}
+              </Typography>
               <IconButton
                 size="large"
                 aria-label="account of current user"
@@ -199,9 +204,6 @@ export default function Header() {
               >
                 <AccountCircle />
               </IconButton>
-              <Typography variant="body1" sx={{ color: "#fff", mr: 2 }}>
-                {userInfo}
-              </Typography>
               <Menu
                 id="menu-appbar"
                 anchorEl={anchorElSignOut}
