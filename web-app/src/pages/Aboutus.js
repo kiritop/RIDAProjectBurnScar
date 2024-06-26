@@ -304,7 +304,7 @@ function AboutUS() {
             sx={{ backgroundColor: "#023e8a", padding: 1, borderRadius: 3, boxShadow: 1 }}
           >
             <Typography variant="h3" color="#fff" sx={{ fontFamily: "monospace" }}>
-              Contact US
+              Contact Us
             </Typography>
           </Grid>
           <Grid spacing={0} my={5}>
@@ -330,7 +330,7 @@ function AboutUS() {
                   Email: ce.itschool@mfu.ac.th
                 </Typography>
                 <Typography variant="body1" mt={4}>
-                  Address : 333 m 1 Thah sud , mueng , chiang rai 57100 
+                  Address : 333 Moo 1, Thasud , Muang , Chiang Rai, Thailand 57100 
                 </Typography>
               </center>
             </Container>

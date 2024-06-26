@@ -22,6 +22,7 @@ const Carddetail = [
         EP: "EP 06 Examples of satellite images (Landsat-8, Sentinel-1, Sentinel-2)",
         yt: "https://www.youtube.com/watch?v=DhWIf1vDh9Y",
       },
+      { EP: "Unit 01 Types and Characteristics of Satellites", yt: "/rida-project/CH1_.pdf" },
     ],
   },
   {
@@ -33,6 +34,7 @@ const Carddetail = [
       { EP: "EP 01 How can ground stations communicate with satellites?", yt: "https://www.youtube.com/watch?v=_u_E3XCxUrQ" },
       { EP: "EP 02 Characteristics of data from satellite images", yt: "https://www.youtube.com/watch?v=KkaXCU2QqC0" },
       { EP: "EP 03 Analyzing satellite images using indices", yt: "https://www.youtube.com/watch?v=97vVaI1qV1A" },
+      { EP: "Unit 02 Interpretation and Analysis of Satellite Data", yt: "/rida-project/CH2_.pdf" },
     ],
   },
   {
@@ -44,6 +46,7 @@ const Carddetail = [
       { EP: "EP 01 Geo-Informatics technology", yt: "https://www.youtube.com/watch?v=SF3xTIOFMYk" },
       { EP: "EP 02 Remote Sensing", yt: "https://www.youtube.com/watch?v=0YTgEarG_Eo" },
       { EP: "EP 03 Global Positioning System", yt: "https://www.youtube.com/watch?v=2wsc97KvH40" },
+      { EP: "Unit 03 Application of Satellite Data.pdf", yt: "/rida-project/CH3_.pdf" },
     ],
   },
   {
@@ -57,6 +60,7 @@ const Carddetail = [
       { EP: "EP 03 Types of Machine Learning", yt: "https://www.youtube.com/watch?v=e4SW5T8o58g" },
       { EP: "EP 04 Models and Algorithms of Machine Learning", yt: "https://www.youtube.com/watch?v=4hqhGBntsqA" },
       { EP: "EP 05 Applications of Machine Learning", yt: "https://www.youtube.com/watch?v=Y4afzOWGDic" },
+      { EP: "Unit 04 Machine Learning.pdf", yt: "/rida-project/CH4_.pdf" },
     ],
   },
 ];
@@ -105,7 +109,7 @@ function Course() {
                   sx={{ borderRadius: 5 }}
                 />
                 <CardContent sx={{ height: "5vh" }}>
-                  <Typography variant="h6">Unit {index + 1}</Typography>
+                  <Typography variant="h6">Chapter {index + 1}</Typography>
                   <Typography variant="body2" color={"text.secondary"}>
                     {e.title}
                   </Typography>

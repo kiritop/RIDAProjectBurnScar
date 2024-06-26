@@ -21,7 +21,7 @@ function App() {
           <Route path="/hot_spot" element={<HotSpotDashboard />} />
           <Route path="/pm_25" element={<AirQualityDashboard />}></Route>
           <Route path="/burn_scar" element={<BurntScar />}></Route>
-          <Route path="/learning_material" element={<Course />} />
+          <Route path="/learning_materials" element={<Course />} />
           <Route path="/api" element={<API />} />
           <Route path="/about_us" element={<AboutUS />} />
           <Route path="/login" element={<LoginPage />} />

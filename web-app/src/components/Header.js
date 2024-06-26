@@ -19,12 +19,12 @@ import { useNavigate } from "react-router-dom";
 const pages = [
   { name: "Map" },
   {
-    name: "DashBoard",
+    name: "Dashboard",
     subMenu: ["Burnt Level", "Hot Spot", "Air Quality"],
   },
-  { name: "Learning Material" },
+  { name: "Learning Materials" },
   { name: "APIs" },
-  { name: "About US" },
+  { name: "About Us" },
 ];
 
 export default function Header() {
@@ -55,11 +55,11 @@ export default function Header() {
         return "/pm_25";
       case "Burnt Level":
         return "/burn_scar";
-      case "Learning Material":
-        return "/learning_material";
+      case "Learning Materials":
+        return "/learning_materials";
       case "APIs":
         return "/api";
-      case "About US":
+      case "About Us":
         return "/about_us";
       default:
         return "/";
