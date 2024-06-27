@@ -9,16 +9,16 @@ const port = process.env.PORT || 4000;
 
 // Create connection to MySQL
 const db = mysql.createConnection({
-  // host: "10.1.29.33",
-  // port: '3306',
-  // user: "root",
-  // password: "gdkll,@MFU2024",
-  // database: "RidaDB",
-  host: process.env.DB_HOST || 'localhost',
-  port: process.env.DB_PORT || '3306',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || 'gdkll,@MFU2024',
-  database: process.env.DB_NAME || 'RidaDB'
+  host: "10.1.29.33",
+  port: '3306',
+  user: "root",
+  password: "gdkll,@MFU2024",
+  database: "RidaDB",
+  // host: process.env.DB_HOST || 'localhost',
+  // port: process.env.DB_PORT || '3306',
+  // user: process.env.DB_USER || 'root',
+  // password: process.env.DB_PASSWORD || 'gdkll,@MFU2024',
+  // database: process.env.DB_NAME || 'RidaDB'
   // host: "localhost",
   // user: "root",
   // password: "root1234",
@@ -39,6 +39,99 @@ server.use(cors()); // ให้ server(express) ใช้งานการ cor
 
 
 server.get('/rida-api/api/line-chart', (req, res) => {
+  const country = req.query.country;
+  const startDate = req.query.startDate;
+  const endDate = req.query.endDate;
+  const province = req.query.province;
+
+  let firstQuery ='';
+
+  if(country=='ALL'&&province =='ALL'){
+    firstQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ? GROUP BY COUNTRY, FIRE_YEAR; `;
+  }else if (country!='ALL'&&province =='ALL'){
+    firstQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR, PV_EN FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ?  ${country ? 'AND ISO3 = ?' : ''} GROUP BY  COUNTRY, FIRE_YEAR, PV_EN; `;
+  }else if (country!='ALL'&&province !='ALL'){
+    firstQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR, AP_EN FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ?  ${country ? 'AND ISO3 = ?' : ''} ${province ? 'AND PV_EN = ?' : ''} GROUP BY  COUNTRY, FIRE_YEAR, AP_EN; `;
+  }
+
+  const queryParameters = [startDate, endDate];
+  if (country && country!='ALL') {
+    queryParameters.push(country);
+  }
+  if (province && province!='ALL') {
+    queryParameters.push(province);
+  }
+
+  db.query(firstQuery, queryParameters, (error, results) => {
+    if (error) {
+      console.error('Error executing first query:', error);
+      res.status(500).send('Internal server error');
+      return;
+    }
+
+    let secondQuery ='';
+
+    if(country=='ALL'&&province =='ALL'){
+      secondQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR, MONTH(FIRE_DATE) AS FIRE_MONTH FROM BURNT_SCAR_INFO WHERE YEAR(FIRE_DATE) IN (?) GROUP BY COUNTRY, FIRE_YEAR, FIRE_MONTH; `;
+    }else if (country!='ALL'&&province =='ALL'){
+      secondQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR, MONTH(FIRE_DATE) AS FIRE_MONTH, PV_EN FROM BURNT_SCAR_INFO WHERE YEAR(FIRE_DATE) IN (?)  ${country ? 'AND ISO3 = ?' : ''} GROUP BY  COUNTRY, FIRE_YEAR, FIRE_MONTH, PV_EN; `;
+    }else if (country!='ALL'&&province !='ALL'){
+      secondQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR, MONTH(FIRE_DATE) AS FIRE_MONTH, AP_EN FROM BURNT_SCAR_INFO WHERE YEAR(FIRE_DATE) IN (?)  ${country ? 'AND ISO3 = ?' : ''} ${province ? 'AND PV_EN = ?' : ''} GROUP BY  COUNTRY, FIRE_YEAR, FIRE_MONTH, AP_EN; `;
+    }
+
+
+    const fireYear = results.map((row) => row.FIRE_YEAR);
+    const uniqueFireYear = fireYear.filter((year, index) => {
+      return fireYear.indexOf(year) === index;
+    });
+
+    const secondQueryParameters = [uniqueFireYear];
+    if (country && country!='ALL') {
+      secondQueryParameters.push(country);
+    }
+    if (province && province!='ALL') {
+      secondQueryParameters.push(province);
+    }
+
+
+
+    db.query(secondQuery, secondQueryParameters, (error, secondResults) => {
+      if (error) {
+        console.error('Error executing second query:', error);
+        res.status(500).send('Internal server error');
+        return;
+      }
+
+
+      const transformedData = [];
+
+      results.forEach((row) => {
+        const { FIRE_YEAR, COUNTRY, PV_EN, AP_EN } = row;
+        const yearly = row; // directly use the current row for summary
+        let details = []
+        if(country=='ALL'&&province =='ALL'){
+          details = secondResults.filter((secondRow) => secondRow.FIRE_YEAR === FIRE_YEAR && secondRow.COUNTRY === COUNTRY);
+        }else if(country!='ALL'&&province =='ALL'){
+          details = secondResults.filter((secondRow) => secondRow.FIRE_YEAR === FIRE_YEAR && secondRow.PV_EN === PV_EN);
+        }else if(country!='ALL'&&province !='ALL'){
+          details = secondResults.filter((secondRow) => secondRow.FIRE_YEAR === FIRE_YEAR && secondRow.AP_EN === AP_EN);
+        }
+
+        const transformedYearData = {
+          yearly,
+          details
+        };
+        transformedData.push(transformedYearData)
+        
+
+      });
+
+      res.json(transformedData);
+    });
+  });
+});
+
+server.get('/rida-api/api/bubble-chart', (req, res) => {
   const country = req.query.country;
   const startDate = req.query.startDate;
   const endDate = req.query.endDate;
@@ -152,6 +245,99 @@ server.get('/rida-api/api/line-chart', (req, res) => {
 //     AND ('THA' IS NULL OR b.ISO3 = 'THA')
 // GROUP BY 
 //     b.AP_EN , b.PV_EN, l.LATITUDE, l.LONGITUDE;
+
+server.get('/rida-api/api/burnt-bubble-chart', (req, res) => {
+  const country = req.query.country;
+  const startDate = req.query.startDate;
+  const endDate = req.query.endDate;
+  const province = req.query.province;
+
+  let query = '';
+  const queryParameters = [startDate, endDate];
+
+  if (country && country !== 'ALL') {
+    queryParameters.push(country);
+  }
+  if (province && province !== 'ALL') {
+    queryParameters.push(province);
+  }
+
+  if (country === 'ALL' && province === 'ALL') {
+    query = `
+      SELECT 
+          b.ISO3,
+          b.PV_EN,
+          ROUND(SUM(b.AREA), 3) AS TOTAL_AREA,
+          l.LATITUDE,
+          l.LONGITUDE
+      FROM 
+          BURNT_SCAR_INFO b
+      JOIN 
+          LOCATION_INFO l
+      ON 
+          b.PV_EN = l.PV_EN AND b.ISO3 = l.ISO3
+      WHERE 
+          b.FIRE_DATE BETWEEN ? AND ?
+          AND l.LOCATION_LEVEL = 'Major'
+      GROUP BY 
+          b.ISO3, b.PV_EN, l.LATITUDE, l.LONGITUDE;
+    `;
+  } else if (country !== 'ALL' && province === 'ALL') {
+    query = `
+      SELECT 
+          b.ISO3,
+          b.PV_EN,
+          ROUND(SUM(b.AREA), 3) AS TOTAL_AREA,
+          l.LATITUDE,
+          l.LONGITUDE
+      FROM 
+          BURNT_SCAR_INFO b
+      JOIN 
+          LOCATION_INFO l
+      ON 
+          b.PV_EN = l.PV_EN AND b.ISO3 = l.ISO3
+      WHERE 
+          b.FIRE_DATE BETWEEN ? AND ?
+          AND b.ISO3 = ?
+          AND l.LOCATION_LEVEL = 'Major'
+      GROUP BY 
+          b.ISO3, b.PV_EN, l.LATITUDE, l.LONGITUDE;
+    `;
+  } else if (country !== 'ALL' && province !== 'ALL') {
+    query = `
+      SELECT 
+          b.ISO3,
+          b.PV_EN,
+          b.AP_EN,
+          ROUND(SUM(b.AREA), 3) AS TOTAL_AREA,
+          l.LATITUDE,
+          l.LONGITUDE
+      FROM 
+          BURNT_SCAR_INFO b
+      JOIN 
+          LOCATION_INFO l
+      ON 
+          b.AP_EN = l.AP_EN AND b.PV_EN = l.PV_EN AND b.ISO3 = l.ISO3
+      WHERE 
+          b.FIRE_DATE BETWEEN ? AND ?
+          AND b.ISO3 = ?
+          AND b.PV_EN = ?,
+      GROUP BY 
+          b.ISO3, b.PV_EN, b.AP_EN, l.LATITUDE, l.LONGITUDE;
+    `;
+  }
+
+  db.query(query, queryParameters, (error, results) => {
+    if (error) {
+      console.error('Error executing query:', error);
+      res.status(500).send('Internal server error');
+      return;
+    }
+
+    res.json(results);
+  });
+});
+
 
 server.get('/rida-api/api/line-chart-pm25', (req, res) => {
   const country = req.query.country;
