@@ -22,7 +22,7 @@ const Carddetail = [
         EP: "EP 06 Examples of satellite images (Landsat-8, Sentinel-1, Sentinel-2)",
         yt: "https://www.youtube.com/watch?v=DhWIf1vDh9Y",
       },
-      { EP: "Unit 01 Types and Characteristics of Satellites", yt: "/rida-project/CH1_.pdf" },
+      { EP: "Unit 01 Types and Characteristics of Satellites.pdf", yt: "/rida-project/CH1_.pdf" },
     ],
   },
   {
@@ -34,7 +34,7 @@ const Carddetail = [
       { EP: "EP 01 How can ground stations communicate with satellites?", yt: "https://www.youtube.com/watch?v=_u_E3XCxUrQ" },
       { EP: "EP 02 Characteristics of data from satellite images", yt: "https://www.youtube.com/watch?v=KkaXCU2QqC0" },
       { EP: "EP 03 Analyzing satellite images using indices", yt: "https://www.youtube.com/watch?v=97vVaI1qV1A" },
-      { EP: "Unit 02 Interpretation and Analysis of Satellite Data", yt: "/rida-project/CH2_.pdf" },
+      { EP: "Unit 02 Interpretation and Analysis of Satellite Data.pdf", yt: "/rida-project/CH2_.pdf" },
     ],
   },
   {

@@ -131,6 +131,28 @@ server.get('/rida-api/api/line-chart', (req, res) => {
   });
 });
 
+
+// for bubble chart
+// SELECT 
+//     b.AP_EN,
+//     b.PV_EN,
+//     ROUND(SUM(b.AREA), 3) AS TOTAL_AREA,
+//     l.LATITUDE,
+//     l.LONGITUDE
+// FROM 
+//     BURNT_SCAR_INFO b
+// JOIN 
+//     LOCATION_INFO l
+// ON 
+//     b.AP_EN = l.AP_EN AND b.PV_EN = l.PV_EN AND b.ISO3 = l.ISO3
+// WHERE 
+//     b.FIRE_DATE BETWEEN '2021-03-25' AND '2021-03-25'
+//    --  AND (:ap_EN IS NULL OR b.AP_EN = :ap_EN)
+//     AND ('Chiang Mai' IS NULL OR b.PV_EN = 'Chiang Mai')
+//     AND ('THA' IS NULL OR b.ISO3 = 'THA')
+// GROUP BY 
+//     b.AP_EN , b.PV_EN, l.LATITUDE, l.LONGITUDE;
+
 server.get('/rida-api/api/line-chart-pm25', (req, res) => {
   const country = req.query.country;
   const startDate = req.query.startDate;
