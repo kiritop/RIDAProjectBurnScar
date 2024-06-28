@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import MapContent from "../components/MapContent";
 import { Box, Card, CardContent, CircularProgress, Typography } from "@mui/material";
-import ToggleButton from "../components/ToggleButton";
-import Sidebar from "../layout/Sidebar";
 import ColorBar from "../components/ColorBar";
 import ColorBarPoint from "../components/ColorBarPoint";
 import { useSelector } from 'react-redux';
+import FilterCard from "../components/FilterCard";
 
 function Map() {
   const [isOpen, setIsOpen] = useState(false);
@@ -88,9 +87,8 @@ function Map() {
             </Box>
           )}
         </Box>
-        <Box sx={{ flex: 1, height: "100vh", overflow: "hidden" }}>
-          <ToggleButton isOpen={isOpen} toggleDrawer={toggleDrawer} />
-          <Sidebar isOpen={isOpen} toggleDrawer={toggleDrawer} />
+        <Box sx={{ flex: 1, height: "100vh", overflow: "hidden", display: 'flex' }}>
+          <FilterCard />
         </Box>
       </Box>
     </Box>

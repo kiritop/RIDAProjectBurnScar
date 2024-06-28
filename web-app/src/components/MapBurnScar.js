@@ -30,10 +30,10 @@ const MapBurnScar = () => {
     dispatch(setLoadingMap(true));
     dispatch(getMax(sidebarForm))
     .finally(() => {
-      dispatch(fetchBurntScarPolygon(sidebarForm))
-      .finally(() => {
+      // dispatch(fetchBurntScarPolygon(sidebarForm))
+      // .finally(() => {
         dispatch(setLoadingMap(false));
-      });
+      // });
     });
   }, [dispatch, sidebarForm]);
 
