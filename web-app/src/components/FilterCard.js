@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Box, Card, CardContent, Select, MenuItem, Typography, Switch, FormControl, FormLabel, FormHelperText, Stack, Divider, Button
+  Card, CardContent, Select, MenuItem, Typography, Switch, FormControl, FormLabel, Divider, InputLabel
 } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { saveLayerSettings, setLoadingMap, getCities } from '../reducers/uiSlice';
@@ -9,6 +9,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 const countries = [
   { name: 'Thailand', value: 'Thailand' },
@@ -30,6 +32,9 @@ function FilterCard() {
   const [date, setDate] = useState(ui.sidebarForm.date);
   const [startDate, setStartDate] = useState(ui.sidebarForm.startDate);
   const [endDate, setEndDate] = useState(ui.sidebarForm.endDate);
+
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   useEffect(() => {
     if (country && country !== 'pls') {
@@ -124,15 +129,24 @@ function FilterCard() {
   };
 
   return (
-    <Card sx={{ backgroundColor: '#fff', padding: 2 }}>
+    <Card sx={{ backgroundColor: '#fff', height: '100%', padding: isSmallScreen ? 1 : 2, overflow: 'auto' }}>
       <CardContent>
-        <Typography variant="h6" gutterBottom>
+        <Typography level="title-md" fontWeight="bold" sx={{ mt: 2 }} gutterBottom>
           Filters
         </Typography>
         <Divider />
-        <FormControl fullWidth margin="normal">
-          <FormLabel>Country</FormLabel>
-          <Select value={country} onChange={handleCountryChange}>
+        <Typography level="title-md"  sx={{ mt: 2 }}>
+          Area
+        </Typography>
+        <FormControl fullWidth margin="normal" sx={{ mt: isSmallScreen ? 1 : 2 }} size="small">
+        <InputLabel id="country-select-label">Country</InputLabel>
+          <Select 
+            labelId="country-select-label"
+            label="Country"
+            value={country} 
+            onChange={handleCountryChange}
+            sx={{ fontSize: isSmallScreen ? '0.75rem' : '1rem' }}
+          >
             <MenuItem value="All">Select all</MenuItem>
             {countries.map((country) => (
               <MenuItem key={country.value} value={country.value}>
@@ -141,9 +155,15 @@ function FilterCard() {
             ))}
           </Select>
         </FormControl>
-        <FormControl fullWidth margin="normal">
-          <FormLabel>City</FormLabel>
-          <Select value={city} onChange={handleCityChange}>
+        <FormControl fullWidth margin="normal" sx={{ mt: isSmallScreen ? 1 : 2 }} size="small">
+          <InputLabel id="province-select-label">Province</InputLabel>
+          <Select 
+            labelId="province-select-label"
+            label="Province"
+            value={city} 
+            onChange={handleCityChange}
+            sx={{ fontSize: isSmallScreen ? '0.75rem' : '1rem' }}
+          >
             <MenuItem value="All">Select all</MenuItem>
             {cities.map((city) => (
               <MenuItem key={city.city} value={city.city}>
@@ -152,38 +172,85 @@ function FilterCard() {
             ))}
           </Select>
         </FormControl>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <FormControl fullWidth margin="normal">
-            <FormLabel>Start Date</FormLabel>
-            <DatePicker value={dayjs(startDate)} onChange={handleStartDateChange} />
-          </FormControl>
-          <FormControl fullWidth margin="normal">
-            <FormLabel>End Date</FormLabel>
-            <DatePicker value={dayjs(endDate)} onChange={handleEndDateChange} />
-          </FormControl>
-          <FormControl fullWidth margin="normal">
-            <FormLabel>Date</FormLabel>
-            <DatePicker value={dayjs(date)} onChange={(newValue) => setDate(newValue.format('YYYY-MM-DD'))} />
-          </FormControl>
-        </LocalizationProvider>
-        <FormControl fullWidth margin="normal">
+        {(burntScar === true) && (
+          <Typography level="title-md"  sx={{ mt: 2 }}>
+            Date Range
+          </Typography>
+        )}
+        {(hotSpot === true || aqi === true) && (
+          <Typography level="title-md"  sx={{ mt: 2 }}>
+            Select Date
+          </Typography>
+        )}
+        {(burntScar === true) && (
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <FormControl fullWidth margin="normal" sx={{ mt: isSmallScreen ? 1 : 2 }}>
+              <DatePicker 
+                label="Start Date"
+                value={dayjs(startDate)} 
+                onChange={handleStartDateChange} 
+                sx={{ fontSize: isSmallScreen ? '0.75rem' : '1rem' }}
+                slotProps={{ textField: { size: 'small' }, InputProps: { readOnly: true } }}
+                maxDate={dayjs(new Date())}
+              />
+            </FormControl>
+            <FormControl fullWidth margin="normal" sx={{ mt: isSmallScreen ? 1 : 2 }}>
+              <DatePicker 
+                label="End Date"
+                value={dayjs(endDate)} 
+                onChange={handleEndDateChange} 
+                sx={{ fontSize: isSmallScreen ? '0.75rem' : '1rem' }}
+                slotProps={{ textField: { size: 'small' }, InputProps: { readOnly: true } }}
+                minDate={dayjs(startDate)}
+                maxDate={dayjs(new Date())}
+              />
+            </FormControl>
+          </LocalizationProvider>
+        )}
+        {(hotSpot === true || aqi === true) && (
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <FormControl fullWidth margin="normal" sx={{ mt: isSmallScreen ? 1 : 2 }}>
+              <DatePicker 
+                label="Date"
+                value={dayjs(date)} 
+                onChange={(newValue) => setDate(newValue.format('YYYY-MM-DD'))} 
+                sx={{ fontSize: isSmallScreen ? '0.75rem' : '1rem' }}
+                slotProps={{ textField: { size: 'small' }, InputProps: { readOnly: true } }}
+                maxDate={dayjs(new Date())}
+              />
+            </FormControl>
+          </LocalizationProvider>
+         )}
+        <FormControl fullWidth margin="normal" sx={{ mt: isSmallScreen ? 1 : 2 }}>
           <FormLabel>Map Layer</FormLabel>
-          <FormControl fullWidth margin="normal">
+          <FormControl fullWidth margin="normal" sx={{ mt: isSmallScreen ? 1 : 2 }}>
             <FormLabel>Burnt Level Layer (Area-based)</FormLabel>
-            <Switch checked={burntScar} onChange={handleChange} name="burntScar" />
+            <Switch 
+              checked={burntScar} 
+              onChange={handleChange} 
+              name="burntScar" 
+              sx={{ transform: isSmallScreen ? 'scale(0.75)' : 'scale(1)' }}
+            />
           </FormControl>
-          <FormControl fullWidth margin="normal">
+          <FormControl fullWidth margin="normal" sx={{ mt: isSmallScreen ? 1 : 2 }}>
             <FormLabel>Air quality layer</FormLabel>
-            <Switch checked={aqi} onChange={handleChange} name="aqi" />
+            <Switch 
+              checked={aqi} 
+              onChange={handleChange} 
+              name="aqi" 
+              sx={{ transform: isSmallScreen ? 'scale(0.75)' : 'scale(1)' }}
+            />
           </FormControl>
-          <FormControl fullWidth margin="normal">
+          <FormControl fullWidth margin="normal" sx={{ mt: isSmallScreen ? 1 : 2 }}>
             <FormLabel>Hotspot layer</FormLabel>
-            <Switch checked={hotSpot} onChange={handleChange} name="hotSpot" />
+            <Switch 
+              checked={hotSpot} 
+              onChange={handleChange} 
+              name="hotSpot" 
+              sx={{ transform: isSmallScreen ? 'scale(0.75)' : 'scale(1)' }}
+            />
           </FormControl>
         </FormControl>
-        <Button variant="contained" color="primary" onClick={handleSave}>
-          Submit
-        </Button>
       </CardContent>
     </Card>
   );

@@ -1,15 +1,19 @@
 import React, { useState } from "react";
 import MapContent from "../components/MapContent";
-import { Box, Card, CardContent, CircularProgress, Typography } from "@mui/material";
+import { Box, Card, CardContent, CircularProgress, Typography, useMediaQuery } from "@mui/material";
 import ColorBar from "../components/ColorBar";
 import ColorBarPoint from "../components/ColorBarPoint";
 import { useSelector } from 'react-redux';
 import FilterCard from "../components/FilterCard";
+import { useTheme } from '@mui/material/styles';
 
 function Map() {
   const [isOpen, setIsOpen] = useState(false);
   const { burntScar, burntScarPoint } = useSelector(state => state.ui);
   const loadingMap = useSelector(state => state.ui.loadingMap);
+
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const toggleDrawer = () => {
     setIsOpen(!isOpen);
@@ -17,8 +21,8 @@ function Map() {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "calc(100vh - 56px)", overflow: "hidden" }}>
-      <Box sx={{ display: "flex", flexGrow: 1, overflow: "hidden" }}>
-        <Box sx={{ flex: 4, position: "relative", height: "100vh", overflow: "hidden" }}>
+      <Box sx={{ display: "flex", flexGrow: 1, overflow: "hidden", flexDirection: isSmallScreen ? 'column' : 'row' }}>
+        <Box sx={{ flex: 4, position: "relative", height: isSmallScreen ? '50vh' : '100vh', overflow: "hidden" }}>
           <MapContent />
           <Card
             sx={{
@@ -87,7 +91,7 @@ function Map() {
             </Box>
           )}
         </Box>
-        <Box sx={{ flex: 1, height: "100vh", overflow: "hidden", display: 'flex' }}>
+        <Box sx={{ flex: 1, height: isSmallScreen ? '50vh' : '100vh', overflow: "hidden", display: 'flex', flexDirection: 'column' }}>
           <FilterCard />
         </Box>
       </Box>
