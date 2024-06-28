@@ -58,11 +58,6 @@ function BurntScarDashboard() {
   }, [dispatch, country, province, startDate, endDate]);
 
   useEffect(() => {
-    console.log('dataBurntBubbleMap', dataBurntBubbleMap)
-    
-  }, [dataBurntBubbleMap]);
-
-  useEffect(() => {
     if (dataBurntTable) {
       const dataWithNumericSumArea = dataBurntTable.map(item => ({
         ...item,

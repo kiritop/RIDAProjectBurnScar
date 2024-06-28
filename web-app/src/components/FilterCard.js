@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Card, CardContent, Select, MenuItem, Typography, Switch, FormControl, FormLabel, Divider, InputLabel
+  Box, Card, CardContent, Select, MenuItem, Typography, Switch, FormControl, FormLabel, Divider, InputLabel, Button
 } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
-import { saveLayerSettings, setLoadingMap, getCities } from '../reducers/uiSlice';
+import { saveLayerSettings, setLoadingMap, fetchProvinceByCountry } from '../reducers/uiSlice';
 import { fetchBurntScarPolygon, fetchBurntScarData } from '../reducers/burntScarSlice';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -23,7 +23,9 @@ function FilterCard() {
   const dispatch = useDispatch();
   const ui = useSelector(state => state.ui);
   const cities = useSelector(state => state.ui ? state.ui.cities : []);
+  const dataProvince = useSelector((state) => state.ui.dataProvince ?? []);
   const [country, setCountry] = useState(ui.sidebarForm.country);
+  const [province, setProvince] = useState(ui.sidebarForm.province);
   const [city, setCity] = useState(ui.sidebarForm.city);
   const [burntScar, setBurntScar] = useState(ui.burntScar);
   const [aqi, setAqi] = useState(ui.aqi);
@@ -37,8 +39,12 @@ function FilterCard() {
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   useEffect(() => {
-    if (country && country !== 'pls') {
-      dispatch(getCities(country));
+    if (country) {
+      dispatch(setLoadingMap(true));
+      dispatch(fetchProvinceByCountry({country: country, module:'burnscar'}))
+      .finally(() => {
+        dispatch(setLoadingMap(false));
+      });
     }
   }, [country, dispatch]);
 
@@ -50,13 +56,13 @@ function FilterCard() {
     setEndDate(date.format('YYYY-MM-DD'));
   };
 
-  const handleCountryChange = (event) => {
+  const handleChangeCountry = (event) => {
     setCountry(event.target.value);
-    setCity('All');
+    setProvince('ALL')
   };
 
-  const handleCityChange = (event) => {
-    setCity(event.target.value);
+  const handleChangeProvince = (event) => {
+    setProvince(event.target.value);
   };
 
   const handleChange = (event) => {
@@ -144,15 +150,14 @@ function FilterCard() {
             labelId="country-select-label"
             label="Country"
             value={country} 
-            onChange={handleCountryChange}
+            onChange={(event) => handleChangeCountry(event)}
             sx={{ fontSize: isSmallScreen ? '0.75rem' : '1rem' }}
           >
-            <MenuItem value="All">Select all</MenuItem>
-            {countries.map((country) => (
-              <MenuItem key={country.value} value={country.value}>
-                {country.name}
-              </MenuItem>
-            ))}
+            <MenuItem value={"ALL"}><em>All</em></MenuItem>
+            <MenuItem value={"THA"}>Thailand</MenuItem>
+            <MenuItem value={"VNM"}>Vietnam</MenuItem>
+            <MenuItem value={"MMR"}>Myanmar</MenuItem>
+            <MenuItem value={"LAO"}>Laos</MenuItem>
           </Select>
         </FormControl>
         <FormControl fullWidth margin="normal" sx={{ mt: isSmallScreen ? 1 : 2 }} size="small">
@@ -160,14 +165,14 @@ function FilterCard() {
           <Select 
             labelId="province-select-label"
             label="Province"
-            value={city} 
-            onChange={handleCityChange}
+            value={province} 
+            onChange={(event) => handleChangeProvince(event)}
             sx={{ fontSize: isSmallScreen ? '0.75rem' : '1rem' }}
           >
-            <MenuItem value="All">Select all</MenuItem>
-            {cities.map((city) => (
-              <MenuItem key={city.city} value={city.city}>
-                {city.city}
+            <MenuItem key={"ALL"} value={"ALL"}><em>All</em></MenuItem>
+            {dataProvince.map((pv_en) => (
+              <MenuItem key={pv_en.PV_EN} value={pv_en.PV_EN}>
+                {pv_en.PV_EN}
               </MenuItem>
             ))}
           </Select>
@@ -251,6 +256,16 @@ function FilterCard() {
             />
           </FormControl>
         </FormControl>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: isSmallScreen ? 1 : 2 }}>
+          <Button 
+            variant="contained" 
+            color="primary" 
+            onClick={handleSave}
+            sx={{ fontSize: isSmallScreen ? '0.75rem' : '1rem' }}
+          >
+            Submit
+          </Button>
+        </Box>
       </CardContent>
     </Card>
   );

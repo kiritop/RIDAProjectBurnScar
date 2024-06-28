@@ -1,5 +1,6 @@
 // src/reducers/uiSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import CONFIG from '../config';
 import data from './json/data_state.json';
 import dayjs from 'dayjs';
 
@@ -11,6 +12,18 @@ export const saveLayerSettings = createAsyncThunk(
   }
 );
 
+export const fetchProvinceByCountry = createAsyncThunk("dashboard/fetchProvinceByCountry", async (object) => {
+  try{
+    const response = await fetch(`${CONFIG.API_URL}/get-province?country=${object.country}&module=${object.module}`);
+    const data = await response.json();
+    return data;
+  }catch (error){
+    console.error(error);
+    return null;
+  }
+
+});
+
 const currentDate = new Date();
 const startDate = new Date();
 const year = currentDate.getFullYear();
@@ -21,7 +34,8 @@ const uiSlice = createSlice({
     isSidebarOpen: false,
     sidebarForm :{
       yearRange : [year, year],
-      country : 'All',
+      country : 'ALL',
+      province : 'ALL',
       city : 'All',
       date: dayjs(currentDate).format('YYYY-MM-DD'),
       startDate : dayjs(startDate.setFullYear(startDate.getFullYear() - 1)).format('YYYY-MM-DD'),
@@ -38,6 +52,7 @@ const uiSlice = createSlice({
     loadingMap: false,
     loadingSidebar: false,
     cities: [],
+    dataProvince: [],
     error: null, // สร้าง state สำหรับข้อมูล form control ของ Sidebar
   },
   reducers: {
@@ -79,7 +94,14 @@ const uiSlice = createSlice({
       .addCase(saveLayerSettings.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
-      });
+      })
+      .addCase(fetchProvinceByCountry.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchProvinceByCountry.fulfilled, (state, action) => {
+        state.dataProvince = action.payload;
+        state.loading = false;
+      })
   },
 });
 
