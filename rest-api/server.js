@@ -1053,25 +1053,8 @@ server.get("/rida-api/api/get-users", async (req, res) => {
   }
 });
 
-server.post("/rida-api/api/login", async (req, res) => {
-  const { username, name, email } = req.body;
 
-  let sql = "SELECT * FROM users WHERE email = ?";
-  try {
-    const results = await executeQuery(sql, [email]);
-    if (results.length > 0) {
-      res.send("Logged in successfully");
-    } else {
-      sql = "INSERT INTO users (username, name, email) VALUES (?, ?, ?)";
-      await executeQuery(sql, [username, name, email]);
-      res.send("User created successfully");
-    }
-  } catch (error) {
-    console.error('Error executing query:', error);
-    res.status(500).send("Server error");
-  }
-});
-
+// Generate API key
 server.post("/rida-api/api/generate", async (req, res) => {
   const { email } = req.body;
   const apiKey = crypto.randomBytes(20).toString("hex");
@@ -1085,6 +1068,117 @@ server.post("/rida-api/api/generate", async (req, res) => {
       await executeQuery(sql, [apiKey, email]);
       res.send("API key generated...");
     }
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send("Server error");
+  }
+});
+
+
+// Nodemailer setup
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'your-email@gmail.com',
+    pass: 'your-email-password'
+  }
+});
+
+// Register new user
+server.post("/rida-api/api/register", async (req, res) => {
+  const { username, name, email, password } = req.body;
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const sql = "INSERT INTO users (username, name, surname, email, password) VALUES (?, ?, ?, ?)";
+    await executeQuery(sql, [username, name, email, hashedPassword]);
+    res.send("User registered successfully");
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send("Server error");
+  }
+});
+
+// Login user
+server.post("/rida-api/api/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  let sql = "SELECT * FROM users WHERE email = ?";
+  try {
+    const results = await executeQuery(sql, [email]);
+    if (results.length > 0) {
+      const user = results[0];
+      const match = await bcrypt.compare(password, user.password);
+      if (match) {
+        res.send("Logged in successfully");
+      } else {
+        res.status(400).send("Invalid email or password");
+      }
+    } else {
+      res.status(400).send("Invalid email or password");
+    }
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send("Server error");
+  }
+});
+
+// Reset password
+server.post("/rida-api/api/reset-password", async (req, res) => {
+  const { email } = req.body;
+  const newPassword = crypto.randomBytes(8).toString("hex"); // Generate a random new password
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  let sql = "UPDATE users SET password = ? WHERE email = ?";
+  try {
+    await executeQuery(sql, [hashedPassword, email]);
+
+    const mailOptions = {
+      from: 'your-email@gmail.com',
+      to: email,
+      subject: 'Password Reset',
+      text: `Your new password is: ${newPassword}`
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Error sending email:', error);
+        res.status(500).send("Error sending email");
+      } else {
+        res.send("Password reset successfully. Check your email for the new password.");
+      }
+    });
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send("Server error");
+  }
+});
+
+// Edit user details
+server.put("/rida-api/api/edit-user", async (req, res) => {
+  const { id, username, name, surname, email, password } = req.body;
+
+  try {
+    let hashedPassword;
+    if (password) {
+      hashedPassword = await bcrypt.hash(password, 10);
+    }
+
+    const sql = `UPDATE users SET
+                 username = ?,
+                 name = ?,
+                 surname = ?,
+                 email = ?${password ? ', password = ?' : ''}
+                 WHERE id = ?`;
+
+    const params = [username, name, surname, email];
+    if (password) {
+      params.push(hashedPassword);
+    }
+    params.push(id);
+
+    await executeQuery(sql, params);
+    res.send("User updated successfully");
   } catch (error) {
     console.error('Error executing query:', error);
     res.status(500).send("Server error");
