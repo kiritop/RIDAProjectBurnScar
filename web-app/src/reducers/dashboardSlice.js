@@ -34,6 +34,18 @@ export const fetchBurntChart = createAsyncThunk("dashboard/fetchBurntChart", asy
 
 });
 
+export const fetchBubbleBurntMap = createAsyncThunk("dashboard/fetchBubbleBurntMap", async (object) => {
+  try{
+    const response = await fetch(`${CONFIG.API_URL}/burnt-bubble-chart?country=${object.country}&province=${object.province}&startDate=${object.startDate}&endDate=${object.endDate}`);
+    const data = await response.json();
+    return data;
+  }catch (error){
+    console.error(error);
+    return null;
+  }
+
+});
+
 export const fetchAqiChart = createAsyncThunk("dashboard/fetchAqiChart", async (object) => {
   try{
     const response = await fetch(`${CONFIG.API_URL}/line-chart-pm25?country=${object.country}&province=${object.province}&startDate=${object.startDate}&endDate=${object.endDate}`);
@@ -108,7 +120,8 @@ export const DashboardSlice = createSlice({
     dataBurntTable:[],
     dataBurntChart:[],
     dataAqiChart:[],
-    dataHotspotChart:[]
+    dataHotspotChart:[],
+    dataBurntBubbleMap:[]
   },
   reducers: {
     setFilter: (state, action) => {
@@ -167,6 +180,14 @@ export const DashboardSlice = createSlice({
         state.dataHotspotTable = action.payload;
         state.loading = false;
       })
+      .addCase(fetchBubbleBurntMap.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchBubbleBurntMap.fulfilled, (state, action) => {
+        state.dataBurntBubbleMap = action.payload;
+        state.loading = false;
+      })
+      
   },
 });
 

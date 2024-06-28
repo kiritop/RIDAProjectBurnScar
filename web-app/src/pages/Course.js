@@ -92,7 +92,7 @@ function Course() {
         sx={{ backgroundColor: "#023e8a", padding: 3, borderRadius: 3, boxShadow: 1 }}
       >
         <Typography variant="h3" color="#fff" sx={{ fontFamily: "monospace" }}>
-          Learning Material
+          Learning Materials
         </Typography>
       </Grid>
 

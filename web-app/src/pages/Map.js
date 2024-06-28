@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import MapContent from "../components/MapContent";
-import { Box, Card, CardContent, CircularProgress, Typography  } from "@mui/material";
+import { Box, Card, CardContent, CircularProgress, Typography } from "@mui/material";
 import ToggleButton from "../components/ToggleButton";
 import Sidebar from "../layout/Sidebar";
 import ColorBar from "../components/ColorBar";
-import FilterBar from "../components/filterBar";
 import ColorBarPoint from "../components/ColorBarPoint";
 import { useSelector } from 'react-redux';
 
@@ -18,74 +17,81 @@ function Map() {
   };
 
   return (
-
-    <Box sx={{ display: "flex", flexDirection: "column" }}>
-      <Box sx={{ display: "flex", flexGrow: 1 }}>
-        <ToggleButton isOpen={isOpen} toggleDrawer={toggleDrawer} />
-        <MapContent z />
-        <Sidebar isOpen={isOpen} toggleDrawer={toggleDrawer} />
-        <Card
-          sx={{
-            position: "absolute",
-            top: "30%",
-            left: 16,
-            maxWidth: "20%",
-            zIndex: 1050,
-            backgroundColor: "rgba(255, 255, 255, 0.5)",
-          }}
-        >
-          <CardContent>
-            <FilterBar/>
-          </CardContent>
-        </Card>
-        {burntScar && <Card
-          sx={{
-            position: "absolute",
-            bottom: "10%",
-            left: 16,
-            maxWidth: "20%",
-            zIndex: 1050,
-            backgroundColor: "rgba(255, 255, 255, 0.2)",
-          }}
-        >
-          <CardContent>
-            <ColorBar /> 
-          </CardContent>
-        </Card> }
-        {burntScarPoint && <Card
-          sx={{
-            position: "absolute",
-            bottom: "10%",
-            left: 16,
-            maxWidth: "20%",
-            zIndex: 1050,
-            backgroundColor: "rgba(255, 255, 255, 0.2)",
-          }}
-        >
-          {/* <CardContent>
-            <ColorBarPoint /> 
-          </CardContent> */}
-        </Card> }
-        {loadingMap && (
-          <Box
-            display="flex"
-            flexDirection="column"
-            justifyContent="center"
-            alignItems="center"
-            width="100%"
-            height="100%"
-            position="absolute"
-            top={0}
-            left={0}
-            zIndex={1050}
-            bgcolor="rgba(0, 0, 0, 0.5)"
+    <Box sx={{ display: "flex", flexDirection: "column", height: "calc(100vh - 56px)", overflow: "hidden" }}>
+      <Box sx={{ display: "flex", flexGrow: 1, overflow: "hidden" }}>
+        <Box sx={{ flex: 4, position: "relative", height: "100vh", overflow: "hidden" }}>
+          <MapContent />
+          <Card
+            sx={{
+              position: "absolute",
+              top: "30%",
+              left: 16,
+              maxWidth: "20%",
+              zIndex: 1050,
+              backgroundColor: "rgba(255, 255, 255, 0.5)",
+              margin: 0
+            }}
           >
-            <CircularProgress />
-            <Typography variant="h6" color="white">
-              Loading...
-            </Typography>
-          </Box>
-        )}
+          </Card>
+          {burntScar && (
+            <Card
+              sx={{
+                position: "absolute",
+                bottom: "10%",
+                left: 16,
+                maxWidth: "20%",
+                zIndex: 1050,
+                backgroundColor: "rgba(255, 255, 255, 0.2)",
+                margin: 0
+              }}
+            >
+              <CardContent sx={{ padding: 1 }}>
+                <ColorBar />
+              </CardContent>
+            </Card>
+          )}
+          {burntScarPoint && (
+            <Card
+              sx={{
+                position: "absolute",
+                bottom: "10%",
+                left: 16,
+                maxWidth: "20%",
+                zIndex: 1050,
+                backgroundColor: "rgba(255, 255, 255, 0.2)",
+                margin: 0
+              }}
+            >
+              <CardContent sx={{ padding: 1 }}>
+                <ColorBarPoint />
+              </CardContent>
+            </Card>
+          )}
+          {loadingMap && (
+            <Box
+              display="flex"
+              flexDirection="column"
+              justifyContent="center"
+              alignItems="center"
+              width="100%"
+              height="100%"
+              position="absolute"
+              top={0}
+              left={0}
+              zIndex={1050}
+              bgcolor="rgba(0, 0, 0, 0.5)"
+            >
+              <CircularProgress />
+              <Typography variant="h6" color="white">
+                Loading...
+              </Typography>
+            </Box>
+          )}
+        </Box>
+        <Box sx={{ flex: 1, height: "100vh", overflow: "hidden" }}>
+          <ToggleButton isOpen={isOpen} toggleDrawer={toggleDrawer} />
+          <Sidebar isOpen={isOpen} toggleDrawer={toggleDrawer} />
+        </Box>
       </Box>
     </Box>
   );

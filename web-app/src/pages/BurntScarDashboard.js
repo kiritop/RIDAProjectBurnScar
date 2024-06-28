@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from "react";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
+import { Box, Typography, Container, CircularProgress, TableCell, InputLabel, FormControl, Select, MenuItem, Grid, Card, CardContent, Button } from "@mui/material";
 import MUIDataTable from "mui-datatables";
-import { Container, CircularProgress, TableCell, InputLabel, FormControl, Select, MenuItem, Grid, Card, CardContent, Button } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProvinceByCountry, fetchBurntDataTable, fetchBurntChart } from '../reducers/dashboardSlice';
+import { fetchProvinceByCountry, fetchBurntDataTable, fetchBurntChart, fetchBubbleBurntMap } from '../reducers/dashboardSlice';
 import { format } from 'date-fns';
 import LineChart from '../components/LineChart';
 import CONFIG from '../config';
@@ -13,26 +11,23 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
-
-
+import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
 
 function BurntScarDashboard() {
   const dispatch = useDispatch();
   const dataProvince = useSelector((state) => state.dashboard.dataProvince ?? []);
   const dataBurntTable = useSelector((state) => state.dashboard.dataBurntTable ?? []);
+  const dataBurntBubbleMap = useSelector((state) => state.dashboard.dataBurntBubbleMap ?? []);
   const [country, setCountry] = useState("ALL");
   const [province, setProvince] = useState("ALL");
   const [totalPoint, setTotalPoint] = useState(0);
   const [dataShow, setDataShow] = useState([]);
   const [tableData, setTableData] = useState([]);
-
   const [countryText, setCountryText] = useState("All");
   const [provinceText, setProvinceText] = useState("All");
-
-
   const [startDate, setStartDate] = useState(dayjs(new Date().setFullYear(new Date().getFullYear() - 1)).format('YYYY-MM-DD'));
   const [endDate, setEndDate] = useState(dayjs(new Date()).format('YYYY-MM-DD'));
-
 
   const handleStartDateChange = (date) => {
     setStartDate(date.format('YYYY-MM-DD'));
@@ -40,13 +35,11 @@ function BurntScarDashboard() {
 
   const handleEndDateChange = (date) => {
     if (startDate && date < startDate) {
-      // Validate end date not less than start date
       console.error('End date cannot be less than start date');
       return;
     }
     setEndDate(date.format('YYYY-MM-DD'));
   };
-
 
   useEffect(() => {
     let obj = {
@@ -60,13 +53,17 @@ function BurntScarDashboard() {
     }
     dispatch(fetchBurntChart(obj));
     dispatch(fetchBurntDataTable(obj));
+    dispatch(fetchBubbleBurntMap(obj));
     
   }, [dispatch, country, province, startDate, endDate]);
 
-  // Update chart data when dataHotspotC changes
+  useEffect(() => {
+    console.log('dataBurntBubbleMap', dataBurntBubbleMap)
+    
+  }, [dataBurntBubbleMap]);
+
   useEffect(() => {
     if (dataBurntTable) {
-
       const dataWithNumericSumArea = dataBurntTable.map(item => ({
         ...item,
         SUM_AREA: Number(item.SUM_AREA)
@@ -89,10 +86,7 @@ function BurntScarDashboard() {
     }
   }, [dataBurntTable]);
 
-
-  //table
   const columns = [
-
     {
       name: "No.",
       options: {
@@ -105,7 +99,6 @@ function BurntScarDashboard() {
         },
       },
     },
-    
     {
       name: "Name",
       options: {
@@ -129,12 +122,10 @@ function BurntScarDashboard() {
           );
         },
         customBodyRender: (value) => {
-          // Format the numerical value with commas
           const formattedValue = new Intl.NumberFormat('th-TH', {
-            useGrouping: true, // Enable commas for thousands
+            useGrouping: true,
             maximumFractionDigits: 2,
           }).format(value);
-  
           return formattedValue;
         },
       },
@@ -156,7 +147,6 @@ function BurntScarDashboard() {
         },
       };
     },
-    
   };
 
   const handleChangeCountry = (event) => {
@@ -185,8 +175,6 @@ function BurntScarDashboard() {
   };
 
   const handleDownloadClick = () => {
-    // Construct the GET request URL with query parameters
-
     let obj = {
       country: country,
       province: province,
@@ -201,13 +189,11 @@ function BurntScarDashboard() {
     fetch(csvUrl)
       .then(response => response.blob())
       .then(blob => {
-        // สร้าง URL สำหรับ blob
         const url = window.URL.createObjectURL(blob);
-        // สร้าง anchor tag และเซ็ต attribute สำหรับการดาวน์โหลด
         const a = document.createElement('a');
         a.style.display = 'none';
         a.href = url;
-        a.download = 'data.csv'; // ตั้งชื่อไฟล์ที่จะดาวน์โหลด
+        a.download = 'data.csv';
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
@@ -216,6 +202,15 @@ function BurntScarDashboard() {
       .catch(error => console.error('Error:', error));
   }
 
+  const center = [15, 105]; // Center of the map (Indochina Peninsula)
+  const zoom = 5; // Zoom level
+
+  const burntAreas = dataBurntTable.map((item) => ({
+    position: [item.LAT, item.LON],
+    radius: item.SUM_AREA / 100000, // Adjust the radius for visibility
+    name: item.NAME_LIST,
+    area: item.SUM_AREA
+  }));
 
   return (
     <>
@@ -283,7 +278,7 @@ function BurntScarDashboard() {
                               value={dayjs(endDate)}
                               onChange={handleEndDateChange}
                               slotProps={{ textField: { size: 'small' }, InputProps: { readOnly: true } }}
-                              minDate={dayjs(startDate)} // Set minimum date for end date
+                              minDate={dayjs(startDate)}
                             />
                           </DemoContainer>
                         </LocalizationProvider>
@@ -304,34 +299,33 @@ function BurntScarDashboard() {
           <Grid item xs={12} md={5}>
             <Card sx={{ borderRadius: 3, overflow: "hidden", height:'400px' }} variant="outlined">
               <CardContent>
-                <Typography  variant="h4" component="div">
+                <Typography variant="h4" component="div">
                   {provinceText != 'ALL' ? provinceText : countryText} burnt scar
                 </Typography>
-                <Typography  variant="subtitle1" color="text.secondary">
+                <Typography variant="subtitle1" color="text.secondary">
                   {provinceText != 'ALL' ? provinceText +', '+ countryText : countryText}  burnt scar (  {format(new Date(startDate),'MMM dd yyyy')} - {format(new Date(endDate),'MMM dd yyyy')} )
                 </Typography>
                 <Box height={50}/>
-                <Typography  variant="h3" component="div">
+                <Typography variant="h3" component="div">
                   {totalPoint} sq m
                 </Typography>
                 <Box height={50}/>
-
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between' }}>
-                {dataShow.slice(0, 4).map((data, index) => (
-                  <Box key={index} sx={{ width: 'calc(25% - 8px)' }}> {/* ลบด้วย 8px เพื่อคำนวณ spacing */}
-                    <Card sx={{ borderRadius: 3, overflow: "hidden", border:0, backgroundColor: '#F5F5F5' }} variant="outlined">
-                      <CardContent>
-                        <Typography variant="subtitle1" >
-                          {data[1]}
-                        </Typography>
-                        <Typography variant="body1" color="text.secondary">
-                          {new Intl.NumberFormat('en-US').format(data[2])}
-                        </Typography>
-                      </CardContent>
-                    </Card>
-                  </Box>
-                ))}
-              </Box>
+                  {dataShow.slice(0, 4).map((data, index) => (
+                    <Box key={index} sx={{ width: 'calc(25% - 8px)' }}>
+                      <Card sx={{ borderRadius: 3, overflow: "hidden", border:0, backgroundColor: '#F5F5F5' }} variant="outlined">
+                        <CardContent>
+                          <Typography variant="subtitle1">
+                            {data[1]}
+                          </Typography>
+                          <Typography variant="body1" color="text.secondary">
+                            {new Intl.NumberFormat('en-US').format(data[2])}
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    </Box>
+                  ))}
+                </Box>
               </CardContent>
             </Card>
           </Grid>
@@ -342,17 +336,50 @@ function BurntScarDashboard() {
               </CardContent>
             </Card>
           </Grid>
-         
+          <Grid item xs={12}>
+            <Card sx={{ borderRadius: 3, overflow: "hidden" }} variant="outlined">
+              <CardContent>
+                <Typography variant="h5" component="div" gutterBottom>
+                  Burn Area By Location
+                </Typography>
+                <MapContainer center={center} zoom={zoom} style={{ height: "500px", width: "100%" }}>
+                  <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  />
+                  {dataBurntBubbleMap.map((area, index) => (
+                    <CircleMarker
+                      key={index}
+                      center={[area.LATITUDE, area.LONGITUDE]}
+                      radius={20 * Math.log(area.TOTAL_AREA / 10000000)}
+                      fillOpacity={0.5}
+                      stroke={false}
+                    >
+                      <Popup>
+                        <Typography variant="subtitle1">
+                          {area.PV_EN}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Burnt Area: {new Intl.NumberFormat('en-US').format(area.TOTAL_AREA)} sq m
+                        </Typography>
+                      </Popup>
+                    </CircleMarker>
+                  ))}
+                </MapContainer>
+              </CardContent>
+            </Card>
+          </Grid>
           <Grid item xs={12} md={12}>
-            <Box sx={{ borderRadius: 3, overflow: "hidden", flex: 1}}>
-                <MUIDataTable
-                  title={<h3>Burnt Scar Area Ranking {format(new Date(startDate),'MMM dd yyyy')} - {format(new Date(endDate),'MMM dd yyyy')}</h3>}
-                  data={tableData}
-                  columns={columns}
-                  options={options}
-                />
+            <Box sx={{ borderRadius: 3, overflow: "hidden", flex: 1 }}>
+              <MUIDataTable
+                title={<h3>Burnt Scar Area Ranking {format(new Date(startDate),'MMM dd yyyy')} - {format(new Date(endDate),'MMM dd yyyy')}</h3>}
+                data={tableData}
+                columns={columns}
+                options={options}
+              />
             </Box>
           </Grid>
+          
         </Grid>
       </Container>
     </>
