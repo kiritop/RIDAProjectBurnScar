@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchProvinceByCountry, fetchBurntDataTable, fetchBurntChart, fetchBubbleBurntMap } from '../reducers/dashboardSlice';
 import { format } from 'date-fns';
 import LineChart from '../components/LineChart';
+import DrilldownChart from '../components/DrilldownChart'
 import CONFIG from '../config';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -327,7 +328,8 @@ function BurntScarDashboard() {
           <Grid item xs={12} md={7}>
             <Card sx={{ borderRadius: 3, overflow: "hidden" }} variant="outlined">
               <CardContent>
-                <LineChart/>              
+                {/* <LineChart/>               */}
+                  <DrilldownChart/>
               </CardContent>
             </Card>
           </Grid>

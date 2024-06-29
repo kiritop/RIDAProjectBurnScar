@@ -193,7 +193,6 @@ server.get('/rida-api/api/burnt-bubble-chart', async (req, res) => {
     query = `
       SELECT 
           b.ISO3,
-          b.PV_EN,
           ROUND(SUM(b.AREA), 3) AS TOTAL_AREA,
           l.LATITUDE,
           l.LONGITUDE
@@ -202,12 +201,12 @@ server.get('/rida-api/api/burnt-bubble-chart', async (req, res) => {
       JOIN 
           LOCATION_INFO l
       ON 
-          b.PV_EN = l.PV_EN AND b.ISO3 = l.ISO3
+          b.ISO3 = l.ISO3
       WHERE 
           b.FIRE_DATE BETWEEN ? AND ?
-          AND l.LOCATION_LEVEL = 'Major'
+          AND l.LOCATION_LEVEL = 'Admin'
       GROUP BY 
-          b.ISO3, b.PV_EN, l.LATITUDE, l.LONGITUDE;
+          b.ISO3, l.LATITUDE, l.LONGITUDE;
     `;
   } else if (country !== 'ALL' && province === 'ALL') {
     query = `
