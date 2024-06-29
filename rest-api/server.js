@@ -6,6 +6,7 @@ const mysql = require("mysql2/promise");
 const crypto = require("crypto");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
+const topojson = require('topojson-server');
 
 const port = process.env.PORT || 4000;
 
@@ -569,41 +570,70 @@ server.get("/rida-api/api/get-max-freq", async (req, res) => {
 server.get('/rida-api/api/get-burnt-from-date', async (req, res) => {
   const { startDate, endDate, country, province } = req.query;
 
-  let sql = `SELECT BURNT_SCAR_ID, AP_EN, PV_EN, FIRE_DATE, AREA, COUNTRY, LATITUDE, LONGITUDE, REPLACE(REPLACE(GEOMETRY_DATA, '(', '['), ')', ']') AS GEOMETRY_DATA, GEOMETRY_TYPE FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ?`;
+  let sql = `
+    SELECT 
+      BURNT_SCAR_ID, AP_EN, PV_EN, FIRE_DATE, AREA, COUNTRY, LATITUDE, LONGITUDE, 
+      CONCAT('[', REPLACE(REPLACE(GEOMETRY_DATA, '(', '['), ')', ']'), ']') AS GEOMETRY_DATA, GEOMETRY_TYPE 
+    FROM 
+      BURNT_SCAR_INFO 
+    WHERE 
+      FIRE_DATE BETWEEN ? AND ?
+  `;
 
-  if (country && country!='All') {
+  if (country && country !== 'All') {
     sql += ` AND ISO3 = ?`;
   }
-  if (province && province!='All') {
+  if (province && province !== 'All') {
     sql += ` AND PV_EN = ?`;
   }
 
   const queryParams = [startDate, endDate];
-  if (country && country != 'ALL') queryParams.push(country);
-  if (province && province != 'ALL') queryParams.push(province);
+  if (country && country !== 'All') queryParams.push(country);
+  if (province && province !== 'All') queryParams.push(province);
 
   try {
     const results = await executeQuery(sql, queryParams);
 
     let geojson = {
       type: "FeatureCollection",
-      features: results.map(item => ({
-        type: "Feature",
-        properties: {
-          BURNT_SCAR_ID: item.BURNT_SCAR_ID,
-          AP_EN: item.AP_EN,
-          PV_EN: item.PV_EN,
-          COUNTRY: item.COUNTRY,
-          AREA: item.AREA,
-          FIRE_DATE: item.FIRE_DATE,
-          LATITUDE: item.LATITUDE,
-          LONGITUDE: item.LONGITUDE,
-        },
-        geometry: {
-          type: item.GEOMETRY_TYPE,
-          coordinates: JSON.parse(item.GEOMETRY_DATA)
+      features: results.map(item => {
+        let coordinates;
+        try {
+          // Validate and parse coordinates
+          coordinates = JSON.parse(item.GEOMETRY_DATA);
+
+          // Ensure coordinates are in the correct format for GeoJSON
+          if (item.GEOMETRY_TYPE === 'Polygon') {
+            // Example: Check if coordinates is an array of linear rings
+            if (!Array.isArray(coordinates) || !Array.isArray(coordinates[0])) {
+              throw new Error('Invalid Polygon coordinates format');
+            }
+          }
+
+          // Add other geometry type validations if needed
+        } catch (error) {
+          console.error('Invalid geometry data:', item.GEOMETRY_DATA, 'Error:', error);
+          coordinates = [];
         }
-      }))
+
+        return {
+          type: "Feature",
+          properties: {
+            BURNT_SCAR_ID: item.BURNT_SCAR_ID,
+            AP_EN: item.AP_EN,
+            PV_EN: item.PV_EN,
+            COUNTRY: item.COUNTRY,
+            AREA: item.AREA,
+            FIRE_DATE: item.FIRE_DATE,
+            LATITUDE: item.LATITUDE,
+            LONGITUDE: item.LONGITUDE,
+          },
+          geometry: {
+            type: item.GEOMETRY_TYPE,
+            coordinates: coordinates
+          }
+        };
+      })
     };
 
     res.json(geojson);
@@ -1188,6 +1218,59 @@ server.put("/rida-api/api/edit-user", async (req, res) => {
   } catch (error) {
     console.error('Error executing query:', error);
     res.status(500).send("Server error");
+  }
+});
+
+server.get('/rida-api/api/get-burnt-from-date-topo', async (req, res) => {
+  const { startDate, endDate, country, province } = req.query;
+  let sql = `SELECT BURNT_SCAR_ID, AP_EN, PV_EN, FIRE_DATE, AREA, COUNTRY, LATITUDE, LONGITUDE, REPLACE(REPLACE(GEOMETRY_DATA, '(', '['), ')', ']') AS GEOMETRY_DATA, GEOMETRY_TYPE FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ?`;
+
+  if (country && country !== 'All') {
+    sql += ` AND ISO3 = ?`;
+  }
+  if (province && province !== 'All') {
+    sql += ` AND PV_EN = ?`;
+  }
+
+  const queryParams = [startDate, endDate];
+  if (country && country !== 'All') queryParams.push(country);
+  if (province && province !== 'All') queryParams.push(province);
+
+  try {
+    const results = await executeQuery(sql, queryParams);
+
+    // Convert SQL results to GeoJSON features
+    const features = results.map(item => ({
+      type: "Feature",
+      properties: {
+        BURNT_SCAR_ID: item.BURNT_SCAR_ID,
+        AP_EN: item.AP_EN,
+        PV_EN: item.PV_EN,
+        COUNTRY: item.COUNTRY,
+        AREA: item.AREA,
+        FIRE_DATE: item.FIRE_DATE,
+        LATITUDE: item.LATITUDE,
+        LONGITUDE: item.LONGITUDE,
+      },
+      geometry: {
+        type: item.GEOMETRY_TYPE,
+        coordinates: JSON.parse(item.GEOMETRY_DATA)
+      }
+    }));
+
+    // Create a GeoJSON feature collection
+    const geojson = {
+      type: "FeatureCollection",
+      features: features
+    };
+
+    // Create a TopoJSON topology
+    const topology = topojson.topology({ collection: geojson });
+
+    res.json(topology);
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send('Internal server error');
   }
 });
 
