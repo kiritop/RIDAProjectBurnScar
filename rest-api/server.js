@@ -4,6 +4,8 @@ const morgan = require("morgan");
 const cors = require("cors");
 const mysql = require("mysql2/promise");
 const crypto = require("crypto");
+const bcrypt = require("bcrypt");
+const nodemailer = require("nodemailer");
 
 const port = process.env.PORT || 4000;
 
