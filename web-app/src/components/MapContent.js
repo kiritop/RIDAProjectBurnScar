@@ -1,4 +1,5 @@
 import React from 'react';
+import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import BaseMap from "./layers/BaseMap";
 import MapLocation from "./MapLocation";
@@ -18,6 +19,7 @@ const MapContent = () => {
       center={[19.9094, 99.8275]}
       zoom={8}
       preferCanvas={true}
+      renderer={L.canvas()}
     >
       <ChangeView />
       <BaseMap />

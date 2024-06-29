@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import {GeoJSON} from "react-leaflet";
+import React, { useEffect } from "react";
+import { GeoJSON, useMapEvents } from "react-leaflet";
 import L from "leaflet"; // import Leaflet library
 import './custom.css';
 import { useDispatch, useSelector } from 'react-redux';
@@ -18,57 +18,56 @@ const colorIntensityArray = [
   { fillOpacity: 1.0, color: '#FF0000' }
 ];
 
-
 const MapBurnScar = () => {
   const dispatch = useDispatch();
   const burntScarData = useSelector(state => state.burnScar.data);
   const max_freq = useSelector(state => state.burnScar.max);
-  // const loading = useSelector(state => state.burnScar.loading); 
   const sidebarForm = useSelector(state => state.ui.sidebarForm);
 
   useEffect(() => {
     dispatch(setLoadingMap(true));
-    dispatch(getMax(sidebarForm))
-    .finally(() => {
-      // dispatch(fetchBurntScarPolygon(sidebarForm))
-      // .finally(() => {
-        dispatch(setLoadingMap(false));
-      // });
-    });
+    // dispatch(getMax(sidebarForm)).finally(() => {
+    //   dispatch(fetchBurntScarPolygon(sidebarForm)).finally(() => {
+    //     // Remove this call here, as it will be handled after rendering
+    //     // dispatch(setLoadingMap(false));
+    //   });
+    // });
   }, [dispatch, sidebarForm]);
 
-  
+  useMapEvents({
+    layeradd: () => {
+      dispatch(setLoadingMap(false));
+    }
+  });
 
-const percentToColor = (percent) => {
-  const value = percent / 100;
-  const red = Math.round(255);
-  const green = Math.round(255 * (1 - value));
-  const blue = 0;
-  
-  console.log("green", green)
-  // Convert RGB to HEX
-  const rgbToHex = (r, g, b) => '#' + [r, g, b].map(x => {
-    const hex = x.toString(16);
-    return hex.length === 1 ? '0' + hex : hex;
-  }).join('');
+  const percentToColor = (percent) => {
+    const value = percent / 100;
+    const red = Math.round(255);
+    const green = Math.round(255 * (1 - value));
+    const blue = 0;
 
-  return rgbToHex(red, green, blue); // Only green component changes
-};
+    // Convert RGB to HEX
+    const rgbToHex = (r, g, b) => '#' + [r, g, b].map(x => {
+      const hex = x.toString(16);
+      return hex.length === 1 ? '0' + hex : hex;
+    }).join('');
 
-
-// 
-
-const style = (feature, index) => { // Include index as a parameter
-  return {
-    color: 'red', // Set color based on overlap percentage
-    weight: 0, // No border
-    fillOpacity: max_freq == 1? 0.5 :1/max_freq // Semi-transparent fill
+    return rgbToHex(red, green, blue); // Only green component changes
   };
-};
 
+  const style = (feature, index) => {
+    // Calculate fillOpacity based on some property of feature
+    const fillOpacity = max_freq === 1 ? 0.5 : 1 / max_freq;
+    const color = colorIntensityArray[index % colorIntensityArray.length].color; // Use the colorIntensityArray
+
+    return {
+      color: color,
+      weight: 0,
+      fillOpacity: fillOpacity
+    };
+  };
 
   const onEachFeature = (feature, layer) => {
-
     // Function to format date to MM DD YYYY
     const formatDate = (dateString) => {
       const date = new Date(dateString);
@@ -91,33 +90,25 @@ const style = (feature, index) => { // Include index as a parameter
         <tr><td><strong>Area M :</strong></td><td style="text-align:right">${formattedArea}</td></tr>
       </table>
     </div>`;
-    
-    layer.bindPopup(popupContent, { className: 'custom-popup' }); // add a custom class name
-  };
 
+    layer.bindPopup(popupContent, { className: 'custom-popup' });
+  };
 
   return (
     <>
-     {
-          // Iterate the borderData with .map():
-          burntScarData.map((data, index) => {
-            // Convert the coordinates to a format that can be used by Leaflet
-            // Convert the coordinates to a format that can be used by Leaflet
-            const coordinates = data.geometry.coordinates.map(coordinate => [coordinate[1], coordinate[0]]);
-
+      {
+        burntScarData.map((data, index) => {
           return (
-            // Pass data to layer via props:
             <GeoJSON
               key={index}
-              data={{ ...data, geometry: { ...data.geometry, coordinates: [coordinates] } }}
-              style={style} // ใช้ฟังก์ชัน style ที่กำหนดไว้
-              coordsToLatLng={coords => new L.LatLng(coords[0], coords[1])}
+              data={data}
+              style={(feature) => style(feature, index)} // Pass index to style function
+              coordsToLatLng={coords => new L.LatLng(coords[1], coords[0])}
               onEachFeature={onEachFeature}
             />
-            )
-          })
+          )
+        })
       }
-      
     </>
   );
 };

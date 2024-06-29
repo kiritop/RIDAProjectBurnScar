@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchProvinceByCountry, fetchBurntDataTable, fetchBurntChart, fetchBubbleBurntMap } from '../reducers/dashboardSlice';
 import { format } from 'date-fns';
 import LineChart from '../components/LineChart';
-import DrilldownChart from '../components/DrilldownChart'
+import DrilldownChart from '../components/DrilldownChart';
 import CONFIG from '../config';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -29,6 +29,7 @@ function BurntScarDashboard() {
   const [provinceText, setProvinceText] = useState("All");
   const [startDate, setStartDate] = useState(dayjs(new Date().setFullYear(new Date().getFullYear() - 1)).format('YYYY-MM-DD'));
   const [endDate, setEndDate] = useState(dayjs(new Date()).format('YYYY-MM-DD'));
+  const [loadingMap, setLoadingMap] = useState(true);
 
   const handleStartDateChange = (date) => {
     setStartDate(date.format('YYYY-MM-DD'));
@@ -50,12 +51,12 @@ function BurntScarDashboard() {
       endDate: endDate
     }
     if (country) {
-      dispatch(fetchProvinceByCountry({country: country, module:'burnscar'}));
+      dispatch(fetchProvinceByCountry({ country: country, module: 'burnscar' }));
     }
     dispatch(fetchBurntChart(obj));
     dispatch(fetchBurntDataTable(obj));
     dispatch(fetchBubbleBurntMap(obj));
-    
+    setLoadingMap(true); // Set loading to true when fetching data
   }, [dispatch, country, province, startDate, endDate]);
 
   useEffect(() => {
@@ -64,21 +65,22 @@ function BurntScarDashboard() {
         ...item,
         SUM_AREA: Number(item.SUM_AREA)
       }));
-      
+
       const newTableData = [...dataWithNumericSumArea.map((item) => [item.NAME_LIST, item.SUM_AREA])];
       let dataShow = []
-      if(country == 'ALL' && province=='ALL'){
+      if (country == 'ALL' && province == 'ALL') {
         dataShow = [...dataWithNumericSumArea.map((item) => [item.ISO3, item.SUM_AREA])];
-      }else{
+      } else {
         dataShow = [...dataWithNumericSumArea.map((item) => [item.NAME_LIST, item.SUM_AREA])];
       }
-      const dataShowNewFormat = dataShow.map((item, index) => [index+1, ...item]);
-      const newTableDataNewFormat = newTableData.map((item, index) => [index+1, ...item]);
+      const dataShowNewFormat = dataShow.map((item, index) => [index + 1, ...item]);
+      const newTableDataNewFormat = newTableData.map((item, index) => [index + 1, ...item]);
       const totalRowsSum = dataWithNumericSumArea.reduce((sum, item) => sum + item.SUM_AREA, 0);
       const formattedSum = new Intl.NumberFormat('en-US').format(totalRowsSum);
       setTableData(newTableDataNewFormat);
       setTotalPoint(formattedSum);
-      setDataShow(dataShowNewFormat)
+      setDataShow(dataShowNewFormat);
+      setLoadingMap(false); // Set loading to false when data is fetched
     }
   }, [dataBurntTable]);
 
@@ -88,7 +90,7 @@ function BurntScarDashboard() {
       options: {
         customHeadRender: ({ index, ...column }) => {
           return (
-            <TableCell key={index} style={{  fontWeight: 600 }}>
+            <TableCell key={index} style={{ fontWeight: 600 }}>
               {column.name}
             </TableCell>
           );
@@ -100,7 +102,7 @@ function BurntScarDashboard() {
       options: {
         customHeadRender: ({ index, ...column }) => {
           return (
-            <TableCell key={index} style={{  fontWeight: 600 }}>
+            <TableCell key={index} style={{ fontWeight: 600 }}>
               {column.name}
             </TableCell>
           );
@@ -247,7 +249,7 @@ function BurntScarDashboard() {
                       </FormControl>
                     </Box>
                   </Grid>
-                  <Grid item xs={12} md={2}/>
+                  <Grid item xs={12} md={2} />
                   <Grid item xs={12} md={2}>
                     <Box my={1} sx={{ minWidth: 120, display: "flex", justifyContent: "flex-start" }} >
                       <FormControl sx={{ m: 1, width: 300, borderRadius: 2 }} size="small">
@@ -293,23 +295,23 @@ function BurntScarDashboard() {
             </Card>
           </Grid>
           <Grid item xs={12} md={5}>
-            <Card sx={{ borderRadius: 3, overflow: "hidden", height:'400px' }} variant="outlined">
+            <Card sx={{ borderRadius: 3, overflow: "hidden", height: '540px' }} variant="outlined">
               <CardContent>
                 <Typography variant="h4" component="div">
-                  {provinceText != 'ALL' ? provinceText : countryText} burnt scar
+                  Burnt Scar Summary
                 </Typography>
                 <Typography variant="subtitle1" color="text.secondary">
-                  {provinceText != 'ALL' ? provinceText +', '+ countryText : countryText}  burnt scar (  {format(new Date(startDate),'MMM dd yyyy')} - {format(new Date(endDate),'MMM dd yyyy')} )
+                  {provinceText != 'ALL' ? provinceText + ', ' + countryText : countryText} burnt scar ({format(new Date(startDate), 'MMM dd yyyy')} - {format(new Date(endDate), 'MMM dd yyyy')})
                 </Typography>
-                <Box height={50}/>
+                <Box height={50} />
                 <Typography variant="h3" component="div">
                   {totalPoint} sq m
                 </Typography>
-                <Box height={50}/>
+                <Box height={50} />
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between' }}>
                   {dataShow.slice(0, 4).map((data, index) => (
                     <Box key={index} sx={{ width: 'calc(25% - 8px)' }}>
-                      <Card sx={{ borderRadius: 3, overflow: "hidden", border:0, backgroundColor: '#F5F5F5' }} variant="outlined">
+                      <Card sx={{ borderRadius: 3, overflow: "hidden", border: 0, backgroundColor: '#F5F5F5' }} variant="outlined">
                         <CardContent>
                           <Typography variant="subtitle1">
                             {data[1]}
@@ -329,7 +331,7 @@ function BurntScarDashboard() {
             <Card sx={{ borderRadius: 3, overflow: "hidden" }} variant="outlined">
               <CardContent>
                 {/* <LineChart/>               */}
-                  <DrilldownChart/>
+                <DrilldownChart />
               </CardContent>
             </Card>
           </Grid>
@@ -369,16 +371,35 @@ function BurntScarDashboard() {
           <Grid item xs={12} md={12}>
             <Box sx={{ borderRadius: 3, overflow: "hidden", flex: 1 }}>
               <MUIDataTable
-                title={<h3>Burnt Scar Area Ranking {format(new Date(startDate),'MMM dd yyyy')} - {format(new Date(endDate),'MMM dd yyyy')}</h3>}
+                title={<h3>Burnt Scar Area Ranking {format(new Date(startDate), 'MMM dd yyyy')} - {format(new Date(endDate), 'MMM dd yyyy')}</h3>}
                 data={tableData}
                 columns={columns}
                 options={options}
               />
             </Box>
           </Grid>
-          
         </Grid>
       </Container>
+      {loadingMap && (
+        <Box
+          display="flex"
+          flexDirection="column"
+          justifyContent="center"
+          alignItems="center"
+          width="100%"
+          height="100%"
+          position="fixed"
+          top={0}
+          left={0}
+          zIndex={1050}
+          bgcolor="rgba(0, 0, 0, 0.5)"
+        >
+          <CircularProgress />
+          <Typography variant="h6" color="white">
+            Loading...
+          </Typography>
+        </Box>
+      )}
     </>
   );
 }

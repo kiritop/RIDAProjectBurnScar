@@ -1,5 +1,6 @@
 // src/reducers/burntScarSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import * as topojson from 'topojson-client';
 import CONFIG from '../config';
 
 export const fetchBurntScarData = createAsyncThunk('burntScar/fetchBurntScarData', async (filter) => {
@@ -9,10 +10,20 @@ export const fetchBurntScarData = createAsyncThunk('burntScar/fetchBurntScarData
 });
 
 export const fetchBurntScarPolygon = createAsyncThunk('burntScar/fetchBurntScarPolygon', async (filter) => {
-  const response = await fetch(`${CONFIG.API_URL}/get-burnt-from-date?startDate=${filter.startDate}&endDate=${filter.endDate}${filter.country==='ALL'?'': '&country='+filter.country}${(filter.province==="ALL")?'': '&province='+filter.province}`);
+  const response = await fetch(`${CONFIG.API_URL}/get-burnt-from-date?startDate=${filter.startDate}&endDate=${filter.endDate}${filter.country === 'ALL' ? '' : '&country=' + filter.country}${(filter.province === "All") ? '' : '&province=' + filter.province}`);
   const data = await response.json();
   return data;
 });
+
+// export const fetchBurntScarPolygon = createAsyncThunk('burntScar/fetchBurntScarPolygon', async (filter) => {
+//   const response = await fetch(`${CONFIG.API_URL}/get-burnt-from-date-topo?startDate=${filter.startDate}&endDate=${filter.endDate}${filter.country === 'ALL' ? '' : '&country=' + filter.country}${(filter.province === "All") ? '' : '&province=' + filter.province}`);
+//   const data = await response.json();
+
+//   // Convert TopoJSON to GeoJSON
+//   const geojson = topojson.feature(data, data.objects.collection); // Adjust the object name based on your topology structure
+
+//   return geojson;
+// });
 
 export const getMax = createAsyncThunk('burntScar/getMax', async (filter) => {
   const response = await fetch(`${CONFIG.API_URL}/get-max-freq?startDate=${filter.startDate}&endDate=${filter.endDate}${filter.country==='All'?'': '&country='+filter.iso3}${(filter.city==="All")?'': '&province='+filter.city}`);
