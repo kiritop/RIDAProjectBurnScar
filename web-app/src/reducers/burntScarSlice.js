@@ -9,7 +9,7 @@ export const fetchBurntScarData = createAsyncThunk('burntScar/fetchBurntScarData
 });
 
 export const fetchBurntScarPolygon = createAsyncThunk('burntScar/fetchBurntScarPolygon', async (filter) => {
-  const response = await fetch(`${CONFIG.API_URL}/get-burnt-from-date?startDate=${filter.startDate}&endDate=${filter.endDate}${filter.country==='All'?'': '&country='+filter.iso3}${(filter.city==="All")?'': '&province='+filter.city}`);
+  const response = await fetch(`${CONFIG.API_URL}/get-burnt-from-date?startDate=${filter.startDate}&endDate=${filter.endDate}${filter.country==='ALL'?'': '&country='+filter.country}${(filter.province==="ALL")?'': '&province='+filter.province}`);
   const data = await response.json();
   return data;
 });

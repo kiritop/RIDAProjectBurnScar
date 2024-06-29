@@ -518,13 +518,18 @@ server.get("/rida-api/api/overview-chart", async (req, res) => {
 
 server.get("/rida-api/api/get-province", async (req, res) => {
   const { country, module } = req.query;
-  let table = 'BURNT_SCAR_INFO';
+  let table = 'BURNT_SCAR_INFO b';
   if(module === "aqi"){
-    table = 'AIR_QUALITY';
+    table = 'AIR_QUALITY b';
   }else if(module === "hotspot"){
-    table = 'HOT_SPOT';
+    table = 'HOT_SPOT b';
   }
-  let sql = `SELECT DISTINCT PV_EN FROM ${table} WHERE ISO3 = ? ORDER BY PV_EN`;
+
+  let sql = `SELECT DISTINCT 
+  b.ISO3 AS ISO3, b.PV_EN AS PV_EN, l.LATITUDE AS LATITUDE, l.LONGITUDE AS LONGITUDE 
+  FROM ${table} INNER JOIN LOCATION_INFO l ON b.PV_EN = l.PV_EN AND b.ISO3 = l.ISO3
+  WHERE b.ISO3 = ? AND l.LOCATION_LEVEL = 'Major' 
+  ORDER BY b.PV_EN`;
 
   try {
     const results = await executeQuery(sql, [country]);

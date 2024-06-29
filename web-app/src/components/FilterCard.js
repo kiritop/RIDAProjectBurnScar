@@ -99,35 +99,28 @@ function FilterCard() {
   const handleSave = () => {
     const sidebarForm = {
       country: country,
-      city: city,
+      province: province,
       date: date,
       startDate: startDate,
       endDate: endDate
     };
 
+    console.log('sidebarForm', sidebarForm)
+
     let current_lat, current_lng;
 
-    if (city === 'All' || country === 'All') {
+    if (province === 'ALL' || country === 'ALL') {
       current_lat = '19.9094';
       current_lng = '99.8275';
     } else {
-      const filteredCity = cities.find(item => item.city === city);
-      current_lat = filteredCity ? filteredCity.lat : '19.9094';
-      current_lng = filteredCity ? filteredCity.lng : '99.8275';
+      const filteredPV = dataProvince.find(item => item.PV_EN === province);
+      current_lat = filteredPV ? filteredPV.LATITUDE : '19.9094';
+      current_lng = filteredPV ? filteredPV.LONGITUDE : '99.8275';
     }
-
     dispatch(saveLayerSettings({ sidebarForm, burntScar, aqi, hotSpot, burntScarPoint, current_lat, current_lng }));
-
     if (burntScar) {
       dispatch(setLoadingMap(true));
       dispatch(fetchBurntScarPolygon(sidebarForm))
-        .finally(() => {
-          dispatch(setLoadingMap(false));
-        });
-    }
-    if (burntScarPoint) {
-      dispatch(setLoadingMap(true));
-      dispatch(fetchBurntScarData(sidebarForm))
         .finally(() => {
           dispatch(setLoadingMap(false));
         });
