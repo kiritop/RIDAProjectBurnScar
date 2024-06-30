@@ -32,6 +32,7 @@ function AirQualityDashboard() {
 
   const [startDate, setStartDate] = useState(dayjs(new Date().setFullYear(new Date().getFullYear() - 1)).format('YYYY-MM-DD'));
   const [endDate, setEndDate] = useState(dayjs(new Date()).format('YYYY-MM-DD'));
+  const [loadingMap, setLoadingMap] = useState(true);
 
 
   const handleStartDateChange = (date) => {
@@ -55,13 +56,23 @@ function AirQualityDashboard() {
       startDate: startDate,
       endDate: endDate
     }
+  
     if (country) {
-      dispatch(fetchProvinceByCountry({country: country, module:'aqi'}));
+      dispatch(fetchProvinceByCountry({ country: country, module: 'aqi' }));
     }
-    dispatch(fetchAqiChart(obj));
-    dispatch(fetchAqiDataTable(obj));
-    
+  
+    setLoadingMap(true);
+  
+    dispatch(fetchAqiChart(obj))
+      .finally(() => {
+        dispatch(fetchAqiDataTable(obj))
+          .finally(() => {
+            setLoadingMap(false);
+          });
+      });
   }, [dispatch, country, province, startDate, endDate]);
+  
+  
 
   // Update chart data when dataHotspotC changes
   useEffect(() => {
@@ -339,7 +350,18 @@ function AirQualityDashboard() {
           <Grid item xs={12} md={7}>
             <Card sx={{ borderRadius: 3, overflow: "hidden" }} variant="outlined">
               <CardContent>
-                <LineChartAqi/>              
+                {/* <LineChartAqi/>               */}
+              </CardContent>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12}>
+            <Card sx={{ borderRadius: 3, overflow: "hidden" }} variant="outlined">
+              <CardContent>
+                <Typography variant="h5" component="div" gutterBottom>
+                  Aqi By Time
+                </Typography>
+                <LineChartAqi/>      
               </CardContent>
             </Card>
           </Grid>
@@ -356,6 +378,26 @@ function AirQualityDashboard() {
           </Grid>
         </Grid>
       </Container>
+      {loadingMap && (
+        <Box
+          display="flex"
+          flexDirection="column"
+          justifyContent="center"
+          alignItems="center"
+          width="100%"
+          height="100%"
+          position="fixed"
+          top={0}
+          left={0}
+          zIndex={1050}
+          bgcolor="rgba(0, 0, 0, 0.5)"
+        >
+          <CircularProgress />
+          <Typography variant="h6" color="white">
+            Loading...
+          </Typography>
+        </Box>
+      )}
     </>
   );
 }

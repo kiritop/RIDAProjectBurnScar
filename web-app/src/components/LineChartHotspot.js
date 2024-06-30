@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import ReactApexChart from 'react-apexcharts';
 import { useSelector } from "react-redux";
+import './LineChartHotspot.css'; // Import CSS file
 
 const LineChartHotspot = () => {
-
   const dataFromRedux = useSelector((state) => state.dashboard.dataHotspotChart ?? []);
   const [seriesData, setSeriesData] = useState([]);
 
@@ -11,13 +11,12 @@ const LineChartHotspot = () => {
     const processData = () => {
       const groupedData = dataFromRedux.reduce((acc, data) => {
         const { COUNTRY, HOT_SPOT_YEAR, PV_EN, AP_EN } = data.yearly;
-        let countryData
-        if(data.yearly.PV_EN){
-          console.log('1')
+        let countryData;
+        if (data.yearly.PV_EN) {
           countryData = acc[PV_EN] || [];
-        }else if(data.yearly.AP_EN){
+        } else if (data.yearly.AP_EN) {
           countryData = acc[AP_EN] || [];
-        }else{
+        } else {
           countryData = acc[COUNTRY] || [];
         }
 
@@ -48,22 +47,20 @@ const LineChartHotspot = () => {
           }
         });
 
-        if(data.yearly.PV_EN){
+        if (data.yearly.PV_EN) {
           acc[PV_EN] = countryData;
-        }else if(data.yearly.AP_EN){
+        } else if (data.yearly.AP_EN) {
           acc[AP_EN] = countryData;
-        }else{
+        } else {
           acc[COUNTRY] = countryData;
         }
         return acc;
       }, {});
 
-      
       const series = Object.keys(groupedData).map(country => ({
         name: country,
         data: groupedData[country].sort((a, b) => a.x - b.x) // Sort by date
       }));
-
 
       setSeriesData(series);
     };
@@ -77,13 +74,22 @@ const LineChartHotspot = () => {
       height: 350,
       zoom: {
         enabled: false
-      }
+      },
+      toolbar: {
+        show: false
+      },
     },
+    colors: [
+      '#008FFB', '#00E396', '#FEB019', '#FF4560', '#775DD0', '#3F51B5', '#546E7A', '#D4526E', '#8D5B4C', '#F86624',
+      '#D7263D', '#1B998B', '#2E294E', '#F46036', '#2D87B0', '#662E9B', '#F46036', '#8D5B4C', '#FF4560', '#00E396'
+    ], // Add default colors
     dataLabels: {
       enabled: false
     },
     stroke: {
-      curve: 'straight'
+      curve: 'straight',
+      width: 2,
+      opacity: 0.7 // Increase transparency of the lines
     },
     xaxis: {
       type: 'datetime',
@@ -107,16 +113,26 @@ const LineChartHotspot = () => {
       }
     },
     legend: {
-      position: 'top',
-      horizontalAlign: 'right',
-      floating: true
-    }
+      show: false, // Hide the default legend
+    },
+    markers: {
+      size: 0,
+    },
   };
-  
- 
+
+  const customLegend = seriesData.map((series, index) => (
+    <div key={index} className="legend-item">
+      <span className="legend-marker" style={{ backgroundColor: options.colors[index % options.colors.length] }}></span>
+      {series.name}
+    </div>
+  ));
+
   return (
     <div>
       <ReactApexChart options={options} series={seriesData} type="line" height={350} />
+      <div className="custom-legend">
+        {customLegend}
+      </div>
     </div>
   );
 };

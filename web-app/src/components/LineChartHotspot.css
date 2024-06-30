@@ -1,0 +1,21 @@
+.custom-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 10px;
+  }
+  
+  .legend-item {
+    display: flex;
+    align-items: center;
+    margin-right: 15px;
+    margin-bottom: 5px;
+  }
+  
+  .legend-marker {
+    width: 10px;
+    height: 10px;
+    margin-right: 5px;
+    display: inline-block;
+  }
+  
