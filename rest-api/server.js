@@ -6,8 +6,6 @@ const mysql = require("mysql2/promise");
 const crypto = require("crypto");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
-const topojson = require('topojson-server');
-const turf = require('@turf/turf');
 const port = process.env.PORT || 4000;
 
 // Create connection pool to MySQL
@@ -653,7 +651,14 @@ server.get('/rida-api/api/get-burnt-scar-polygon', async (req, res) => {
       return;
     }
 
-    sql = `SELECT BURNT_SCAR_ID, AP_EN, PV_EN, FIRE_DATE, AREA, COUNTRY, LATITUDE, LONGITUDE, REPLACE(REPLACE(GEOMETRY_DATA, '(', '['), ')', ']') AS GEOMETRY_DATA, GEOMETRY_TYPE FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ?`;
+    sql = ` SELECT 
+          BURNT_SCAR_ID, AP_EN, PV_EN, FIRE_DATE, AREA, COUNTRY, LATITUDE, LONGITUDE, 
+          CONCAT('[', REPLACE(REPLACE(GEOMETRY_DATA, '(', '['), ')', ']'), ']') AS GEOMETRY_DATA, GEOMETRY_TYPE 
+        FROM 
+          BURNT_SCAR_INFO 
+        WHERE 
+          FIRE_DATE BETWEEN ? AND ?
+      `;
     if (country && country!='All') {
       sql += ` AND ISO3 = ?`;
     }
@@ -1121,12 +1126,12 @@ const transporter = nodemailer.createTransport({
 
 // Register new user
 server.post("/rida-api/api/register", async (req, res) => {
-  const { username, name, email, password } = req.body;
+  const { username, name, surname, email, password } = req.body;
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
-    const sql = "INSERT INTO users (username, name, surname, email, password) VALUES (?, ?, ?, ?)";
-    await executeQuery(sql, [username, name, email, hashedPassword]);
+    const sql = "INSERT INTO users (username, name, surname, email, password) VALUES (?, ?, ?, ?, ?)";
+    await executeQuery(sql, [username, name, surname, email, hashedPassword]);
     res.send("User registered successfully");
   } catch (error) {
     console.error('Error executing query:', error);
@@ -1145,16 +1150,24 @@ server.post("/rida-api/api/login", async (req, res) => {
       const user = results[0];
       const match = await bcrypt.compare(password, user.password);
       if (match) {
-        res.send("Logged in successfully");
+        res.json({
+          message: "Logged in successfully",
+          user: {
+            id: user.id,
+            name: user.name,
+            surname: user.surname,
+            email: user.email,
+          },
+        });
       } else {
-        res.status(400).send("Invalid email or password");
+        res.status(400).json({ message: "Invalid email or password" });
       }
     } else {
-      res.status(400).send("Invalid email or password");
+      res.status(400).json({ message: "Invalid email or password" });
     }
   } catch (error) {
     console.error('Error executing query:', error);
-    res.status(500).send("Server error");
+    res.status(500).json({ message: "Server error" });
   }
 });
 
@@ -1217,189 +1230,6 @@ server.put("/rida-api/api/edit-user", async (req, res) => {
   } catch (error) {
     console.error('Error executing query:', error);
     res.status(500).send("Server error");
-  }
-});
-
-server.get('/rida-api/api/get-burnt-from-date-topo', async (req, res) => {
-  const { startDate, endDate, country, province } = req.query;
-  let sql = `SELECT BURNT_SCAR_ID, AP_EN, PV_EN, FIRE_DATE, AREA, COUNTRY, LATITUDE, LONGITUDE, REPLACE(REPLACE(GEOMETRY_DATA, '(', '['), ')', ']') AS GEOMETRY_DATA, GEOMETRY_TYPE FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ?`;
-
-  if (country && country !== 'All') {
-    sql += ` AND ISO3 = ?`;
-  }
-  if (province && province !== 'All') {
-    sql += ` AND PV_EN = ?`;
-  }
-
-  const queryParams = [startDate, endDate];
-  if (country && country !== 'All') queryParams.push(country);
-  if (province && province !== 'All') queryParams.push(province);
-
-  try {
-    const results = await executeQuery(sql, queryParams);
-
-    // Convert SQL results to GeoJSON features
-    const features = results.map(item => ({
-      type: "Feature",
-      properties: {
-        BURNT_SCAR_ID: item.BURNT_SCAR_ID,
-        AP_EN: item.AP_EN,
-        PV_EN: item.PV_EN,
-        COUNTRY: item.COUNTRY,
-        AREA: item.AREA,
-        FIRE_DATE: item.FIRE_DATE,
-        LATITUDE: item.LATITUDE,
-        LONGITUDE: item.LONGITUDE,
-      },
-      geometry: {
-        type: item.GEOMETRY_TYPE,
-        coordinates: JSON.parse(item.GEOMETRY_DATA)
-      }
-    }));
-
-    // Create a GeoJSON feature collection
-    const geojson = {
-      type: "FeatureCollection",
-      features: features
-    };
-
-    // Create a TopoJSON topology
-    const topology = topojson.topology({ collection: geojson });
-
-    res.json(topology);
-  } catch (error) {
-    console.error('Error executing query:', error);
-    res.status(500).send('Internal server error');
-  }
-});
-
-
-server.get('/rida-api/api/update-frequency', async (req, res) => {
-  const { country, province } = req.query;
-
-  let sql = `
-    SELECT 
-      BURNT_SCAR_ID, AP_EN, PV_EN, FIRE_DATE, AREA, COUNTRY, LATITUDE, LONGITUDE, 
-      CONCAT('[', REPLACE(REPLACE(GEOMETRY_DATA, '(', '['), ')', ']'), ']') AS GEOMETRY_DATA, GEOMETRY_TYPE, FREQUENCY_DATE
-    FROM 
-      BURNT_SCAR_INFO_SECOUND 
-    WHERE 1=1
-  `;
-
-  if (country && country !== 'All') {
-    sql += ` AND ISO3 = ?`;
-  }
-  if (province && province !== 'All') {
-    sql += ` AND PV_EN = ?`;
-  }
-
-  const queryParams = [];
-  if (country && country !== 'All') queryParams.push(country);
-  if (province && province !== 'All') queryParams.push(province);
-
-  try {
-    const results = await executeQuery(sql, queryParams);
-
-    let geojson = {
-      type: "FeatureCollection",
-      features: results.map(item => {
-        let coordinates;
-        try {
-          // Validate and parse coordinates
-          coordinates = JSON.parse(item.GEOMETRY_DATA);
-
-          // Ensure coordinates are in the correct format for GeoJSON
-          if (item.GEOMETRY_TYPE === 'Polygon') {
-            // Example: Check if coordinates is an array of linear rings
-            if (!Array.isArray(coordinates) || !Array.isArray(coordinates[0])) {
-              throw new Error('Invalid Polygon coordinates format');
-            }
-          }
-
-          // Add other geometry type validations if needed
-        } catch (error) {
-          console.error('Invalid geometry data:', item.GEOMETRY_DATA, 'Error:', error);
-          coordinates = [];
-        }
-
-        return {
-          type: "Feature",
-          properties: {
-            BURNT_SCAR_ID: item.BURNT_SCAR_ID,
-            AP_EN: item.AP_EN,
-            PV_EN: item.PV_EN,
-            COUNTRY: item.COUNTRY,
-            AREA: item.AREA,
-            FIRE_DATE: item.FIRE_DATE,
-            LATITUDE: item.LATITUDE,
-            LONGITUDE: item.LONGITUDE,
-            FREQUENCY_DATE: item.FREQUENCY_DATE ? JSON.parse(item.FREQUENCY_DATE) : []
-          },
-          geometry: {
-            type: item.GEOMETRY_TYPE,
-            coordinates: coordinates
-          }
-        };
-      })
-    };
-
-    // Check for intersections and update frequency_date
-    const features = geojson.features;
-    for (let i = 0; i < features.length; i++) {
-      const feature1 = features[i];
-      const poly1 = turf.polygon(feature1.geometry.coordinates);
-      for (let j = i + 1; j < features.length; j++) {
-        const feature2 = features[j];
-        const poly2 = turf.polygon(feature2.geometry.coordinates);
-
-        if (turf.intersect(poly1, poly2)) {
-          // Found intersection
-          const date1 = feature1.properties.FIRE_DATE;
-          const date2 = feature2.properties.FIRE_DATE;
-
-          // Update frequency_date for both features
-          let updateFeature1 = false;
-          let updateFeature2 = false;
-
-          if (!feature1.properties.FREQUENCY_DATE.includes(date2)) {
-            feature1.properties.FREQUENCY_DATE.push(date2);
-            updateFeature1 = true;
-          } else {
-            console.log(`Duplicate date ${date2} found in feature ID ${feature1.properties.BURNT_SCAR_ID}`);
-          }
-          if (!feature2.properties.FREQUENCY_DATE.includes(date1)) {
-            feature2.properties.FREQUENCY_DATE.push(date1);
-            updateFeature2 = true;
-          } else {
-            console.log(`Duplicate date ${date1} found in feature ID ${feature2.properties.BURNT_SCAR_ID}`);
-          }
-
-          // Save updated frequency_date to the database only if there are new dates
-          if (updateFeature1) {
-            const updateSql1 = `
-              UPDATE BURNT_SCAR_INFO_SECOUND
-              SET FREQUENCY_DATE = ?
-              WHERE BURNT_SCAR_ID = ?
-            `;
-            await executeQuery(updateSql1, [JSON.stringify(feature1.properties.FREQUENCY_DATE), feature1.properties.BURNT_SCAR_ID]);
-          }
-
-          if (updateFeature2) {
-            const updateSql2 = `
-              UPDATE BURNT_SCAR_INFO_SECOUND
-              SET FREQUENCY_DATE = ?
-              WHERE BURNT_SCAR_ID = ?
-            `;
-            await executeQuery(updateSql2, [JSON.stringify(feature2.properties.FREQUENCY_DATE), feature2.properties.BURNT_SCAR_ID]);
-          }
-        }
-      }
-    }
-
-    res.send('successful');
-  } catch (error) {
-    console.error('Error executing query:', error);
-    res.status(500).send('Internal server error');
   }
 });
 

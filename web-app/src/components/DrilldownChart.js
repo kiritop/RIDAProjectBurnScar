@@ -56,7 +56,7 @@ const DrilldownChart = () => {
           labelAngle: -45
         },
         axisY: {
-          title: "Sum Area",
+          title: "Sum Area (sq m)",
           labelFormatter: function (e) {
             return CanvasJSReact.CanvasJS.formatNumber(e.value, "#,###");
           }
@@ -111,7 +111,7 @@ const DrilldownChart = () => {
         valueFormatString: "MMM YYYY"
       },
       axisY: {
-        title: "Sum Area",
+        title: "Sum Area (sq m)",
         labelFormatter: function (e) {
           return CanvasJSReact.CanvasJS.formatNumber(e.value, "#,###");
         }

@@ -1,6 +1,7 @@
 // src/reducers/index.js
 import { combineReducers } from "@reduxjs/toolkit";
 import aqiReducer from "./aqiSlice";
+import authReducer from "./authSlice";
 import burntScarReducer from "./burntScarSlice";
 import hotSpotReducer from "./hotSpotSlice";
 import uiReducer from "./uiSlice";
@@ -10,6 +11,7 @@ import dashboardSlice from "./dashboardSlice";
 
 const rootReducer = combineReducers({
   aqi: aqiReducer,
+  auth: authReducer,
   burnScar: burntScarReducer,
   hotSpot: hotSpotReducer,
   ui: uiReducer,

@@ -7,6 +7,7 @@ import AboutUS from "./pages/Aboutus";
 import API from "./pages/API";
 import "./App.css";
 import LoginPage from "./pages/loginpage";
+import SignUp from "./pages/SignUp";
 import Layout from "./components/layout";
 import HotSpotDashboard from "./pages/HotSpotDashboard";
 import AirQualityDashboard from "./pages/AirQualityDashboard";
@@ -25,6 +26,7 @@ function App() {
           <Route path="/api" element={<API />} />
           <Route path="/about_us" element={<AboutUS />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignUp />} />
         </Routes>
       </Layout>
     </div>

@@ -5,21 +5,16 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import AccountCircle from "@mui/icons-material/AccountCircle";
-import GoogleIcon from "@mui/icons-material/Google";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import { Button, Grid, useMediaQuery } from "@mui/material";
-import { GoogleLogin } from "@react-oauth/google";
-import { jwtDecode } from "jwt-decode"; // Import jwtDecode correctly as named import
-import axios from "axios";
-import CONFIG from "../config";
-import Logo from './m_burn_logo.png';
 import { useNavigate } from "react-router-dom";
 import MenuIcon from "@mui/icons-material/Menu";
 import Drawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
+import Logo from './m_burn_logo.png';
 
 const pages = [
   { name: "Map" },
@@ -34,7 +29,6 @@ const pages = [
 
 export default function Header() {
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const [anchorElSignIn, setAnchorElSignIn] = React.useState(null);
   const [anchorElSignOut, setAnchorElSignOut] = React.useState(null);
   const [userInfo, setUserInfo] = React.useState(
     JSON.parse(localStorage.getItem("myData")) || null
@@ -44,8 +38,8 @@ export default function Header() {
   const isMobile = useMediaQuery('(max-width:600px)');
 
   React.useEffect(() => {
-    localStorage.setItem("myData", JSON.stringify(userInfo));
-  }, [userInfo]);
+    setUserInfo(JSON.parse(localStorage.getItem("myData")));
+  }, []);
 
   const handleNavigation = (page) => {
     const url = getPageUrl(page);
@@ -91,19 +85,8 @@ export default function Header() {
     setDrawerOpen(open);
   };
 
-  const loginApi = async (name, email) => {
-    const payload = {
-      username: email,
-      name: name,
-      email: email,
-    };
-
-    try {
-      const response = await axios.post(CONFIG.API_URL + "/login", payload);
-      return response.data; // Return the response data
-    } catch (error) {
-      console.error(error); // Log the error message
-    }
+  const handleLogin = () => {
+    navigate('/login');
   };
 
   const drawerList = () => (
@@ -129,6 +112,12 @@ export default function Header() {
       </List>
     </Box>
   );
+
+  const handleLogout = () => {
+    setUserInfo(null);
+    localStorage.removeItem("myData");
+    navigate('/login');
+  };
 
   return (
     <AppBar position="static" sx={{ backgroundColor: "#0077b6", color: "#fff", height: 56, justifyContent: 'center' }}>
@@ -212,51 +201,16 @@ export default function Header() {
                 {drawerList()}
               </Drawer>
               {!userInfo ? (
-                <>
-                  <IconButton
-                    size="large"
-                    aria-label="account of current user"
-                    aria-controls="menu-appbar"
-                    aria-haspopup="true"
-                    onClick={handleOpen(setAnchorElSignIn)}
-                    color="inherit"
-                  >
-                    <GoogleIcon />
-                  </IconButton>
-                  <Menu
-                    id="menu-appbar"
-                    anchorEl={anchorElSignIn}
-                    anchorOrigin={{
-                      vertical: "top",
-                      horizontal: "right",
-                    }}
-                    keepMounted
-                    transformOrigin={{
-                      vertical: "top",
-                      horizontal: "right",
-                    }}
-                    open={Boolean(anchorElSignIn)}
-                    onClose={handleClose(setAnchorElSignIn)}
-                  >
-                    <MenuItem onClick={handleClose(setAnchorElSignIn)}>
-                      <GoogleLogin
-                        onSuccess={(credentialResponse) => {
-                          const decoded = jwtDecode(credentialResponse?.credential);
-                          const name = decoded.given_name;
-                          const email = decoded.email;
-                          setUserInfo(email);
-                          loginApi(name, email);
-                          handleClose(setAnchorElSignIn)();
-                        }}
-                        onError={() => {}}
-                      />
-                    </MenuItem>
-                  </Menu>
-                </>
+                <Button
+                  onClick={handleLogin}
+                  sx={{ my: 2, color: '#fff', display: 'block' }}
+                >
+                  Login
+                </Button>
               ) : (
                 <>
                   <Typography variant="body1" sx={{ color: "#fff", mr: 2 }}>
-                    {userInfo}
+                    {userInfo.name} {userInfo.surname}
                   </Typography>
                   <IconButton
                     size="large"
@@ -283,14 +237,7 @@ export default function Header() {
                     open={Boolean(anchorElSignOut)}
                     onClose={handleClose(setAnchorElSignOut)}
                   >
-                    <MenuItem
-                      onClick={() => {
-                        setUserInfo(null);
-                        handleClose(setAnchorElSignOut)();
-                      }}
-                    >
-                      Sign Out
-                    </MenuItem>
+                    <MenuItem onClick={handleLogout}>Sign Out</MenuItem>
                   </Menu>
                 </>
               )}
