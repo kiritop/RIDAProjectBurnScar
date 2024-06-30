@@ -7,7 +7,7 @@ import CONFIG from '../config';
 
 
 export const fetchAqi = createAsyncThunk('aqi/fetchAqi', async (filter) => {
-  const response = await fetch(`${CONFIG.API_URL}/get-air-quality-from-date?date=${filter.date}${filter.country==='All'?'': '&country='+filter.iso3}${(filter.city==="All")?'': '&province='+filter.city}`);
+  const response = await fetch(`${CONFIG.API_URL}/get-air-quality-from-date?date=${filter.date}${filter.country==='ALL'?'': '&country='+filter.country}${(filter.province==="ALL")?'': '&province='+filter.province}`);
   const data = await response.json();
   return data;
 });

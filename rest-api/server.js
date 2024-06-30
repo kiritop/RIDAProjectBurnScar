@@ -473,15 +473,14 @@ server.get("/rida-api/api/overview-table", async (req, res) => {
   if(country=='ALL'&&province =='ALL'){
     sql = `SELECT ROUND(SUM(AREA),2) as SUM_AREA, COUNTRY as NAME_LIST, ISO3 FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ? GROUP BY COUNTRY, ISO3 ORDER BY SUM_AREA DESC `;
   }else if (country!='ALL'&&province =='ALL'){
-    sql = `SELECT ROUND(SUM(AREA),2) as SUM_AREA, PV_EN as NAME_LIST, ISO3 FROM BURNT_SCAR_INFO WHERE ISO3 = ? AND FIRE_DATE BETWEEN ? AND ? GROUP BY PV_EN ORDER BY SUM_AREA DESC` ;
+    sql = `SELECT ROUND(SUM(AREA),2) as SUM_AREA, PV_EN as NAME_LIST, ISO3 FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ? AND ISO3 = ? GROUP BY PV_EN ORDER BY SUM_AREA DESC` ;
   }else if (country!='ALL'&&province !='ALL'){
-    sql = `SELECT ROUND(SUM(AREA),2) as SUM_AREA, AP_EN as NAME_LIST, ISO3 FROM BURNT_SCAR_INFO WHERE ISO3 = ? AND PV_EN=? AND FIRE_DATE BETWEEN ? AND ? GROUP BY AP_EN ORDER BY SUM_AREA DESC` ;
+    sql = `SELECT ROUND(SUM(AREA),2) as SUM_AREA, AP_EN as NAME_LIST, ISO3 FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ? AND ISO3 = ? AND PV_EN=? GROUP BY AP_EN ORDER BY SUM_AREA DESC` ;
   }
 
   const queryParams = [fromDate, toDate];
   if (country && country != 'ALL') queryParams.push(country);
   if (province && province != 'ALL') queryParams.push(province);
-
   try {
     const results = await executeQuery(sql, queryParams);
     res.send(results);

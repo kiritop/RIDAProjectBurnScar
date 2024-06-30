@@ -40,13 +40,25 @@ function FilterCard() {
 
   useEffect(() => {
     if (country) {
-      dispatch(setLoadingMap(true));
-      dispatch(fetchProvinceByCountry({country: country, module:'burnscar'}))
-      .finally(() => {
-        dispatch(setLoadingMap(false));
-      });
+      let module = 'burnscar'
+      if(burntScar){
+        module = 'burnscar'
+      }else if(aqi){
+        module = 'aqi'
+      }else if(hotSpot){
+        module = 'hotspot'
+      }
+      getProvince(module)
     }
   }, [country, dispatch]);
+
+  const getProvince = (module) => {
+    dispatch(setLoadingMap(true));
+    dispatch(fetchProvinceByCountry({country: country, module: module}))
+    .finally(() => {
+      dispatch(setLoadingMap(false));
+    });
+  }
 
   const handleStartDateChange = (date) => {
     setStartDate(date.format('YYYY-MM-DD'));
@@ -66,34 +78,33 @@ function FilterCard() {
   };
 
   const handleChange = (event) => {
+    let module = 'burnscar'
     switch (event.target.name) {
       case 'burntScar':
         setBurntScar(event.target.checked);
         setAqi(false);
         setHotSpot(false);
         setBurntScarPoint(false);
-        break;
-      case 'burntScarPoint':
-        setBurntScarPoint(event.target.checked);
-        setAqi(false);
-        setHotSpot(false);
-        setBurntScar(false);
+        module = 'burnscar'
         break;
       case 'aqi':
         setAqi(event.target.checked);
         setBurntScar(false);
         setHotSpot(false);
         setBurntScarPoint(false);
+        module = 'aqi'
         break;
       case 'hotSpot':
         setHotSpot(event.target.checked);
         setBurntScar(false);
         setAqi(false);
         setBurntScarPoint(false);
+        module = 'hotspot'
         break;
       default:
         break;
     }
+    getProvince(module)
   };
 
   const handleSave = () => {
