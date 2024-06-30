@@ -204,12 +204,12 @@ function BurntScarDashboard() {
   const center = [15, 105]; // Center of the map (Indochina Peninsula)
   const zoom = 5; // Zoom level
 
-  const burntAreas = dataBurntTable.map((item) => ({
-    position: [item.LAT, item.LON],
-    radius: item.SUM_AREA / 100000, // Adjust the radius for visibility
-    name: item.NAME_LIST,
-    area: item.SUM_AREA
-  }));
+  const getColor = (index) => {
+    const colors = [
+      '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF', '#800000', '#008000', '#000080', '#808000', '#800080', '#008080'
+    ];
+    return colors[index % colors.length];
+  };
 
   return (
     <>
@@ -363,6 +363,7 @@ function BurntScarDashboard() {
                       center={[area.LATITUDE, area.LONGITUDE]}
                       radius={20 * Math.log(area.TOTAL_AREA / 10000000)}
                       fillOpacity={0.5}
+                      fillColor={getColor(index)}
                       stroke={false}
                     >
                       <Popup>

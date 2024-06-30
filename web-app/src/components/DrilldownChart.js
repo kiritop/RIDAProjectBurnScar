@@ -50,9 +50,6 @@ const DrilldownChart = () => {
       setOptions({
         animationEnabled: true,
         theme: "light2",
-        title: {
-          text: "Yearly Burnt Area"
-        },
         axisX: {
           title: "Country",
           interval: 1,
@@ -108,9 +105,6 @@ const DrilldownChart = () => {
     const drilldownOptions = {
       animationEnabled: true,
       theme: "light2",
-      title: {
-        text: `Monthly Burnt Area in ${item.label}`
-      },
       axisX: {
         title: "Month",
         interval: 1,

@@ -78,24 +78,28 @@ function FilterCard() {
   };
 
   const handleChange = (event) => {
+    if (event.target.checked === false) {
+      return; // Prevent the switch from being turned off
+    }
+
     let module = 'burnscar'
     switch (event.target.name) {
       case 'burntScar':
-        setBurntScar(event.target.checked);
+        setBurntScar(true);
         setAqi(false);
         setHotSpot(false);
         setBurntScarPoint(false);
         module = 'burnscar'
         break;
       case 'aqi':
-        setAqi(event.target.checked);
+        setAqi(true);
         setBurntScar(false);
         setHotSpot(false);
         setBurntScarPoint(false);
         module = 'aqi'
         break;
       case 'hotSpot':
-        setHotSpot(event.target.checked);
+        setHotSpot(true);
         setBurntScar(false);
         setAqi(false);
         setBurntScarPoint(false);
@@ -104,6 +108,7 @@ function FilterCard() {
       default:
         break;
     }
+    setProvince('ALL')
     getProvince(module)
   };
 

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { GeoJSON, useMapEvents } from "react-leaflet";
+import { useMap } from "react-leaflet";
 import L from "leaflet"; // import Leaflet library
 import './custom.css';
 import { useDispatch, useSelector } from 'react-redux';
@@ -23,22 +23,28 @@ const MapBurnScar = () => {
   const burntScarData = useSelector(state => state.burnScar.data);
   const max_freq = useSelector(state => state.burnScar.max);
   const sidebarForm = useSelector(state => state.ui.sidebarForm);
+  const map = useMap();
 
   useEffect(() => {
     dispatch(setLoadingMap(true));
-    // dispatch(getMax(sidebarForm)).finally(() => {
-    //   dispatch(fetchBurntScarPolygon(sidebarForm)).finally(() => {
-    //     // Remove this call here, as it will be handled after rendering
-    //     // dispatch(setLoadingMap(false));
-    //   });
-    // });
-  }, [dispatch, sidebarForm]);
 
-  useMapEvents({
-    layeradd: () => {
-      dispatch(setLoadingMap(false));
-    }
-  });
+    let layersAdded = 0;
+
+    burntScarData.forEach((data, index) => {
+      const geoJsonLayer = L.geoJSON(data, {
+        style: feature => style(feature, index),
+        coordsToLatLng: coords => new L.LatLng(coords[1], coords[0]),
+        onEachFeature: onEachFeature
+      }).addTo(map);
+
+      geoJsonLayer.on('add', () => {
+        layersAdded++;
+        if (layersAdded === burntScarData.length) {
+          dispatch(setLoadingMap(false));
+        }
+      });
+    });
+  }, [dispatch, sidebarForm, burntScarData, map]);
 
   const percentToColor = (percent) => {
     const value = percent / 100;
@@ -94,23 +100,7 @@ const MapBurnScar = () => {
     layer.bindPopup(popupContent, { className: 'custom-popup' });
   };
 
-  return (
-    <>
-      {
-        burntScarData.map((data, index) => {
-          return (
-            <GeoJSON
-              key={index}
-              data={data}
-              style={(feature) => style(feature, index)} // Pass index to style function
-              coordsToLatLng={coords => new L.LatLng(coords[1], coords[0])}
-              onEachFeature={onEachFeature}
-            />
-          )
-        })
-      }
-    </>
-  );
+  return null; // No need to return JSX as layers are directly added to the map
 };
 
 export default MapBurnScar;
