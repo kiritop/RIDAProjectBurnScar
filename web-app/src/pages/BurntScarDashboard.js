@@ -49,14 +49,15 @@ function BurntScarDashboard() {
       province: province,
       startDate: startDate,
       endDate: endDate
-    }
+    };
     if (country) {
       dispatch(fetchProvinceByCountry({ country: country, module: 'burnscar' }));
     }
-    dispatch(fetchBurntChart(obj));
-    dispatch(fetchBurntDataTable(obj));
-    dispatch(fetchBubbleBurntMap(obj));
-    setLoadingMap(true); // Set loading to true when fetching data
+    setLoadingMap(true);
+    dispatch(fetchBurntChart(obj))
+      .finally(() => dispatch(fetchBurntDataTable(obj))
+      .finally(() => dispatch(fetchBubbleBurntMap(obj))
+      .finally(() => setLoadingMap(false))));
   }, [dispatch, country, province, startDate, endDate]);
 
   useEffect(() => {
@@ -80,7 +81,7 @@ function BurntScarDashboard() {
       setTableData(newTableDataNewFormat);
       setTotalPoint(formattedSum);
       setDataShow(dataShowNewFormat);
-      setLoadingMap(false); // Set loading to false when data is fetched
+      // setLoadingMap(false); // Set loading to false when data is fetched
     }
   }, [dataBurntTable]);
 
@@ -332,6 +333,16 @@ function BurntScarDashboard() {
               <CardContent>
                 {/* <LineChart/>               */}
                 <DrilldownChart />
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12}>
+            <Card sx={{ borderRadius: 3, overflow: "hidden" }} variant="outlined">
+              <CardContent>
+                <Typography variant="h5" component="div" gutterBottom>
+                  Burn Area By Time
+                </Typography>
+                <LineChart/>
               </CardContent>
             </Card>
           </Grid>
