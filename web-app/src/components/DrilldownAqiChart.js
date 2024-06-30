@@ -5,15 +5,15 @@ import { useSelector } from "react-redux";
 
 const CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
-const DrilldownChart = () => {
-  const dataFromRedux = useSelector((state) => state.dashboard.dataBurntChart ?? []);
+const DrilldownAqiChart = () => {
+  const dataFromRedux = useSelector((state) => state.dashboard.dataAqiChart ?? []);
   const [drilldownData, setDrilldownData] = useState(null);
   const [options, setOptions] = useState({});
 
   useEffect(() => {
     const processData = () => {
       const groupedData = dataFromRedux.reduce((acc, data) => {
-        const { COUNTRY, FIRE_YEAR, PV_EN, AP_EN } = data.yearly;
+        const { COUNTRY, AQI_YEAR, PV_EN, AP_EN } = data.yearly;
         let countryKey;
 
         if (PV_EN) {
@@ -29,8 +29,8 @@ const DrilldownChart = () => {
         }
 
         acc[countryKey].push({
-          FIRE_YEAR,
-          SUM_AREA: parseFloat(data.yearly.SUM_AREA),
+          AQI_YEAR,
+          MAX_PM25: parseFloat(data.yearly.MAX_PM25),
           details: data.details
         });
 
@@ -38,14 +38,14 @@ const DrilldownChart = () => {
       }, {});
 
       const aggregatedData = Object.entries(groupedData).map(([key, value]) => {
-        const totalSumArea = value.reduce((sum, item) => sum + item.SUM_AREA, 0);
+        const maxArea = Math.max(...value.map(item => item.MAX_PM25));
         return {
           label: key,
-          y: totalSumArea,
+          y: maxArea,
           details: value.flatMap(item => item.details),
-          yearly: value.map(item => ({ COUNTRY: key, FIRE_YEAR: item.FIRE_YEAR }))
+          yearly: value.map(item => ({ COUNTRY: key, AQI_YEAR: item.AQI_YEAR }))
         };
-      }).sort((a, b) => b.y - a.y);
+      }).sort((a, b) => b.y - a.y);  // Sort descending
 
       setOptions({
         animationEnabled: true,
@@ -56,7 +56,7 @@ const DrilldownChart = () => {
           labelAngle: -45
         },
         axisY: {
-          title: "Sum Area (sq m)",
+          title: "Max PM2.5 (µg/m^3)",
           labelFormatter: function (e) {
             return CanvasJSReact.CanvasJS.formatNumber(e.value, "#,###");
           }
@@ -66,8 +66,8 @@ const DrilldownChart = () => {
           contentFormatter: function (e) {
             let content = `<strong>${e.entries[0].dataPoint.label}</strong><br>`;
             e.entries.forEach(function (entry) {
-              const years = entry.dataPoint.yearly.map(y => y.FIRE_YEAR).join(", ");
-              content += `Area: ${CanvasJSReact.CanvasJS.formatNumber(entry.dataPoint.y, "#,###")} sq m (${years})<br>`;
+              const years = entry.dataPoint.yearly.map(y => y.AQI_YEAR).join(", ");
+              content += `Max PM2.5: ${CanvasJSReact.CanvasJS.formatNumber(entry.dataPoint.y, "#,###")} (µg/m^3) (${years})<br>`;
             });
             return content;
           }
@@ -89,18 +89,18 @@ const DrilldownChart = () => {
 
   const handleDrilldown = (item) => {
     const monthData = item.details.reduce((acc, detail) => {
-      const yearMonth = `${detail.FIRE_YEAR}-${detail.FIRE_MONTH}`;
+      const yearMonth = `${detail.AQI_YEAR}-${detail.AQI_MONTH}`;
       if (!acc[yearMonth]) {
         acc[yearMonth] = {
-          x: new Date(detail.FIRE_YEAR, detail.FIRE_MONTH - 1),
+          x: new Date(detail.AQI_YEAR, detail.AQI_MONTH - 1),
           y: 0
         };
       }
-      acc[yearMonth].y += parseFloat(detail.SUM_AREA);
+      acc[yearMonth].y = Math.max(acc[yearMonth].y, parseFloat(detail.MAX_PM25));
       return acc;
     }, {});
 
-    const dataPoints = Object.values(monthData).sort((a, b) => a.x - b.x);
+    const dataPoints = Object.values(monthData).sort((a, b) => a.x - b.x);  // Sort ascending by date
 
     const drilldownOptions = {
       animationEnabled: true,
@@ -111,7 +111,7 @@ const DrilldownChart = () => {
         valueFormatString: "MMM YYYY"
       },
       axisY: {
-        title: "Sum Area (sq m)",
+        title: "Max PM2.5 (µg/m^3)",
         labelFormatter: function (e) {
           return CanvasJSReact.CanvasJS.formatNumber(e.value, "#,###");
         }
@@ -121,7 +121,7 @@ const DrilldownChart = () => {
         contentFormatter: function (e) {
           let content = `<strong>${item.label}</strong><br>`;
           e.entries.forEach(function (entry) {
-            content += `Month ${entry.dataPoint.x.toLocaleDateString('default', { month: 'short', year: 'numeric' })}: ${CanvasJSReact.CanvasJS.formatNumber(entry.dataPoint.y, "#,###")} sq m<br>`;
+            content += `Month ${entry.dataPoint.x.toLocaleDateString('default', { month: 'short', year: 'numeric' })}: ${CanvasJSReact.CanvasJS.formatNumber(entry.dataPoint.y, "#,###")} µg/m^3<br>`;
           });
           return content;
         }
@@ -142,7 +142,7 @@ const DrilldownChart = () => {
     <Grid container spacing={3}>
       <Grid item xs={12}>
         <Typography variant="h5" gutterBottom>
-         Burnt Area by Time
+         Air Quality by Time
         </Typography>
         <Button onClick={handleBack} disabled={!drilldownData}>Back</Button>
       </Grid>
@@ -153,4 +153,4 @@ const DrilldownChart = () => {
   );
 };
 
-export default DrilldownChart;
+export default DrilldownAqiChart;

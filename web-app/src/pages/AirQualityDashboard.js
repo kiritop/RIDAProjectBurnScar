@@ -13,6 +13,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
+import DrilldownAqiChart from '../components/DrilldownAqiChart';
 
 
 
@@ -185,6 +186,9 @@ function AirQualityDashboard() {
       case 'MMR':
         setCountryText("Myanmar");
         break;
+      case 'ALL':
+        setProvince("ALL");
+        break;
       default:
         break;
     }
@@ -314,7 +318,7 @@ function AirQualityDashboard() {
             </Card>
           </Grid>
           <Grid item xs={12} md={5}>
-            <Card sx={{ borderRadius: 3, overflow: "hidden", height:'400px' }} variant="outlined">
+            <Card sx={{ borderRadius: 3, overflow: "hidden", height:'540px' }} variant="outlined">
               <CardContent>
                 <Typography  variant="h4" component="div">
                   {provinceText != 'All' ? provinceText : countryText} air quality
@@ -350,7 +354,7 @@ function AirQualityDashboard() {
           <Grid item xs={12} md={7}>
             <Card sx={{ borderRadius: 3, overflow: "hidden" }} variant="outlined">
               <CardContent>
-                {/* <LineChartAqi/>               */}
+                <DrilldownAqiChart/>              
               </CardContent>
             </Card>
           </Grid>

@@ -162,6 +162,9 @@ function BurntScarDashboard() {
       case 'MMR':
         setCountryText("Myanmar");
         break;
+      case 'ALL':
+        setProvince("ALL");
+        break;
       default:
         break;
     }

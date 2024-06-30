@@ -261,6 +261,7 @@ server.get('/rida-api/api/burnt-bubble-chart', async (req, res) => {
   }
 });
 
+
 server.get('/rida-api/api/line-chart-pm25', async (req, res) => {
   const { country, startDate, endDate, province } = req.query;
 
@@ -401,13 +402,13 @@ server.get("/rida-api/api/overview-table-hot-spot", async (req, res) => {
   }else if (country!='ALL'&&province =='ALL'){
     sql = `SELECT COUNT(*) AS COUNT_ROWS, PV_EN as NAME_LIST, ISO3 
           FROM HOT_SPOT 
-          WHERE ISO3 = ? AND HOT_SPOT_DATE BETWEEN ? AND ? 
+          WHERE HOT_SPOT_DATE BETWEEN ? AND ? AND ISO3 = ?
           GROUP BY PV_EN, ISO3 
           ORDER BY COUNT_ROWS DESC`;
   }else if (country!='ALL'&&province !='ALL'){
     sql = `SELECT COUNT(*) AS COUNT_ROWS, AP_EN as NAME_LIST, ISO3 
           FROM HOT_SPOT 
-          WHERE ISO3 = ? AND PV_EN = ? AND HOT_SPOT_DATE BETWEEN ? AND ? 
+          WHERE HOT_SPOT_DATE BETWEEN ? AND ? AND ISO3 = ? AND PV_EN = ?
           GROUP BY AP_EN, ISO3 
           ORDER BY COUNT_ROWS DESC`;
   }
@@ -439,13 +440,13 @@ server.get("/rida-api/api/overview-table-pm25", async (req, res) => {
   }else if (country!='ALL'&&province =='ALL'){
     sql = `SELECT ROUND(MAX(PM25), 2) AS MAX_PM25, PV_EN as NAME_LIST, ISO3 
           FROM AIR_QUALITY 
-          WHERE ISO3 = ? AND AQI_DATE BETWEEN ? AND ? 
+          WHERE AQI_DATE BETWEEN ? AND ? AND ISO3 = ?
           GROUP BY PV_EN, ISO3 
           ORDER BY MAX_PM25 DESC`;
   }else if (country!='ALL'&&province !='ALL'){
     sql = `SELECT ROUND(MAX(PM25), 2) AS MAX_PM25, AP_EN as NAME_LIST, ISO3 
           FROM AIR_QUALITY 
-          WHERE ISO3 = ? AND PV_EN = ? AND AQI_DATE BETWEEN ? AND ? 
+          WHERE AQI_DATE BETWEEN ? AND ? AND ISO3 = ? AND PV_EN = ?
           GROUP BY AP_EN, ISO3 
           ORDER BY MAX_PM25 DESC`;
   }

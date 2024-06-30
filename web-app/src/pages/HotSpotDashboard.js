@@ -13,7 +13,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
-
+import DrilldownHotspotChart from '../components/DrilldownHotspotChart';
 
 
 function HotSpotDashboard() {
@@ -26,8 +26,8 @@ function HotSpotDashboard() {
   const [dataShow, setDataShow] = useState([]);
   const [tableData, setTableData] = useState([]);
 
-  const [countryText, setCountryText] = useState("All");
-  const [provinceText, setProvinceText] = useState("All");
+  const [countryText, setCountryText] = useState("ALL");
+  const [provinceText, setProvinceText] = useState("ALL");
 
 
   const [startDate, setStartDate] = useState(dayjs(new Date().setFullYear(new Date().getFullYear() - 1)).format('YYYY-MM-DD'));
@@ -182,6 +182,9 @@ function HotSpotDashboard() {
       case 'MMR':
         setCountryText("Myanmar");
         break;
+      case 'ALL':
+        setProvince("ALL");
+        break;
       default:
         break;
     }
@@ -311,7 +314,7 @@ function HotSpotDashboard() {
             </Card>
           </Grid>
           <Grid item xs={12} md={5}>
-            <Card sx={{ borderRadius: 3, overflow: "hidden", height:'400px' }} variant="outlined">
+            <Card sx={{ borderRadius: 3, overflow: "hidden", height:'540px' }} variant="outlined">
               <CardContent>
                 <Typography  variant="h4" component="div">
                   {provinceText != 'All' ? provinceText : countryText} Hot Spot
@@ -347,7 +350,7 @@ function HotSpotDashboard() {
           <Grid item xs={12} md={7}>
             <Card sx={{ borderRadius: 3, overflow: "hidden" }} variant="outlined">
               <CardContent>
-                {/* <LineChartHotspot/>               */}
+                <DrilldownHotspotChart />
               </CardContent>
             </Card>
           </Grid>
