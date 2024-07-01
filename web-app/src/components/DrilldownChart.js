@@ -127,7 +127,7 @@ const DrilldownChart = () => {
         }
       },
       data: [{
-        type: "line",
+        type: "column", // Change this line to use "column" for bar chart
         dataPoints
       }]
     };
@@ -142,7 +142,7 @@ const DrilldownChart = () => {
     <Grid container spacing={3}>
       <Grid item xs={12}>
         <Typography variant="h4" component="div" gutterBottom>
-         Burnt Area
+          Burnt Area
         </Typography>
         <Button onClick={handleBack} disabled={!drilldownData}>Back</Button>
       </Grid>

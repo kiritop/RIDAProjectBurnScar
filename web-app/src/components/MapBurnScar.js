@@ -6,17 +6,25 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchBurntScarPolygon, getMax } from '../reducers/burntScarSlice';
 import { setLoadingMap } from '../reducers/uiSlice';
 
-const colorIntensityArray = [
-  { fillOpacity: 0.2, color: '#FFCCCC' },
-  { fillOpacity: 0.3, color: '#FFB2B2' },
-  { fillOpacity: 0.4, color: '#FF9999' },
-  { fillOpacity: 0.5, color: '#FF7F7F' },
-  { fillOpacity: 0.6, color: '#FF6666' },
-  { fillOpacity: 0.7, color: '#FF4C4C' },
-  { fillOpacity: 0.8, color: '#FF3232' },
-  { fillOpacity: 0.9, color: '#FF1919' },
-  { fillOpacity: 1.0, color: '#FF0000' }
-];
+const generateColorIntensityArray = (max_freq) => {
+  const colors = ['#FFCCCC', '#FFB2B2', '#FF9999', '#FF7F7F', '#FF6666', '#FF4C4C', '#FF3232', '#FF1919', '#FF0000'];
+  const intensityArray = [];
+
+  if (max_freq === 1) {
+    intensityArray.push({ fillOpacity: 0.5, color: colors[4] });
+    intensityArray.push({ fillOpacity: 1.0, color: colors[8] });
+  } else {
+    const stepSize = 1 / max_freq;
+    for (let i = 1; i <= max_freq; i++) {
+      intensityArray.push({
+        fillOpacity: stepSize * i,
+        color: i === max_freq ? '#FF0000' : colors[Math.floor((i - 1) * (colors.length - 1) / (max_freq - 1))]
+      });
+    }
+  }
+
+  return intensityArray;
+};
 
 const MapBurnScar = () => {
   const dispatch = useDispatch();
@@ -24,6 +32,8 @@ const MapBurnScar = () => {
   const max_freq = useSelector(state => state.burnScar.max);
   const sidebarForm = useSelector(state => state.ui.sidebarForm);
   const map = useMap();
+
+  const colorIntensityArray = generateColorIntensityArray(max_freq);
 
   useEffect(() => {
     dispatch(setLoadingMap(true));
@@ -46,47 +56,25 @@ const MapBurnScar = () => {
     });
   }, [dispatch, sidebarForm, burntScarData, map]);
 
-  const percentToColor = (percent) => {
-    const value = percent / 100;
-    const red = Math.round(255);
-    const green = Math.round(255 * (1 - value));
-    const blue = 0;
-
-    // Convert RGB to HEX
-    const rgbToHex = (r, g, b) => '#' + [r, g, b].map(x => {
-      const hex = x.toString(16);
-      return hex.length === 1 ? '0' + hex : hex;
-    }).join('');
-
-    return rgbToHex(red, green, blue); // Only green component changes
-  };
-
   const style = (feature, index) => {
-    // Calculate fillOpacity based on some property of feature
-    const fillOpacity = max_freq === 1 ? 0.5 : 1 / max_freq;
-    const color = colorIntensityArray[index % colorIntensityArray.length].color; // Use the colorIntensityArray
-
+    const intensity = colorIntensityArray[index % colorIntensityArray.length];
     return {
-      color: color,
+      color: intensity.color,
       weight: 0,
-      fillOpacity: fillOpacity
+      fillOpacity: intensity.fillOpacity
     };
   };
 
   const onEachFeature = (feature, layer) => {
-    // Function to format date to MM DD YYYY
     const formatDate = (dateString) => {
       const date = new Date(dateString);
       const options = { year: 'numeric', month: 'short', day: '2-digit' };
       return date.toLocaleDateString('en-US', options);
     };
 
-    // Format the FIRE_DATE
     const formattedDate = formatDate(feature.properties.FIRE_DATE);
-    // Format the AREA property with thousand separators and two decimal places
     const formattedArea = `${new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(feature.properties.AREA)} sq m`;
 
-    // create a popup with the feature's properties
     let popupContent = ` <div style="font-family: Arial, sans-serif; padding: 10px; border-radius: 5px;">
       <h4 style="text-align: center">${feature?.properties?.AP_EN} ${feature?.properties?.PV_EN}, ${feature?.properties?.COUNTRY}</h4>
       <table>

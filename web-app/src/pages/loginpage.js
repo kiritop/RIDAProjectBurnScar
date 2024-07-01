@@ -1,38 +1,36 @@
-import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useState, useContext } from 'react';
 import { Container, Box, Avatar, Button, TextField, Grid, Typography, Alert, Card, CardContent, Link } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import LoadingScreen from '../components/LoadingScreen';
-import { loginUser } from '../reducers/authSlice';
 import { useNavigate } from 'react-router-dom';
-import Swal from 'sweetalert2';
+import { UserContext } from '../contexts/UserContext';
+import axios from 'axios';
+import CONFIG from '../config';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const { updateUserInfo } = useContext(UserContext);
   const navigate = useNavigate();
-  const { user, loading, error } = useSelector((state) => state.auth);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    dispatch(loginUser({ email, password }))
-      .unwrap()
-      .then((userData) => {
-        localStorage.setItem('myData', JSON.stringify(userData));
-        navigate('/');
-      })
-      .catch((error) => {
-        console.error('Login error:', error);
-      });
+    setLoading(true);
+    try {
+      const response = await axios.post(`${CONFIG.API_URL}/login`, { email, password });
+      updateUserInfo(response.data.user);
+      navigate('/');
+    } catch (error) {
+      setError('Invalid email or password');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleForgotPassword = () => {
-    Swal.fire({
-      title: 'Please contact Admin',
-      icon: 'info',
-      confirmButtonText: 'OK'
-    });
+    // SweetAlert for Forgot Password
   };
 
   const handleSignUp = () => {

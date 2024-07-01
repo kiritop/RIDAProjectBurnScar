@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   Box, Card, CardContent, Select, MenuItem, Typography, Switch, FormControl, FormLabel, Divider, InputLabel, Button
 } from '@mui/material';
+import FormHelperText from '@mui/joy/FormHelperText';
 import { useDispatch, useSelector } from 'react-redux';
 import { saveLayerSettings, setLoadingMap, fetchProvinceByCountry } from '../reducers/uiSlice';
 import { fetchBurntScarPolygon, fetchBurntScarData } from '../reducers/burntScarSlice';
@@ -248,6 +249,9 @@ function FilterCard() {
           </FormControl>
           <FormControl fullWidth margin="normal" sx={{ mt: isSmallScreen ? 1 : 2 }}>
             <FormLabel>Air quality layer</FormLabel>
+            <FormHelperText sx={{ typography: 'body-sm' }}>
+                Source from openweathermap.org
+            </FormHelperText>
             <Switch 
               checked={aqi} 
               onChange={handleChange} 
@@ -257,6 +261,9 @@ function FilterCard() {
           </FormControl>
           <FormControl fullWidth margin="normal" sx={{ mt: isSmallScreen ? 1 : 2 }}>
             <FormLabel>Hotspot layer</FormLabel>
+            <FormHelperText sx={{ typography: 'body-sm' }}>
+                Source from firms.modaps.eosdis.nasa.gov
+            </FormHelperText>
             <Switch 
               checked={hotSpot} 
               onChange={handleChange} 

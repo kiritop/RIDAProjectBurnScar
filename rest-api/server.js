@@ -750,16 +750,16 @@ server.get('/rida-api/api/get-burnt-from-date', async (req, res) => {
       FIRE_DATE BETWEEN ? AND ?
   `;
 
-  if (country && country !== 'All') {
+  if (country && country !== 'ALL') {
     sql += ` AND ISO3 = ?`;
   }
-  if (province && province !== 'All') {
+  if (province && province !== 'ALL') {
     sql += ` AND PV_EN = ?`;
   }
 
   const queryParams = [startDate, endDate];
-  if (country && country !== 'All') queryParams.push(country);
-  if (province && province !== 'All') queryParams.push(province);
+  if (country && country !== 'ALL') queryParams.push(country);
+  if (province && province !== 'ALL') queryParams.push(province);
 
   try {
     const results = await executeQuery(sql, queryParams);
@@ -832,10 +832,10 @@ server.get('/rida-api/api/get-burnt-scar-polygon', async (req, res) => {
         WHERE 
           FIRE_DATE BETWEEN ? AND ?
       `;
-    if (country && country!='All') {
+    if (country && country!='ALL') {
       sql += ` AND ISO3 = ?`;
     }
-    if (province && province!='All') {
+    if (province && province!='ALL') {
       sql += ` AND PV_EN = ?`;
     }
 
@@ -1152,10 +1152,10 @@ server.get('/rida-api/api/get-csv', async (req, res) => {
 
   let sql = `SELECT DATE_FORMAT(FIRE_DATE, '%d-%m-%Y') as FIRE_DATE, AP_EN, PV_EN, COUNTRY, AREA, LATITUDE, LONGITUDE, REPLACE(REPLACE(GEOMETRY_DATA, '(', '['), ')', ']') AS GEOMETRY_DATA, GEOMETRY_TYPE FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ?`;
 
-  if (country && country != 'All') {
+  if (country && country != 'ALL') {
     sql += ` AND ISO3 = ?`;
   }
-  if (province && province != 'All') {
+  if (province && province != 'ALL') {
     sql += ` AND PV_EN = ?`;
   }
 
@@ -1188,10 +1188,10 @@ server.get('/rida-api/api/get-csv-hot-spot', async (req, res) => {
 
   let sql = `SELECT DATE_FORMAT(HOT_SPOT_DATE, '%d-%m-%Y') as HOT_SPOT_DATE, AP_EN, PV_EN, COUNTRY, ISO3, LATITUDE, LONGITUDE FROM HOT_SPOT WHERE HOT_SPOT_DATE BETWEEN ? AND ?`;
 
-  if (country && country != 'All') {
+  if (country && country != 'ALL') {
     sql += ` AND ISO3 = ?`;
   }
-  if (province && province != 'All') {
+  if (province && province != 'ALL') {
     sql += ` AND PV_EN = ?`;
   }
 
@@ -1224,10 +1224,10 @@ server.get('/rida-api/api/get-csv-pm25', async (req, res) => {
 
   let sql = `SELECT DATE_FORMAT(AQI_DATE, '%d-%m-%Y') as AQI_DATE, AP_EN, PV_EN, COUNTRY, ISO3, LATITUDE, LONGITUDE, PM25 FROM AIR_QUALITY WHERE AQI_DATE BETWEEN ? AND ?`;
 
-  if (country && country != 'All') {
+  if (country && country != 'ALL') {
     sql += ` AND ISO3 = ?`;
   }
-  if (province && province != 'All') {
+  if (province && province != 'ALL') {
     sql += ` AND PV_EN = ?`;
   }
 

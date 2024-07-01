@@ -383,7 +383,7 @@ const API = () => {
   const dispatch = useDispatch();
   const users = useSelector((state) => state.users.data ?? []);
   const getfile = useSelector((state) => state.getfile);
-  const apikey = users[0]?.api_key ?? ["dddd54dab276fcd40937ad83f342a2200282f43b"];
+  const apikey = users[0]?.api_key ?? [];
   console.log(getfile);
 
   useEffect(() => {
@@ -446,7 +446,7 @@ const API = () => {
           />
         </Box>
 
-        <Button variant="contained" onClick={apiGen} disabled>
+        <Button variant="contained" onClick={apiGen}>
           Generate KEY
         </Button>
       </Box>

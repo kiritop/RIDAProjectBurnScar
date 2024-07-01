@@ -15,6 +15,7 @@ import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import Logo from './m_burn_logo.png';
+import { UserContext } from '../contexts/UserContext';
 
 const pages = [
   { name: "Map" },
@@ -30,16 +31,10 @@ const pages = [
 export default function Header() {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [anchorElSignOut, setAnchorElSignOut] = React.useState(null);
-  const [userInfo, setUserInfo] = React.useState(
-    JSON.parse(localStorage.getItem("myData")) || null
-  );
   const [drawerOpen, setDrawerOpen] = React.useState(false);
   const navigate = useNavigate();
   const isMobile = useMediaQuery('(max-width:600px)');
-
-  React.useEffect(() => {
-    setUserInfo(JSON.parse(localStorage.getItem("myData")));
-  }, []);
+  const { userInfo, updateUserInfo } = React.useContext(UserContext);
 
   const handleNavigation = (page) => {
     const url = getPageUrl(page);
@@ -114,8 +109,7 @@ export default function Header() {
   );
 
   const handleLogout = () => {
-    setUserInfo(null);
-    localStorage.removeItem("myData");
+    updateUserInfo(null);
     navigate('/login');
   };
 
