@@ -342,7 +342,7 @@ function BurntScarDashboard() {
           <Grid item xs={12}>
             <Card sx={{ borderRadius: 3, overflow: "hidden" }} variant="outlined">
               <CardContent>
-                <Typography variant="h5" component="div" gutterBottom>
+                <Typography variant="h4" component="div" gutterBottom>
                   Burn Area By Time
                 </Typography>
                 <LineChart/>
@@ -352,7 +352,7 @@ function BurntScarDashboard() {
           <Grid item xs={12}>
             <Card sx={{ borderRadius: 3, overflow: "hidden" }} variant="outlined">
               <CardContent>
-                <Typography variant="h5" component="div" gutterBottom>
+                <Typography variant="h4" component="div" gutterBottom>
                   Burn Area By Location
                 </Typography>
                 <MapContainer center={center} zoom={zoom} style={{ height: "500px", width: "100%" }}>
@@ -386,7 +386,7 @@ function BurntScarDashboard() {
           <Grid item xs={12} md={12}>
             <Box sx={{ borderRadius: 3, overflow: "hidden", flex: 1 }}>
               <MUIDataTable
-                title={<h3>Burnt Scar Area Ranking {format(new Date(startDate), 'MMM dd yyyy')} - {format(new Date(endDate), 'MMM dd yyyy')}</h3>}
+                title={<h4>Burnt Scar Area Ranking {format(new Date(startDate), 'MMM dd yyyy')} - {format(new Date(endDate), 'MMM dd yyyy')}</h4>}
                 data={tableData}
                 columns={columns}
                 options={options}

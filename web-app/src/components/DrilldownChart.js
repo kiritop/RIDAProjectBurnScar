@@ -141,8 +141,8 @@ const DrilldownChart = () => {
   return (
     <Grid container spacing={3}>
       <Grid item xs={12}>
-        <Typography variant="h5" gutterBottom>
-         Burnt Area by Time
+        <Typography variant="h4" component="div" gutterBottom>
+         Burnt Area
         </Typography>
         <Button onClick={handleBack} disabled={!drilldownData}>Back</Button>
       </Grid>

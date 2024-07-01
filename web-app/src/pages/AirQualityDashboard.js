@@ -81,19 +81,19 @@ function AirQualityDashboard() {
 
       const dataWithNumericSumArea = dataAqiTable.map(item => ({
         ...item,
-        MAX_PM25: Number(item.MAX_PM25)
+        AVG_PM25: Number(item.AVG_PM25)
       }));
       
-      const newTableData = [...dataWithNumericSumArea.map((item) => [item.NAME_LIST, item.MAX_PM25])];
+      const newTableData = [...dataWithNumericSumArea.map((item) => [item.NAME_LIST, item.AVG_PM25])];
       let dataShow = []
       if(country == 'ALL' && province=='ALL'){
-        dataShow = [...dataWithNumericSumArea.map((item) => [item.ISO3, item.MAX_PM25])];
+        dataShow = [...dataWithNumericSumArea.map((item) => [item.ISO3, item.AVG_PM25])];
       }else{
-        dataShow = [...dataWithNumericSumArea.map((item) => [item.NAME_LIST, item.MAX_PM25])];
+        dataShow = [...dataWithNumericSumArea.map((item) => [item.NAME_LIST, item.AVG_PM25])];
       }
       const dataShowNewFormat = dataShow.map((item, index) => [index+1, ...item]);
       const newTableDataNewFormat = newTableData.map((item, index) => [index+1, ...item]);
-      const totalRowsSum = dataWithNumericSumArea.reduce((sum, item) => sum + item.MAX_PM25, 0);
+      const totalRowsSum = dataWithNumericSumArea.reduce((sum, item) => sum + item.AVG_PM25, 0);
       const avg = totalRowsSum/dataWithNumericSumArea.length
       const formattedAvg = new Intl.NumberFormat('en-US').format(avg);
       setTableData(newTableDataNewFormat);
@@ -362,7 +362,7 @@ function AirQualityDashboard() {
           <Grid item xs={12}>
             <Card sx={{ borderRadius: 3, overflow: "hidden" }} variant="outlined">
               <CardContent>
-                <Typography variant="h5" component="div" gutterBottom>
+                <Typography variant="h4" component="div" gutterBottom>
                   Aqi By Time
                 </Typography>
                 <LineChartAqi/>      
@@ -373,7 +373,7 @@ function AirQualityDashboard() {
           <Grid item xs={12} md={12}>
             <Box sx={{ borderRadius: 3, overflow: "hidden", flex: 1}}>
                 <MUIDataTable
-                  title={<h3>Burnt Scar Area Ranking {format(new Date(startDate),'MMM dd yyyy')} - {format(new Date(endDate),'MMM dd yyyy')}</h3>}
+                  title={<h4>Air Quality Ranking {format(new Date(startDate),'MMM dd yyyy')} - {format(new Date(endDate),'MMM dd yyyy')}</h4>}
                   data={tableData}
                   columns={columns}
                   options={options}

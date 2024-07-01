@@ -30,7 +30,7 @@ const DrilldownAqiChart = () => {
 
         acc[countryKey].push({
           AQI_YEAR,
-          MAX_PM25: parseFloat(data.yearly.MAX_PM25),
+          AVG_PM25: parseFloat(data.yearly.AVG_PM25),
           details: data.details
         });
 
@@ -38,7 +38,7 @@ const DrilldownAqiChart = () => {
       }, {});
 
       const aggregatedData = Object.entries(groupedData).map(([key, value]) => {
-        const maxArea = Math.max(...value.map(item => item.MAX_PM25));
+        const maxArea = Math.max(...value.map(item => item.AVG_PM25));
         return {
           label: key,
           y: maxArea,
@@ -96,7 +96,7 @@ const DrilldownAqiChart = () => {
           y: 0
         };
       }
-      acc[yearMonth].y = Math.max(acc[yearMonth].y, parseFloat(detail.MAX_PM25));
+      acc[yearMonth].y = Math.max(acc[yearMonth].y, parseFloat(detail.AVG_PM25));
       return acc;
     }, {});
 
@@ -141,8 +141,8 @@ const DrilldownAqiChart = () => {
   return (
     <Grid container spacing={3}>
       <Grid item xs={12}>
-        <Typography variant="h5" gutterBottom>
-         Air Quality by Time
+        <Typography variant="h4" component="div" gutterBottom>
+         Air Quality
         </Typography>
         <Button onClick={handleBack} disabled={!drilldownData}>Back</Button>
       </Grid>

@@ -22,7 +22,7 @@ const LineChartAqi = () => {
 
         // Create a map of existing months with data
         const monthMap = data.details.reduce((map, detail) => {
-          map[detail.AQI_MONTH] = parseFloat(detail.MAX_PM25);
+          map[detail.AQI_MONTH] = parseFloat(detail.AVG_PM25);
           return map;
         }, {});
 
