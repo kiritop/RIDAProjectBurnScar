@@ -56,7 +56,7 @@ const DrilldownAqiChart = () => {
           labelAngle: -45
         },
         axisY: {
-          title: "Max PM2.5 (µg/m^3)",
+          title: "Avg PM2.5 (µg/m^3)",
           labelFormatter: function (e) {
             return CanvasJSReact.CanvasJS.formatNumber(e.value, "#,###");
           }
@@ -111,7 +111,7 @@ const DrilldownAqiChart = () => {
         valueFormatString: "MMM YYYY"
       },
       axisY: {
-        title: "Max PM2.5 (µg/m^3)",
+        title: "Avg PM2.5 (µg/m^3)",
         labelFormatter: function (e) {
           return CanvasJSReact.CanvasJS.formatNumber(e.value, "#,###");
         }

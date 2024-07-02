@@ -99,7 +99,7 @@ const LineChartAqi = () => {
     },
     yaxis: {
       title: {
-        text: 'Max PM2.5 (µg/m^3)'
+        text: 'Avg PM2.5 (µg/m^3)'
       },
       labels: {
         formatter: (value) => {

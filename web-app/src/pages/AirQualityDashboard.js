@@ -132,7 +132,7 @@ function AirQualityDashboard() {
       },
     },
     {
-      name: "Max of PM2.5 (µg/m^3)",
+      name: "Avg of PM2.5 (µg/m^3)",
       options: {
         customHeadRender: ({ index, ...column }) => {
           return (
