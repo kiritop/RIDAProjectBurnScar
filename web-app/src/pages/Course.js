@@ -22,7 +22,7 @@ const Carddetail = [
         EP: "EP 06 Examples of satellite images (Landsat-8, Sentinel-1, Sentinel-2)",
         yt: "https://www.youtube.com/watch?v=4DvyiM4jwNA",
       },
-      { EP: "Unit 01 Types and Characteristics of Satellites.pdf", yt: "/rida-project/CH1_.pdf" },
+      { EP: "Chapter 01 Types and Characteristics of Satellites.pdf", yt: "/rida-project/CH1_.pdf" },
     ],
   },
   {
@@ -34,7 +34,7 @@ const Carddetail = [
       { EP: "EP 01 How can ground stations communicate with satellites?", yt: "https://www.youtube.com/watch?v=IGwlUxhU2kA" },
       { EP: "EP 02 Characteristics of data from satellite images", yt: "https://www.youtube.com/watch?v=l8blwGOrTgs" },
       { EP: "EP 03 Analyzing satellite images using indices", yt: "https://www.youtube.com/watch?v=RGOUn2DNvhg" },
-      { EP: "Unit 02 Interpretation and Analysis of Satellite Data.pdf", yt: "/rida-project/CH2_.pdf" },
+      { EP: "Chapter 02 Interpretation and Analysis of Satellite Data.pdf", yt: "/rida-project/CH2_.pdf" },
     ],
   },
   {
@@ -46,7 +46,7 @@ const Carddetail = [
       { EP: "EP 01 Geo-Informatics technology", yt: "https://www.youtube.com/watch?v=lp2Uu23_qLY" },
       { EP: "EP 02 Remote Sensing", yt: "https://www.youtube.com/watch?v=8KPA-wz64QY" },
       { EP: "EP 03 Global Positioning System", yt: "https://www.youtube.com/watch?v=MpBb_h9ckNM" },
-      { EP: "Unit 03 Application of Satellite Data.pdf", yt: "/rida-project/CH3_.pdf" },
+      { EP: "Chapter 03 Application of Satellite Data.pdf", yt: "/rida-project/CH3_.pdf" },
     ],
   },
   {
@@ -60,7 +60,7 @@ const Carddetail = [
       { EP: "EP 03 Types of Machine Learning", yt: "https://www.youtube.com/watch?v=Hz1O-D1oPHI" },
       { EP: "EP 04 Models and Algorithms of Machine Learning", yt: "https://www.youtube.com/watch?v=Mpnzvqp74bk" },
       { EP: "EP 05 Applications of Machine Learning", yt: "https://www.youtube.com/watch?v=dfsMdUIZHrw" },
-      { EP: "Unit 04 Machine Learning.pdf", yt: "/rida-project/CH4_.pdf" },
+      { EP: "Chapter 04 Machine Learning.pdf", yt: "/rida-project/CH4_.pdf" },
     ],
   },
 ];
