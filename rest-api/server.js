@@ -16,8 +16,8 @@ const pool = mysql.createPool({
   password: "gdkll,@MFU2024",
   database: "RidaDB",
   waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
+  connectionLimit: 20,
+  queueLimit: 100
 });
 
   // host: process.env.DB_HOST || 'localhost',
@@ -713,7 +713,7 @@ server.get("/rida-api/api/overview-table-pm25", async (req, res) => {
           FROM AIR_QUALITY 
           WHERE AQI_DATE BETWEEN ? AND ? AND ISO3 = ?
           GROUP BY PV_EN, ISO3 
-          ORDER BY AVG DESC`;
+          ORDER BY AVG_PM25 DESC`;
   }else if (country!='ALL'&&province !='ALL'){
     sql = `SELECT ROUND(AVG(PM25), 2) AS AVG_PM25, AP_EN as NAME_LIST, ISO3 
           FROM AIR_QUALITY 
@@ -811,17 +811,29 @@ server.get("/rida-api/api/get-province", async (req, res) => {
 
 server.get("/rida-api/api/get-max-freq", async (req, res) => {
   const { startDate, endDate, country, province } = req.query;
-  let sql = `SELECT COALESCE(MAX(count), 1) AS max_count FROM ( SELECT COUNT(*) AS count FROM BURNT_SCAR_POINT WHERE FIRE_DATE BETWEEN ? AND ? `;
-  
-  if (country && country !== 'ALL') {
-    sql += ` AND ISO3 = ?`;
-  }
-  
-  if (province && province !== 'ALL') {
-    sql += ` AND PV_EN = ?`;
-  }
-  
-  sql += ` GROUP BY LATITUDE, LONGITUDE ) AS subquery;`;
+  let sql = `WITH RECURSIVE split_dates AS (
+                SELECT 
+                    BURNT_SCAR_ID,
+                    SUBSTRING_INDEX(SUBSTRING_INDEX(FREQUENCY_DATE, ',', numbers.n), ',', -1) AS date,
+                    FREQUENCY_DATE,
+                    FIRE_DATE
+                FROM 
+                    RidaDB.BURNT_SCAR_INFO
+                JOIN 
+                    (SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 
+                    UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10) numbers 
+                ON CHAR_LENGTH(FREQUENCY_DATE) - CHAR_LENGTH(REPLACE(FREQUENCY_DATE, ',', '')) >= numbers.n - 1
+                WHERE FIRE_DATE BETWEEN ? AND ? ${country ? 'AND ISO3 = ?' : ''} ${province ? 'AND PV_EN = ?' : ''}
+            ),
+            unique_date_counts AS (
+                SELECT 
+                    BURNT_SCAR_ID,
+                    COUNT(DISTINCT date) AS unique_date_count
+                FROM split_dates
+                GROUP BY BURNT_SCAR_ID
+            )
+            SELECT MAX(unique_date_count) AS max_unique_date_count
+            FROM unique_date_counts;`;
 
   const queryParams = [startDate, endDate];
   if (country && country != 'ALL') queryParams.push(country);
@@ -829,7 +841,8 @@ server.get("/rida-api/api/get-max-freq", async (req, res) => {
 
   try {
     const results = await executeQuery(sql, queryParams);
-    res.send(results);
+    const maxUniqueDateCount = results[0]?.max_unique_date_count || 1; // Handle possible empty results
+    res.json({ max_unique_date_count: maxUniqueDateCount });
   } catch (error) {
     console.error('Error executing query:', error);
     res.status(500).send('Internal server error');
@@ -842,7 +855,7 @@ server.get('/rida-api/api/get-burnt-from-date', async (req, res) => {
   let sql = `
     SELECT 
       BURNT_SCAR_ID, AP_EN, PV_EN, FIRE_DATE, AREA, COUNTRY, LATITUDE, LONGITUDE, 
-      CONCAT('[', REPLACE(REPLACE(GEOMETRY_DATA, '(', '['), ')', ']'), ']') AS GEOMETRY_DATA, GEOMETRY_TYPE 
+      CONCAT('[', REPLACE(REPLACE(GEOMETRY_DATA, '(', '['), ')', ']'), ']') AS GEOMETRY_DATA, GEOMETRY_TYPE, FREQUENCY_DATE
     FROM 
       BURNT_SCAR_INFO 
     WHERE 
@@ -896,6 +909,7 @@ server.get('/rida-api/api/get-burnt-from-date', async (req, res) => {
             FIRE_DATE: item.FIRE_DATE,
             LATITUDE: item.LATITUDE,
             LONGITUDE: item.LONGITUDE,
+            FREQUENCY_DATE: item.FREQUENCY_DATE
           },
           geometry: {
             type: item.GEOMETRY_TYPE,

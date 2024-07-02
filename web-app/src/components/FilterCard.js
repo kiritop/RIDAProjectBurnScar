@@ -5,7 +5,7 @@ import {
 import FormHelperText from '@mui/joy/FormHelperText';
 import { useDispatch, useSelector } from 'react-redux';
 import { saveLayerSettings, setLoadingMap, fetchProvinceByCountry } from '../reducers/uiSlice';
-import { fetchBurntScarPolygon, fetchBurntScarData } from '../reducers/burntScarSlice';
+import { fetchBurntScarPolygon, getMax } from '../reducers/burntScarSlice';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
@@ -135,10 +135,13 @@ function FilterCard() {
     dispatch(saveLayerSettings({ sidebarForm, burntScar, aqi, hotSpot, burntScarPoint, current_lat, current_lng }));
     if (burntScar) {
       dispatch(setLoadingMap(true));
-      dispatch(fetchBurntScarPolygon(sidebarForm))
-        .finally(() => {
-          dispatch(setLoadingMap(false));
-        });
+      dispatch(getMax(sidebarForm))
+      .finally(() => {
+        dispatch(fetchBurntScarPolygon(sidebarForm))
+          .finally(() => {
+            dispatch(setLoadingMap(false));
+          });
+      });
     }
   };
 
@@ -248,7 +251,7 @@ function FilterCard() {
           <FormControl fullWidth margin="normal" sx={{ mt: isSmallScreen ? 1 : 2 }}>
             <FormLabel>Air quality layer</FormLabel>
             <FormHelperText sx={{ typography: 'body-sm' }}>
-                Source from openweathermap.org
+              (Data Source: openweathermap.org)
             </FormHelperText>
             <Switch 
               checked={aqi} 
@@ -260,7 +263,7 @@ function FilterCard() {
           <FormControl fullWidth margin="normal" sx={{ mt: isSmallScreen ? 1 : 2 }}>
             <FormLabel>Hotspot layer</FormLabel>
             <FormHelperText sx={{ typography: 'body-sm' }}>
-                Source from firms.modaps.eosdis.nasa.gov
+              (Data Source: firms.modaps.eosdis.nasa.gov)
             </FormHelperText>
             <Switch 
               checked={hotSpot} 

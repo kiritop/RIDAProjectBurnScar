@@ -339,7 +339,7 @@ function AirQualityDashboard() {
             <Card sx={{ borderRadius: 3, overflow: "hidden", height:'540px' }} variant="outlined">
               <CardContent>
                 <Typography  variant="h4" component="div">
-                  {provinceText != 'All' ? provinceText : countryText} air quality
+                  Air Quality Summary
                 </Typography>
                 <Typography  variant="subtitle1" color="text.secondary">
                   {provinceText != 'All' ? provinceText +', '+ countryText : countryText} air quality (  {format(new Date(startDate),'MMM dd yyyy')} - {format(new Date(endDate),'MMM dd yyyy')} )
@@ -381,7 +381,7 @@ function AirQualityDashboard() {
             <Card sx={{ borderRadius: 3, overflow: "hidden" }} variant="outlined">
               <CardContent>
                 <Typography variant="h4" component="div" gutterBottom>
-                  Aqi By Time
+                  Air Quality By Time
                 </Typography>
                 <LineChartAqi/>      
               </CardContent>

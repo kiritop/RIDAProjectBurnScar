@@ -21,7 +21,7 @@ const pages = [
   { name: "Map" },
   {
     name: "Dashboard",
-    subMenu: ["Burnt Level", "Hot Spot", "Air Quality"],
+    subMenu: ["Burnt Level", "Hotspot", "Air Quality"],
   },
   { name: "Learning Materials" },
   { name: "APIs" },
@@ -45,7 +45,7 @@ export default function Header() {
     switch (page) {
       case "Map":
         return "/";
-      case "Hot Spot":
+      case "Hotspot":
         return "/hot_spot";
       case "Air Quality":
         return "/pm_25";

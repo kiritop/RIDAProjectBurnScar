@@ -99,7 +99,7 @@ const LineChartHotspot = () => {
     },
     yaxis: {
       title: {
-        text: 'Sum of Hot Spot'
+        text: 'Sum of Hotspot'
       },
       labels: {
         formatter: (value) => {

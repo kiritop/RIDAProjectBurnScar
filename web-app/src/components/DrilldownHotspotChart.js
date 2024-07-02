@@ -33,7 +33,7 @@ const DrilldownChart = () => {
           labelAngle: -45
         },
         axisY: {
-          title: "Sum of Hot Spot",
+          title: "Sum of Hotspot",
           labelFormatter: function (e) {
             return CanvasJSReact.CanvasJS.formatNumber(e.value, "#,###");
           }
@@ -82,7 +82,7 @@ const DrilldownChart = () => {
         labelAngle: -45
       },
       axisY: {
-        title: "Sum of Hot Spot",
+        title: "Sum of Hotspot",
         labelFormatter: function (e) {
           return CanvasJSReact.CanvasJS.formatNumber(e.value, "#,###");
         }

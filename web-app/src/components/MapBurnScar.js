@@ -45,11 +45,11 @@ const MapBurnScar = () => {
         }
       });
     });
-  }, [dispatch, sidebarForm, burntScarData, map, fillOpacity, polygonColor]);
+  }, [dispatch, sidebarForm, burntScarData, map, fillOpacity]);
 
   const style = () => {
     return {
-      color: polygonColor,
+      color: 'red',
       weight: 0,
       fillOpacity: fillOpacity
     };
@@ -62,7 +62,10 @@ const MapBurnScar = () => {
       return date.toLocaleDateString('en-US', options);
     };
 
-    const formattedDate = formatDate(feature.properties.FIRE_DATE);
+    // const formattedDate = formatDate(feature.properties.FIRE_DATE);
+    let frequencyDates = feature.properties.FREQUENCY_DATE ? feature.properties.FREQUENCY_DATE.split(',') : [feature.properties.FIRE_DATE];
+    const formattedFrequencyDates = frequencyDates.map(formatDate).join('<br>');
+    const times = frequencyDates.length;
     const formattedArea = `${new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(feature.properties.AREA)} sq m`;
 
     let popupContent = ` <div style="font-family: Arial, sans-serif; padding: 10px; border-radius: 5px;">
@@ -70,7 +73,8 @@ const MapBurnScar = () => {
       <table>
         <tr><td><strong>Latitude:</strong></td><td style="text-align:right">${feature.properties.LATITUDE}</td></tr>
         <tr><td><strong>Longitude:</strong></td><td style="text-align:right">${feature.properties.LONGITUDE}</td></tr>
-        <tr><td><strong>Burnt date :</strong></td><td style="text-align:right">${formattedDate}</td></tr>
+        <tr><td><strong>Burnt frequency (time/max) :</strong></td><td style="text-align:right">${times}/${max_freq}</td></tr>
+        <tr><td><strong>Burnt date :</strong></td><td style="text-align:right">${formattedFrequencyDates}</td></tr>
         <tr><td><strong>Area M :</strong></td><td style="text-align:right">${formattedArea}</td></tr>
       </table>
     </div>`;

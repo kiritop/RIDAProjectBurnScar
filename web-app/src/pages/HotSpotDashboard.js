@@ -137,7 +137,7 @@ function HotSpotDashboard() {
       },
     },
     {
-      name: "Hot Spot total (Point)",
+      name: "Hotspot total (Point)",
       options: {
         customHeadRender: ({ index, ...column }) => {
           return (
@@ -336,10 +336,10 @@ function HotSpotDashboard() {
             <Card sx={{ borderRadius: 3, overflow: "hidden", height:'540px' }} variant="outlined">
               <CardContent>
                 <Typography  variant="h4" component="div">
-                  {provinceText != 'All' ? provinceText : countryText} Hot Spot
+                  Hotspot Summary
                 </Typography>
                 <Typography  variant="subtitle1" color="text.secondary">
-                  {provinceText != 'All' ? provinceText +', '+ countryText : countryText} Hot Spot (  {format(new Date(startDate),'MMM dd yyyy')} - {format(new Date(endDate),'MMM dd yyyy')} )
+                  {provinceText != 'All' ? provinceText +', '+ countryText : countryText} Hotspot (  {format(new Date(startDate),'MMM dd yyyy')} - {format(new Date(endDate),'MMM dd yyyy')} )
                 </Typography>
                 <Box height={50}/>
                 <Typography  variant="h3" component="div">
