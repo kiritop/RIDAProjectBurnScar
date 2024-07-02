@@ -6,25 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchBurntScarPolygon, getMax } from '../reducers/burntScarSlice';
 import { setLoadingMap } from '../reducers/uiSlice';
 
-const generateColorIntensityArray = (max_freq) => {
-  const colors = ['#FFCCCC', '#FFB2B2', '#FF9999', '#FF7F7F', '#FF6666', '#FF4C4C', '#FF3232', '#FF1919', '#FF0000'];
-  const intensityArray = [];
-
-  if (max_freq === 1) {
-    intensityArray.push({ fillOpacity: 0.5, color: colors[4] });
-    intensityArray.push({ fillOpacity: 1.0, color: colors[8] });
-  } else {
-    const stepSize = 1 / max_freq;
-    for (let i = 1; i <= max_freq; i++) {
-      intensityArray.push({
-        fillOpacity: stepSize * i,
-        color: i === max_freq ? '#FF0000' : colors[Math.floor((i - 1) * (colors.length - 1) / (max_freq - 1))]
-      });
-    }
-  }
-
-  return intensityArray;
-};
+const colors = ['#FFCCCC', '#FFB2B2', '#FF9999', '#FF7F7F', '#FF6666', '#FF4C4C', '#FF3232', '#FF1919', '#FF0000'];
 
 const MapBurnScar = () => {
   const dispatch = useDispatch();
@@ -33,16 +15,25 @@ const MapBurnScar = () => {
   const sidebarForm = useSelector(state => state.ui.sidebarForm);
   const map = useMap();
 
-  const colorIntensityArray = generateColorIntensityArray(max_freq);
+  let fillOpacity, polygonColor;
+
+  if (max_freq === 1) {
+    fillOpacity = 0.5;
+    polygonColor = '#FF6666';
+  } else {
+    fillOpacity = 1 / max_freq;
+    const colorIndex = Math.min(colors.length - 1, Math.floor(max_freq * (colors.length - 1) / 10)); // Adjusting to fit the colors array
+    polygonColor = colors[colorIndex];
+  }
 
   useEffect(() => {
     dispatch(setLoadingMap(true));
 
     let layersAdded = 0;
 
-    burntScarData.forEach((data, index) => {
+    burntScarData.forEach((data) => {
       const geoJsonLayer = L.geoJSON(data, {
-        style: feature => style(feature, index),
+        style: feature => style(feature),
         coordsToLatLng: coords => new L.LatLng(coords[1], coords[0]),
         onEachFeature: onEachFeature
       }).addTo(map);
@@ -54,14 +45,13 @@ const MapBurnScar = () => {
         }
       });
     });
-  }, [dispatch, sidebarForm, burntScarData, map]);
+  }, [dispatch, sidebarForm, burntScarData, map, fillOpacity, polygonColor]);
 
-  const style = (feature, index) => {
-    const intensity = colorIntensityArray[index % colorIntensityArray.length];
+  const style = () => {
     return {
-      color: intensity.color,
+      color: polygonColor,
       weight: 0,
-      fillOpacity: intensity.fillOpacity
+      fillOpacity: fillOpacity
     };
   };
 

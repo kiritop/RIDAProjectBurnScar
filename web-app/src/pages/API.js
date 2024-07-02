@@ -69,132 +69,54 @@ const spec = {
           }
         ],
         responses: {
-          '200': {
-            description: "Successful operation",
-            content: {
-              'application/json': {
-                schema: {
-                  type: "object",
-                  properties: {
-                    type: {
-                      type: "string"
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string"
                     },
-                    coordinates: {
-                      type: "string"
-                    },
-                    properties: {
-                      type: "object",
-                      properties: {
-                        count: {
-                          type: "integer"
-                        },
-                        year: {
-                          type: "array",
-                          items: {
-                            type: "string"
+                    "features": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string"
+                          },
+                          "properties": {
+                            "type": "object",
+                          },
+                          "geometry": {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string"
+                              },
+                              "coordinates": {
+                                "type": "array",
+                                "items": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "number"
+                                  }
+                                }
+                              }
+                            }
                           }
                         }
                       }
-                    },
-                    geometry: {
-                      type: "object"
                     }
                   }
                 }
               }
             }
           },
-          '404': {
-            description: "Invalid API key"
-          }
-        }
-      }
-    },
-    "/api/get-burnt-scar-point": {
-      get: {
-        tags: ["API LIST"],
-        summary: "Get burnt scar GeoJSON data (point)",
-        description: "This API endpoint returns GeoJSON data for burnt scars point based on the provided query parameters.",
-        parameters: [
-          {
-            in: "query",
-            name: "startDate",
-            schema: {
-              type: "date"
-            },
-            description: "The starting date for the data format yyyy-mm-dd."
-          },
-          {
-            in: "query",
-            name: "endDate",
-            schema: {
-              type: "date"
-            },
-            description: "The ending date for the data format yyyy-mm-dd"
-          },
-          {
-            in: "query",
-            name: "country",
-            schema: {
-              type: "string"
-            },
-            description: "The country to filter the data. (Use ISO3)"
-          },
-          {
-            in: "query",
-            name: "province",
-            schema: {
-              type: "string"
-            },
-            description: "The province to filter the data."
-          },
-          {
-            in: "query",
-            name: "api_key",
-            schema: {
-              type: "string"
-            },
-            description: "The API key for the user."
-          }
-        ],
-        responses: {
-          '200': {
-            description: "Successful operation",
-            content: {
-              'application/json': {
-                schema: {
-                  type: "object",
-                  properties: {
-                    type: {
-                      type: "string"
-                    },
-                    coordinates: {
-                      type: "string"
-                    },
-                    properties: {
-                      type: "object",
-                      properties: {
-                        count: {
-                          type: "integer"
-                        },
-                        year: {
-                          type: "array",
-                          items: {
-                            type: "string"
-                          }
-                        }
-                      }
-                    },
-                    geometry: {
-                      type: "object"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          '404': {
-            description: "Invalid API key"
+          "404": {
+            "description": "Invalid API key"
           }
         }
       }
@@ -246,32 +168,33 @@ const spec = {
                 schema: {
                   type: "object",
                   properties: {
-                    type: {
+                    AQI_ID: {
                       type: "string"
                     },
-                    coordinates: {
+                    AQI_DATE: {
                       type: "string"
                     },
-                    properties: {
-                      type: "object",
-                      properties: {
-                        count: {
-                          type: "integer"
-                        },
-                        year: {
-                          type: "array",
-                          items: {
-                            type: "string"
-                          }
-                        }
-                      }
-                    },
-                    latitude: {
+                    PM25: {
                       type: "string"
                     },
-                    longitude: {
+                    PV_EN: {
                       type: "string"
-                    }
+                    },
+                    AP_EN: {
+                      type: "string"
+                    },
+                    LATITUDE: {
+                      type: "string"
+                    },
+                    LONGITUDE: {
+                      type: "string"
+                    },
+                    COUNTRY: {
+                      type: "string"
+                    },
+                    ISO3: {
+                      type: "string"
+                    },
                   }
                 }
               }
@@ -291,19 +214,11 @@ const spec = {
         parameters: [
           {
             in: "query",
-            name: "startDate",
+            name: "date",
             schema: {
               type: "date"
             },
             description: "The starting date for the data format yyyy-mm-dd."
-          },
-          {
-            in: "query",
-            name: "endDate",
-            schema: {
-              type: "date"
-            },
-            description: "The ending date for the data format yyyy-mm-dd"
           },
           {
             in: "query",
@@ -338,32 +253,33 @@ const spec = {
                 schema: {
                   type: "object",
                   properties: {
-                    type: {
+                    HOT_SPOT_ID: {
+                      type: "integer"
+                    },
+                    HOT_SPOT_DATE: {
                       type: "string"
                     },
-                    coordinates: {
+                    TB_EN: {
                       type: "string"
                     },
-                    properties: {
-                      type: "object",
-                      properties: {
-                        count: {
-                          type: "integer"
-                        },
-                        year: {
-                          type: "array",
-                          items: {
-                            type: "string"
-                          }
-                        }
-                      }
-                    },
-                    latitude: {
+                    PV_EN: {
                       type: "string"
                     },
-                    longitude: {
+                    AP_EN: {
                       type: "string"
-                    }
+                    },
+                    LATITUDE: {
+                      type: "string"
+                    },
+                    LONGITUDE: {
+                      type: "string"
+                    },
+                    COUNTRY: {
+                      type: "string"
+                    },
+                    ISO3: {
+                      type: "string"
+                    },
                   }
                 }
               }
