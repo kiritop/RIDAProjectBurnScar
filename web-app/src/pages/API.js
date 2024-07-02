@@ -300,7 +300,6 @@ const API = () => {
   const users = useSelector((state) => state.users.data ?? []);
   const getfile = useSelector((state) => state.getfile);
   const apikey = users[0]?.api_key ?? [];
-  console.log(getfile);
 
   useEffect(() => {
     dispatch(fetchUsers());   
@@ -325,7 +324,7 @@ const API = () => {
       return;
     }
   
-    dispatch(generateApiKey(email)).then((result) => {
+    dispatch(generateApiKey(email.email)).then((result) => {
       if (result.type === generateApiKey.fulfilled.type) {
         Swal.fire({
           icon: "success",
