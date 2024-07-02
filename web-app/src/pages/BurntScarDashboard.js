@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Box, Typography, Container, CircularProgress, TableCell, InputLabel, FormControl, Select, MenuItem, Grid, Card, CardContent, Button } from "@mui/material";
 import MUIDataTable from "mui-datatables";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProvinceByCountry, fetchBurntDataTable, fetchBurntChart, fetchBubbleBurntMap } from '../reducers/dashboardSlice';
+import { fetchProvinceByCountry, fetchBurntDataTable, fetchBurntChart, fetchBubbleBurntMap, fetchDDBurntChart } from '../reducers/dashboardSlice';
 import { format } from 'date-fns';
 import LineChart from '../components/LineChart';
 import DrilldownChart from '../components/DrilldownChart';
@@ -57,7 +57,8 @@ function BurntScarDashboard() {
     dispatch(fetchBurntChart(obj))
       .finally(() => dispatch(fetchBurntDataTable(obj))
       .finally(() => dispatch(fetchBubbleBurntMap(obj))
-      .finally(() => setLoadingMap(false))));
+      .finally(() => dispatch(fetchDDBurntChart(obj))
+      .finally(() => setLoadingMap(false)))));
   }, [dispatch, country, province, startDate, endDate]);
 
   useEffect(() => {
@@ -371,7 +372,7 @@ function BurntScarDashboard() {
                     >
                       <Popup>
                         <Typography variant="subtitle1">
-                          {area.PV_EN}
+                          {area.AP_EN || area.PV_EN || area.ISO3}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
                           Burnt Area: {new Intl.NumberFormat('en-US').format(area.TOTAL_AREA)} sq m

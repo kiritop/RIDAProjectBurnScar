@@ -4,7 +4,7 @@ import Typography from "@mui/material/Typography";
 import MUIDataTable from "mui-datatables";
 import { Container, CircularProgress, TableCell, InputLabel, FormControl, Select, MenuItem, Grid, Card, CardContent, Button } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProvinceByCountry, fetchHotspotDataTable, fetchHotspotChart } from '../reducers/dashboardSlice';
+import { fetchProvinceByCountry, fetchHotspotDataTable, fetchHotspotChart, fetchDDHotspotChart, fetchBubbleHotspotMap } from '../reducers/dashboardSlice';
 import { format } from 'date-fns';
 import LineChartHotspot from '../components/LineChartHotspot';
 import CONFIG from '../config';
@@ -14,12 +14,15 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
 import DrilldownHotspotChart from '../components/DrilldownHotspotChart';
+import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
 
 
 function HotSpotDashboard() {
   const dispatch = useDispatch();
   const dataProvince = useSelector((state) => state.dashboard.dataProvince ?? []);
   const dataHotspotTable = useSelector((state) => state.dashboard.dataHotspotTable ?? []);
+  const dataHotspotBubbleMap = useSelector((state) => state.dashboard.dataHotspotBubbleMap ?? []);
   const [country, setCountry] = useState("ALL");
   const [province, setProvince] = useState("ALL");
   const [totalPoint, setTotalPoint] = useState(0);
@@ -67,7 +70,13 @@ function HotSpotDashboard() {
       .finally(() => {
         dispatch(fetchHotspotDataTable(obj))
           .finally(() => {
-            setLoadingMap(false);
+            dispatch(fetchDDHotspotChart(obj))
+              .finally(() => {
+                dispatch(fetchBubbleHotspotMap(obj))
+                  .finally(() => {
+                    setLoadingMap(false);
+                  });
+              });
           });
       });
   }, [dispatch, country, province, startDate, endDate]);
@@ -228,6 +237,16 @@ function HotSpotDashboard() {
       .catch(error => console.error('Error:', error));
   }
 
+  const center = [15, 105]; // Center of the map (Indochina Peninsula)
+  const zoom = 5; // Zoom level
+
+  const getColor = (index) => {
+    const colors = [
+      '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF', '#800000', '#008000', '#000080', '#808000', '#800080', '#008080'
+    ];
+    return colors[index % colors.length];
+  };
+
 
   return (
     <>
@@ -365,11 +384,46 @@ function HotSpotDashboard() {
               </CardContent>
             </Card>
           </Grid>
+
+          <Grid item xs={12}>
+            <Card sx={{ borderRadius: 3, overflow: "hidden" }} variant="outlined">
+              <CardContent>
+                <Typography variant="h4" component="div" gutterBottom>
+                Hotspot By Location
+                </Typography>
+                <MapContainer center={center} zoom={zoom} style={{ height: "500px", width: "100%" }}>
+                  <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  />
+                  {dataHotspotBubbleMap.map((area, index) => (
+                    <CircleMarker
+                      key={index}
+                      center={[area.LATITUDE, area.LONGITUDE]}
+                      radius={20 * Math.log(area.SUM_HOTSPOT / 500)}
+                      fillOpacity={0.5}
+                      fillColor={getColor(index)}
+                      stroke={false}
+                    >
+                      <Popup>
+                        <Typography variant="subtitle1">
+                          {area.AP_EN || area.PV_EN || area.ISO3}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Hotspot total: {new Intl.NumberFormat('en-US').format(area.SUM_HOTSPOT)} points
+                        </Typography>
+                      </Popup>
+                    </CircleMarker>
+                  ))}
+                </MapContainer>
+              </CardContent>
+            </Card>
+          </Grid>
          
           <Grid item xs={12} md={12}>
             <Box sx={{ borderRadius: 3, overflow: "hidden", flex: 1}}>
                 <MUIDataTable
-                  title={<h4>Hot Spot Ranking {format(new Date(startDate),'MMM dd yyyy')} - {format(new Date(endDate),'MMM dd yyyy')}</h4>}
+                  title={<h4>Hotspot Ranking {format(new Date(startDate),'MMM dd yyyy')} - {format(new Date(endDate),'MMM dd yyyy')}</h4>}
                   data={tableData}
                   columns={columns}
                   options={options}

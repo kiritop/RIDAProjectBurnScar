@@ -40,10 +40,8 @@ export const fetchAqiData = createAsyncThunk('aqi/fetchAqiData', async (filter) 
       if(valueCity === "All"){
         data_to_use = data.filter(country => country.country === valueCountry);
       }else{
-        console.log("valueCity", valueCity)
         data_to_use = data.filter(country => country.admin_name === valueCity);
       }
-      console.log("data_to_use", data_to_use)
       const promises = data_to_use.map(async (location) => {
           const url = `https://api.waqi.info/feed/geo:${location.lat};${location.lng}/?token=${CONFIG.AQI_API_KEY}`;
           try {

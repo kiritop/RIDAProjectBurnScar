@@ -5,45 +5,22 @@ import { useSelector } from "react-redux";
 
 const CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
-const DrilldownHotspotChart = () => {
-  const dataFromRedux = useSelector((state) => state.dashboard.dataHotspotChart ?? []);
+const DrilldownChart = () => {
+  const dataFromRedux = useSelector((state) => state.dashboard.dataDDHotspotChart ?? []);
   const [drilldownData, setDrilldownData] = useState(null);
   const [options, setOptions] = useState({});
 
   useEffect(() => {
     const processData = () => {
-      const groupedData = dataFromRedux.reduce((acc, data) => {
-        const { COUNTRY, HOT_SPOT_YEAR, PV_EN, AP_EN } = data.yearly;
-        let countryKey;
+      const groupedData = dataFromRedux.map(data => {
+        const label = data.yearly.AP_EN || data.yearly.PV_EN || data.yearly.COUNTRY || 'Unknown';
+        const axisTitle = data.yearly.AP_EN ? "District" : data.yearly.PV_EN ? "Province" : "Country";
 
-        if (PV_EN) {
-          countryKey = PV_EN;
-        } else if (AP_EN) {
-          countryKey = AP_EN;
-        } else {
-          countryKey = COUNTRY || "Unknown";
-        }
-
-        if (!acc[countryKey]) {
-          acc[countryKey] = [];
-        }
-
-        acc[countryKey].push({
-          HOT_SPOT_YEAR,
-          SUM_HOTSPOT: parseFloat(data.yearly.SUM_HOTSPOT),
-          details: data.details
-        });
-
-        return acc;
-      }, {});
-
-      const aggregatedData = Object.entries(groupedData).map(([key, value]) => {
-        const totalSumArea = value.reduce((sum, item) => sum + item.SUM_HOTSPOT, 0);
         return {
-          label: key,
-          y: totalSumArea,
-          details: value.flatMap(item => item.details),
-          yearly: value.map(item => ({ COUNTRY: key, HOT_SPOT_YEAR: item.HOT_SPOT_YEAR }))
+          label,
+          y: parseFloat(data.yearly.SUM_HOTSPOT),
+          details: data.details,
+          axisTitle
         };
       }).sort((a, b) => b.y - a.y);
 
@@ -51,7 +28,7 @@ const DrilldownHotspotChart = () => {
         animationEnabled: true,
         theme: "light2",
         axisX: {
-          title: "Country",
+          title: groupedData[0]?.axisTitle || "Location",
           interval: 1,
           labelAngle: -45
         },
@@ -66,18 +43,16 @@ const DrilldownHotspotChart = () => {
           contentFormatter: function (e) {
             let content = `<strong>${e.entries[0].dataPoint.label}</strong><br>`;
             e.entries.forEach(function (entry) {
-              const years = entry.dataPoint.yearly.map(y => y.HOT_SPOT_YEAR).join(", ");
-              content += `Hotspot: ${CanvasJSReact.CanvasJS.formatNumber(entry.dataPoint.y, "#,###")}(${years})<br>`;
+              content += `Area: ${CanvasJSReact.CanvasJS.formatNumber(entry.dataPoint.y, "#,###")} points<br>`;
             });
             return content;
           }
         },
         data: [{
           type: "column",
-          dataPoints: aggregatedData.map(item => ({
+          dataPoints: groupedData.map(item => ({
             label: item.label,
             y: item.y,
-            yearly: item.yearly,
             click: () => handleDrilldown(item)
           }))
         }]
@@ -88,27 +63,23 @@ const DrilldownHotspotChart = () => {
   }, [dataFromRedux]);
 
   const handleDrilldown = (item) => {
-    const monthData = item.details.reduce((acc, detail) => {
-      const yearMonth = `${detail.HOT_SPOT_YEAR}-${detail.HOT_SPOT_MONTH}`;
-      if (!acc[yearMonth]) {
-        acc[yearMonth] = {
-          x: new Date(detail.HOT_SPOT_YEAR, detail.HOT_SPOT_MONTH - 1),
-          y: 0
-        };
-      }
-      acc[yearMonth].y += parseFloat(detail.SUM_HOTSPOT);
-      return acc;
-    }, {});
+    if (item.details.length === 0) return;
 
-    const dataPoints = Object.values(monthData).sort((a, b) => a.x - b.x);
+    const detailKey = item.details[0].AP_EN ? "AP_EN" : "PV_EN";
+    const axisTitle = detailKey === "AP_EN" ? "District" : "Province";
+
+    const detailData = item.details.map(detail => ({
+      label: detail[detailKey] || 'Unknown',
+      y: parseFloat(detail.SUM_HOTSPOT)
+    })).sort((a, b) => b.y - a.y);
 
     const drilldownOptions = {
       animationEnabled: true,
       theme: "light2",
       axisX: {
-        title: "Month",
+        title: axisTitle,
         interval: 1,
-        valueFormatString: "MMM YYYY"
+        labelAngle: -45
       },
       axisY: {
         title: "Sum of Hot Spot",
@@ -119,16 +90,16 @@ const DrilldownHotspotChart = () => {
       toolTip: {
         shared: true,
         contentFormatter: function (e) {
-          let content = `<strong>${item.label}</strong><br>`;
+          let content = `<strong>${e.entries[0].dataPoint.label}</strong><br>`;
           e.entries.forEach(function (entry) {
-            content += `Month ${entry.dataPoint.x.toLocaleDateString('default', { month: 'short', year: 'numeric' })}: ${CanvasJSReact.CanvasJS.formatNumber(entry.dataPoint.y, "#,###")}<br>`;
+            content += `Area: ${CanvasJSReact.CanvasJS.formatNumber(entry.dataPoint.y, "#,###")} points<br>`;
           });
           return content;
         }
       },
       data: [{
-        type: "line",
-        dataPoints
+        type: "column",
+        dataPoints: detailData
       }]
     };
     setDrilldownData(drilldownOptions);
@@ -142,7 +113,7 @@ const DrilldownHotspotChart = () => {
     <Grid container spacing={3}>
       <Grid item xs={12}>
         <Typography variant="h4" component="div" gutterBottom>
-         Hotspot
+          Hotspot
         </Typography>
         <Button onClick={handleBack} disabled={!drilldownData}>Back</Button>
       </Grid>
@@ -153,4 +124,4 @@ const DrilldownHotspotChart = () => {
   );
 };
 
-export default DrilldownHotspotChart;
+export default DrilldownChart;

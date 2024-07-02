@@ -6,44 +6,21 @@ import { useSelector } from "react-redux";
 const CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
 const DrilldownChart = () => {
-  const dataFromRedux = useSelector((state) => state.dashboard.dataBurntChart ?? []);
+  const dataFromRedux = useSelector((state) => state.dashboard.dataDDBurntChart ?? []);
   const [drilldownData, setDrilldownData] = useState(null);
   const [options, setOptions] = useState({});
 
   useEffect(() => {
     const processData = () => {
-      const groupedData = dataFromRedux.reduce((acc, data) => {
-        const { COUNTRY, FIRE_YEAR, PV_EN, AP_EN } = data.yearly;
-        let countryKey;
+      const groupedData = dataFromRedux.map(data => {
+        const label = data.yearly.AP_EN || data.yearly.PV_EN || data.yearly.COUNTRY || 'Unknown';
+        const axisTitle = data.yearly.AP_EN ? "District" : data.yearly.PV_EN ? "Province" : "Country";
 
-        if (PV_EN) {
-          countryKey = PV_EN;
-        } else if (AP_EN) {
-          countryKey = AP_EN;
-        } else {
-          countryKey = COUNTRY || "Unknown";
-        }
-
-        if (!acc[countryKey]) {
-          acc[countryKey] = [];
-        }
-
-        acc[countryKey].push({
-          FIRE_YEAR,
-          SUM_AREA: parseFloat(data.yearly.SUM_AREA),
-          details: data.details
-        });
-
-        return acc;
-      }, {});
-
-      const aggregatedData = Object.entries(groupedData).map(([key, value]) => {
-        const totalSumArea = value.reduce((sum, item) => sum + item.SUM_AREA, 0);
         return {
-          label: key,
-          y: totalSumArea,
-          details: value.flatMap(item => item.details),
-          yearly: value.map(item => ({ COUNTRY: key, FIRE_YEAR: item.FIRE_YEAR }))
+          label,
+          y: parseFloat(data.yearly.SUM_AREA),
+          details: data.details,
+          axisTitle
         };
       }).sort((a, b) => b.y - a.y);
 
@@ -51,7 +28,7 @@ const DrilldownChart = () => {
         animationEnabled: true,
         theme: "light2",
         axisX: {
-          title: "Country",
+          title: groupedData[0]?.axisTitle || "Location",
           interval: 1,
           labelAngle: -45
         },
@@ -66,18 +43,16 @@ const DrilldownChart = () => {
           contentFormatter: function (e) {
             let content = `<strong>${e.entries[0].dataPoint.label}</strong><br>`;
             e.entries.forEach(function (entry) {
-              const years = entry.dataPoint.yearly.map(y => y.FIRE_YEAR).join(", ");
-              content += `Area: ${CanvasJSReact.CanvasJS.formatNumber(entry.dataPoint.y, "#,###")} sq m (${years})<br>`;
+              content += `Area: ${CanvasJSReact.CanvasJS.formatNumber(entry.dataPoint.y, "#,###")} sq m<br>`;
             });
             return content;
           }
         },
         data: [{
           type: "column",
-          dataPoints: aggregatedData.map(item => ({
+          dataPoints: groupedData.map(item => ({
             label: item.label,
             y: item.y,
-            yearly: item.yearly,
             click: () => handleDrilldown(item)
           }))
         }]
@@ -88,27 +63,23 @@ const DrilldownChart = () => {
   }, [dataFromRedux]);
 
   const handleDrilldown = (item) => {
-    const monthData = item.details.reduce((acc, detail) => {
-      const yearMonth = `${detail.FIRE_YEAR}-${detail.FIRE_MONTH}`;
-      if (!acc[yearMonth]) {
-        acc[yearMonth] = {
-          x: new Date(detail.FIRE_YEAR, detail.FIRE_MONTH - 1),
-          y: 0
-        };
-      }
-      acc[yearMonth].y += parseFloat(detail.SUM_AREA);
-      return acc;
-    }, {});
+    if (item.details.length === 0) return;
 
-    const dataPoints = Object.values(monthData).sort((a, b) => a.x - b.x);
+    const detailKey = item.details[0].AP_EN ? "AP_EN" : "PV_EN";
+    const axisTitle = detailKey === "AP_EN" ? "District" : "Province";
+
+    const detailData = item.details.map(detail => ({
+      label: detail[detailKey] || 'Unknown',
+      y: parseFloat(detail.SUM_AREA)
+    })).sort((a, b) => b.y - a.y);
 
     const drilldownOptions = {
       animationEnabled: true,
       theme: "light2",
       axisX: {
-        title: "Month",
+        title: axisTitle,
         interval: 1,
-        valueFormatString: "MMM YYYY"
+        labelAngle: -45
       },
       axisY: {
         title: "Sum Area (sq m)",
@@ -119,16 +90,16 @@ const DrilldownChart = () => {
       toolTip: {
         shared: true,
         contentFormatter: function (e) {
-          let content = `<strong>${item.label}</strong><br>`;
+          let content = `<strong>${e.entries[0].dataPoint.label}</strong><br>`;
           e.entries.forEach(function (entry) {
-            content += `Month ${entry.dataPoint.x.toLocaleDateString('default', { month: 'short', year: 'numeric' })}: ${CanvasJSReact.CanvasJS.formatNumber(entry.dataPoint.y, "#,###")} sq m<br>`;
+            content += `Area: ${CanvasJSReact.CanvasJS.formatNumber(entry.dataPoint.y, "#,###")} sq m<br>`;
           });
           return content;
         }
       },
       data: [{
-        type: "column", // Change this line to use "column" for bar chart
-        dataPoints
+        type: "column",
+        dataPoints: detailData
       }]
     };
     setDrilldownData(drilldownOptions);

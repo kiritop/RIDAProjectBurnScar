@@ -4,7 +4,7 @@ import Typography from "@mui/material/Typography";
 import MUIDataTable from "mui-datatables";
 import { Container, CircularProgress, TableCell, InputLabel, FormControl, Select, MenuItem, Grid, Card, CardContent, Button } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProvinceByCountry, fetchAqiDataTable, fetchAqiChart } from '../reducers/dashboardSlice';
+import { fetchProvinceByCountry, fetchAqiDataTable, fetchAqiChart, fetchDDAqiChart, fetchBubbleAqiMap } from '../reducers/dashboardSlice';
 import { format } from 'date-fns';
 import LineChartAqi from '../components/LineChartAqi';
 import CONFIG from '../config';
@@ -14,6 +14,8 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
 import DrilldownAqiChart from '../components/DrilldownAqiChart';
+import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
 
 
 
@@ -21,6 +23,7 @@ function AirQualityDashboard() {
   const dispatch = useDispatch();
   const dataProvince = useSelector((state) => state.dashboard.dataProvince ?? []);
   const dataAqiTable = useSelector((state) => state.dashboard.dataAqiTable ?? []);
+  const dataAqiBubbleMap = useSelector((state) => state.dashboard.dataAqiBubbleMap ?? []);
   const [country, setCountry] = useState("ALL");
   const [province, setProvince] = useState("ALL");
   const [totalPoint, setTotalPoint] = useState(0);
@@ -68,7 +71,13 @@ function AirQualityDashboard() {
       .finally(() => {
         dispatch(fetchAqiDataTable(obj))
           .finally(() => {
-            setLoadingMap(false);
+            dispatch(fetchDDAqiChart(obj))
+              .finally(() => {
+                dispatch(fetchBubbleAqiMap(obj))
+                  .finally(() => {
+                    setLoadingMap(false);
+                  });
+              });
           });
       });
   }, [dispatch, country, province, startDate, endDate]);
@@ -232,6 +241,15 @@ function AirQualityDashboard() {
       .catch(error => console.error('Error:', error));
   }
 
+  const center = [15, 105]; // Center of the map (Indochina Peninsula)
+  const zoom = 5; // Zoom level
+
+  const getColor = (index) => {
+    const colors = [
+      '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF', '#800000', '#008000', '#000080', '#808000', '#800080', '#008080'
+    ];
+    return colors[index % colors.length];
+  };
 
   return (
     <>
@@ -366,6 +384,41 @@ function AirQualityDashboard() {
                   Aqi By Time
                 </Typography>
                 <LineChartAqi/>      
+              </CardContent>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12}>
+            <Card sx={{ borderRadius: 3, overflow: "hidden" }} variant="outlined">
+              <CardContent>
+                <Typography variant="h4" component="div" gutterBottom>
+                  Air Quality By Location
+                </Typography>
+                <MapContainer center={center} zoom={zoom} style={{ height: "500px", width: "100%" }}>
+                  <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  />
+                  {dataAqiBubbleMap.map((area, index) => (
+                    <CircleMarker
+                      key={index}
+                      center={[area.LATITUDE, area.LONGITUDE]}
+                      radius={20 * Math.log(area.AVG_PM25 / 1)}
+                      fillOpacity={0.5}
+                      fillColor={getColor(index)}
+                      stroke={false}
+                    >
+                      <Popup>
+                        <Typography variant="subtitle1">
+                          {area.AP_EN || area.PV_EN || area.ISO3}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          average pm25 : {new Intl.NumberFormat('en-US').format(area.AVG_PM25)} µg/m^3
+                        </Typography>
+                      </Popup>
+                    </CircleMarker>
+                  ))}
+                </MapContainer>
               </CardContent>
             </Card>
           </Grid>

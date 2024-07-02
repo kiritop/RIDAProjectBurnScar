@@ -86,7 +86,6 @@ const DataTable = () => {
               color="primary"
               onClick={() => {
                 downloadFile(value);
-                console.log(value);
               }}
             >
               Download

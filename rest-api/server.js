@@ -49,6 +49,167 @@ const executeQuery = async (query, params) => {
   }
 };
 
+
+server.get('/rida-api/api/drildown-chart', async (req, res) => {
+  const { country, startDate, endDate, province } = req.query;
+
+  let firstQuery = '';
+  let firstQueryParams = [startDate, endDate];
+
+  if (country === 'ALL' && province === 'ALL') {
+    firstQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ? GROUP BY COUNTRY;`;
+  } else if (country !== 'ALL' && province === 'ALL') {
+    firstQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, PV_EN FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ? ${country ? 'AND ISO3 = ?' : ''} GROUP BY COUNTRY, PV_EN;`;
+    if (country) firstQueryParams.push(country);
+  } else if (country !== 'ALL' && province !== 'ALL') {
+    firstQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, AP_EN FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ? ${country ? 'AND ISO3 = ?' : ''} ${province ? 'AND PV_EN = ?' : ''} GROUP BY COUNTRY, AP_EN;`;
+    if (country) firstQueryParams.push(country);
+    if (province) firstQueryParams.push(province);
+  }
+
+  try {
+    const firstResults = await executeQuery(firstQuery, firstQueryParams);
+
+    if (country === 'ALL' && province === 'ALL') {
+      secondQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, PV_EN FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ?  GROUP BY COUNTRY, PV_EN;`;
+    } else if (country !== 'ALL' && province === 'ALL') {
+      secondQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, PV_EN, AP_EN FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ? ${country ? 'AND ISO3 = ?' : ''} GROUP BY COUNTRY, PV_EN, AP_EN;`;
+    }
+
+    const secondResults = await executeQuery(secondQuery, firstQueryParams);
+
+    const transformedData = firstResults.map(row => {
+      const { FIRE_YEAR, COUNTRY, PV_EN, AP_EN } = row;
+      let details = [];
+      if (country === 'ALL' && province === 'ALL') {
+        details = secondResults.filter(secondRow => secondRow.COUNTRY === COUNTRY);
+      } else if (country !== 'ALL' && province === 'ALL') {
+        details = secondResults.filter(secondRow => secondRow.PV_EN === PV_EN);
+      } else if (country !== 'ALL' && province !== 'ALL') {
+        details = []
+      }
+
+      return {
+        yearly: row,
+        details
+      };
+
+    });
+
+    res.json(transformedData);
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send('Internal server error');
+  }
+});
+
+
+server.get('/rida-api/api/drildown-chart-hotspot', async (req, res) => {
+  const { country, startDate, endDate, province } = req.query;
+
+  let firstQuery = '';
+  let firstQueryParams = [startDate, endDate];
+
+  if (country === 'ALL' && province === 'ALL') {
+    firstQuery = `SELECT COUNT(*) AS SUM_HOTSPOT, COUNTRY FROM HOT_SPOT WHERE HOT_SPOT_DATE BETWEEN ? AND ? GROUP BY COUNTRY;`;
+  } else if (country !== 'ALL' && province === 'ALL') {
+    firstQuery = `SELECT COUNT(*) AS SUM_HOTSPOT, COUNTRY, PV_EN FROM HOT_SPOT WHERE HOT_SPOT_DATE BETWEEN ? AND ? ${country ? 'AND ISO3 = ?' : ''} GROUP BY COUNTRY, PV_EN;`;
+    if (country) firstQueryParams.push(country);
+  } else if (country !== 'ALL' && province !== 'ALL') {
+    firstQuery = `SELECT COUNT(*) AS SUM_HOTSPOT, COUNTRY, AP_EN FROM HOT_SPOT WHERE HOT_SPOT_DATE BETWEEN ? AND ? ${country ? 'AND ISO3 = ?' : ''} ${province ? 'AND PV_EN = ?' : ''} GROUP BY COUNTRY, AP_EN;`;
+    if (country) firstQueryParams.push(country);
+    if (province) firstQueryParams.push(province);
+  }
+
+  try {
+    const firstResults = await executeQuery(firstQuery, firstQueryParams);
+
+    if (country === 'ALL' && province === 'ALL') {
+      secondQuery = `SELECT COUNT(*) AS SUM_HOTSPOT, COUNTRY, PV_EN FROM HOT_SPOT WHERE HOT_SPOT_DATE BETWEEN ? AND ?  GROUP BY COUNTRY, PV_EN;`;
+    } else if (country !== 'ALL' && province === 'ALL') {
+      secondQuery = `SELECT COUNT(*) AS SUM_HOTSPOT, COUNTRY, PV_EN, AP_EN FROM HOT_SPOT WHERE HOT_SPOT_DATE BETWEEN ? AND ? ${country ? 'AND ISO3 = ?' : ''} GROUP BY COUNTRY, PV_EN, AP_EN;`;
+    }
+
+    const secondResults = await executeQuery(secondQuery, firstQueryParams);
+
+    const transformedData = firstResults.map(row => {
+      const { COUNTRY, PV_EN } = row;
+      let details = [];
+      if (country === 'ALL' && province === 'ALL') {
+        details = secondResults.filter(secondRow => secondRow.COUNTRY === COUNTRY);
+      } else if (country !== 'ALL' && province === 'ALL') {
+        details = secondResults.filter(secondRow => secondRow.PV_EN === PV_EN);
+      } else if (country !== 'ALL' && province !== 'ALL') {
+        details = []
+      }
+
+      return {
+        yearly: row,
+        details
+      };
+
+    });
+
+    res.json(transformedData);
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send('Internal server error');
+  }
+});
+
+server.get('/rida-api/api/drildown-chart-aqi', async (req, res) => {
+  const { country, startDate, endDate, province } = req.query;
+
+  let firstQuery = '';
+  let firstQueryParams = [startDate, endDate];
+
+  if (country === 'ALL' && province === 'ALL') {
+    firstQuery = `SELECT ROUND(AVG(PM25), 2) AS AVG_PM25, COUNTRY FROM AIR_QUALITY WHERE AQI_DATE BETWEEN ? AND ? GROUP BY COUNTRY;`;
+  } else if (country !== 'ALL' && province === 'ALL') {
+    firstQuery = `SELECT ROUND(AVG(PM25), 2) AS AVG_PM25, COUNTRY, PV_EN FROM AIR_QUALITY WHERE AQI_DATE BETWEEN ? AND ? ${country ? 'AND ISO3 = ?' : ''} GROUP BY COUNTRY, PV_EN;`;
+    if (country) firstQueryParams.push(country);
+  } else if (country !== 'ALL' && province !== 'ALL') {
+    firstQuery = `SELECT ROUND(AVG(PM25), 2) AS AVG_PM25, COUNTRY, AP_EN FROM AIR_QUALITY WHERE AQI_DATE BETWEEN ? AND ? ${country ? 'AND ISO3 = ?' : ''} ${province ? 'AND PV_EN = ?' : ''} GROUP BY COUNTRY, AP_EN;`;
+    if (country) firstQueryParams.push(country);
+    if (province) firstQueryParams.push(province);
+  }
+
+  try {
+    const firstResults = await executeQuery(firstQuery, firstQueryParams);
+
+    if (country === 'ALL' && province === 'ALL') {
+      secondQuery = `SELECT ROUND(AVG(PM25), 2) AS AVG_PM25, COUNTRY, PV_EN FROM AIR_QUALITY WHERE AQI_DATE BETWEEN ? AND ?  GROUP BY COUNTRY, PV_EN;`;
+    } else if (country !== 'ALL' && province === 'ALL') {
+      secondQuery = `SELECT ROUND(AVG(PM25), 2) AS AVG_PM25, COUNTRY, PV_EN, AP_EN FROM AIR_QUALITY WHERE AQI_DATE BETWEEN ? AND ? ${country ? 'AND ISO3 = ?' : ''} GROUP BY COUNTRY, PV_EN, AP_EN;`;
+    }
+
+    const secondResults = await executeQuery(secondQuery, firstQueryParams);
+
+    const transformedData = firstResults.map(row => {
+      const { COUNTRY, PV_EN } = row;
+      let details = [];
+      if (country === 'ALL' && province === 'ALL') {
+        details = secondResults.filter(secondRow => secondRow.COUNTRY === COUNTRY);
+      } else if (country !== 'ALL' && province === 'ALL') {
+        details = secondResults.filter(secondRow => secondRow.PV_EN === PV_EN);
+      } else if (country !== 'ALL' && province !== 'ALL') {
+        details = []
+      }
+
+      return {
+        yearly: row,
+        details
+      };
+
+    });
+
+    res.json(transformedData);
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send('Internal server error');
+  }
+});
+
 server.get('/rida-api/api/line-chart', async (req, res) => {
   const { country, startDate, endDate, province } = req.query;
 
@@ -112,68 +273,6 @@ server.get('/rida-api/api/line-chart', async (req, res) => {
   }
 });
 
-server.get('/rida-api/api/bubble-chart', async (req, res) => {
-  const { country, startDate, endDate, province } = req.query;
-
-  let firstQuery = '';
-  let firstQueryParams = [startDate, endDate];
-
-  if (country === 'ALL' && province === 'ALL') {
-    firstQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ? GROUP BY COUNTRY, FIRE_YEAR;`;
-  } else if (country !== 'ALL' && province === 'ALL') {
-    firstQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR, PV_EN FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ? ${country ? 'AND ISO3 = ?' : ''} GROUP BY COUNTRY, FIRE_YEAR, PV_EN;`;
-    if (country) firstQueryParams.push(country);
-  } else if (country !== 'ALL' && province !== 'ALL') {
-    firstQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR, AP_EN FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ? ${country ? 'AND ISO3 = ?' : ''} ${province ? 'AND PV_EN = ?' : ''} GROUP BY COUNTRY, FIRE_YEAR, AP_EN;`;
-    if (country) firstQueryParams.push(country);
-    if (province) firstQueryParams.push(province);
-  }
-
-  try {
-    const firstResults = await executeQuery(firstQuery, firstQueryParams);
-
-    const fireYear = firstResults.map(row => row.FIRE_YEAR);
-    const uniqueFireYear = [...new Set(fireYear)];
-
-    let secondQuery = '';
-    let secondQueryParams = [uniqueFireYear];
-
-    if (country === 'ALL' && province === 'ALL') {
-      secondQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR, MONTH(FIRE_DATE) AS FIRE_MONTH FROM BURNT_SCAR_INFO WHERE YEAR(FIRE_DATE) IN (?) GROUP BY COUNTRY, FIRE_YEAR, FIRE_MONTH;`;
-    } else if (country !== 'ALL' && province === 'ALL') {
-      secondQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR, MONTH(FIRE_DATE) AS FIRE_MONTH, PV_EN FROM BURNT_SCAR_INFO WHERE YEAR(FIRE_DATE) IN (?) ${country ? 'AND ISO3 = ?' : ''} GROUP BY COUNTRY, FIRE_YEAR, FIRE_MONTH, PV_EN;`;
-      if (country) secondQueryParams.push(country);
-    } else if (country !== 'ALL' && province !== 'ALL') {
-      secondQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR, MONTH(FIRE_DATE) AS FIRE_MONTH, AP_EN FROM BURNT_SCAR_INFO WHERE YEAR(FIRE_DATE) IN (?) ${country ? 'AND ISO3 = ?' : ''} ${province ? 'AND PV_EN = ?' : ''} GROUP BY COUNTRY, FIRE_YEAR, FIRE_MONTH, AP_EN;`;
-      if (country) secondQueryParams.push(country);
-      if (province) secondQueryParams.push(province);
-    }
-
-    const secondResults = await executeQuery(secondQuery, secondQueryParams);
-
-    const transformedData = firstResults.map(row => {
-      const { FIRE_YEAR, COUNTRY, PV_EN, AP_EN } = row;
-      let details = [];
-      if (country === 'ALL' && province === 'ALL') {
-        details = secondResults.filter(secondRow => secondRow.FIRE_YEAR === FIRE_YEAR && secondRow.COUNTRY === COUNTRY);
-      } else if (country !== 'ALL' && province === 'ALL') {
-        details = secondResults.filter(secondRow => secondRow.FIRE_YEAR === FIRE_YEAR && secondRow.PV_EN === PV_EN);
-      } else if (country !== 'ALL' && province !== 'ALL') {
-        details = secondResults.filter(secondRow => secondRow.FIRE_YEAR === FIRE_YEAR && secondRow.AP_EN === AP_EN);
-      }
-
-      return {
-        yearly: row,
-        details
-      };
-    });
-
-    res.json(transformedData);
-  } catch (error) {
-    console.error('Error executing query:', error);
-    res.status(500).send('Internal server error');
-  }
-});
 
 server.get('/rida-api/api/burnt-bubble-chart', async (req, res) => {
   const { country, startDate, endDate, province } = req.query;
@@ -261,7 +360,7 @@ server.get('/rida-api/api/burnt-bubble-chart', async (req, res) => {
   }
 });
 
-server.get('/rida-api/api/api-bubble-chart', async (req, res) => {
+server.get('/rida-api/api/aqi-bubble-chart', async (req, res) => {
   const { country, startDate, endDate, province } = req.query;
 
   let query = '';
@@ -278,17 +377,17 @@ server.get('/rida-api/api/api-bubble-chart', async (req, res) => {
     query = `
       SELECT 
           b.ISO3,
-          ROUND(SUM(b.AREA), 3) AS TOTAL_AREA,
+          ROUND(AVG(PM25), 2) AS AVG_PM25,
           l.LATITUDE,
           l.LONGITUDE
       FROM 
-          BURNT_SCAR_INFO b
+          AIR_QUALITY b
       JOIN 
           LOCATION_INFO l
       ON 
           b.ISO3 = l.ISO3
       WHERE 
-          b.FIRE_DATE BETWEEN ? AND ?
+          b.AQI_DATE BETWEEN ? AND ?
           AND l.LOCATION_LEVEL = 'Admin'
       GROUP BY 
           b.ISO3, l.LATITUDE, l.LONGITUDE;
@@ -298,17 +397,17 @@ server.get('/rida-api/api/api-bubble-chart', async (req, res) => {
       SELECT 
           b.ISO3,
           b.PV_EN,
-          ROUND(SUM(b.AREA), 3) AS TOTAL_AREA,
+          ROUND(AVG(PM25), 2) AS AVG_PM25,
           l.LATITUDE,
           l.LONGITUDE
       FROM 
-          BURNT_SCAR_INFO b
+          AIR_QUALITY b
       JOIN 
           LOCATION_INFO l
       ON 
           b.PV_EN = l.PV_EN AND b.ISO3 = l.ISO3
       WHERE 
-          b.FIRE_DATE BETWEEN ? AND ?
+          b.AQI_DATE BETWEEN ? AND ?
           AND b.ISO3 = ?
           AND l.LOCATION_LEVEL = 'Major'
       GROUP BY 
@@ -320,17 +419,17 @@ server.get('/rida-api/api/api-bubble-chart', async (req, res) => {
           b.ISO3,
           b.PV_EN,
           b.AP_EN,
-          ROUND(SUM(b.AREA), 3) AS TOTAL_AREA,
+          ROUND(AVG(PM25), 2) AS AVG_PM25,
           l.LATITUDE,
           l.LONGITUDE
       FROM 
-          BURNT_SCAR_INFO b
+          AIR_QUALITY b
       JOIN 
           LOCATION_INFO l
       ON 
           b.AP_EN = l.AP_EN AND b.PV_EN = l.PV_EN AND b.ISO3 = l.ISO3
       WHERE 
-          b.FIRE_DATE BETWEEN ? AND ?
+          b.AQI_DATE BETWEEN ? AND ?
           AND b.ISO3 = ?
           AND b.PV_EN = ?
       GROUP BY 
@@ -364,17 +463,17 @@ server.get('/rida-api/api/hotspot-bubble-chart', async (req, res) => {
     query = `
       SELECT 
           b.ISO3,
-          ROUND(SUM(b.AREA), 3) AS TOTAL_AREA,
+          COUNT(*) AS SUM_HOTSPOT,
           l.LATITUDE,
           l.LONGITUDE
       FROM 
-          BURNT_SCAR_INFO b
+          HOT_SPOT b
       JOIN 
           LOCATION_INFO l
       ON 
           b.ISO3 = l.ISO3
       WHERE 
-          b.FIRE_DATE BETWEEN ? AND ?
+          b.HOT_SPOT_DATE BETWEEN ? AND ?
           AND l.LOCATION_LEVEL = 'Admin'
       GROUP BY 
           b.ISO3, l.LATITUDE, l.LONGITUDE;
@@ -384,17 +483,17 @@ server.get('/rida-api/api/hotspot-bubble-chart', async (req, res) => {
       SELECT 
           b.ISO3,
           b.PV_EN,
-          ROUND(SUM(b.AREA), 3) AS TOTAL_AREA,
+          COUNT(*) AS SUM_HOTSPOT,
           l.LATITUDE,
           l.LONGITUDE
       FROM 
-          BURNT_SCAR_INFO b
+          HOT_SPOT b
       JOIN 
           LOCATION_INFO l
       ON 
           b.PV_EN = l.PV_EN AND b.ISO3 = l.ISO3
       WHERE 
-          b.FIRE_DATE BETWEEN ? AND ?
+          b.HOT_SPOT_DATE BETWEEN ? AND ?
           AND b.ISO3 = ?
           AND l.LOCATION_LEVEL = 'Major'
       GROUP BY 
@@ -406,17 +505,17 @@ server.get('/rida-api/api/hotspot-bubble-chart', async (req, res) => {
           b.ISO3,
           b.PV_EN,
           b.AP_EN,
-          ROUND(SUM(b.AREA), 3) AS TOTAL_AREA,
+          COUNT(*) AS SUM_HOTSPOT,
           l.LATITUDE,
           l.LONGITUDE
       FROM 
-          BURNT_SCAR_INFO b
+          HOT_SPOT b
       JOIN 
           LOCATION_INFO l
       ON 
           b.AP_EN = l.AP_EN AND b.PV_EN = l.PV_EN AND b.ISO3 = l.ISO3
       WHERE 
-          b.FIRE_DATE BETWEEN ? AND ?
+          b.HOT_SPOT_DATE BETWEEN ? AND ?
           AND b.ISO3 = ?
           AND b.PV_EN = ?
       GROUP BY 

@@ -122,8 +122,6 @@ function FilterCard() {
       endDate: endDate
     };
 
-    console.log('sidebarForm', sidebarForm)
-
     let current_lat, current_lng;
 
     if (province === 'ALL' || country === 'ALL') {

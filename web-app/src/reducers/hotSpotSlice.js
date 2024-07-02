@@ -9,7 +9,6 @@ export const fetchHotSpotData = createAsyncThunk('hotSpot/fetchHotSpotData', asy
     const year = currentDate.getFullYear();
     const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // เดือนเริ่มต้นที่ 0
     const day = String(currentDate.getDate()).padStart(2, '0');
-    console.log("filter", filter)
     
     // Fetch the CSV data from the API URL
     if(filter.iso3){

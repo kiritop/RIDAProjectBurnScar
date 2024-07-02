@@ -5,53 +5,30 @@ import { useSelector } from "react-redux";
 
 const CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
-const DrilldownAqiChart = () => {
-  const dataFromRedux = useSelector((state) => state.dashboard.dataAqiChart ?? []);
+const DrilldownChart = () => {
+  const dataFromRedux = useSelector((state) => state.dashboard.dataDDAqiChart ?? []);
   const [drilldownData, setDrilldownData] = useState(null);
   const [options, setOptions] = useState({});
 
   useEffect(() => {
     const processData = () => {
-      const groupedData = dataFromRedux.reduce((acc, data) => {
-        const { COUNTRY, AQI_YEAR, PV_EN, AP_EN } = data.yearly;
-        let countryKey;
+      const groupedData = dataFromRedux.map(data => {
+        const label = data.yearly.AP_EN || data.yearly.PV_EN || data.yearly.COUNTRY || 'Unknown';
+        const axisTitle = data.yearly.AP_EN ? "District" : data.yearly.PV_EN ? "Province" : "Country";
 
-        if (PV_EN) {
-          countryKey = PV_EN;
-        } else if (AP_EN) {
-          countryKey = AP_EN;
-        } else {
-          countryKey = COUNTRY || "Unknown";
-        }
-
-        if (!acc[countryKey]) {
-          acc[countryKey] = [];
-        }
-
-        acc[countryKey].push({
-          AQI_YEAR,
-          AVG_PM25: parseFloat(data.yearly.AVG_PM25),
-          details: data.details
-        });
-
-        return acc;
-      }, {});
-
-      const aggregatedData = Object.entries(groupedData).map(([key, value]) => {
-        const maxArea = Math.max(...value.map(item => item.AVG_PM25));
         return {
-          label: key,
-          y: maxArea,
-          details: value.flatMap(item => item.details),
-          yearly: value.map(item => ({ COUNTRY: key, AQI_YEAR: item.AQI_YEAR }))
+          label,
+          y: parseFloat(data.yearly.AVG_PM25),
+          details: data.details,
+          axisTitle
         };
-      }).sort((a, b) => b.y - a.y);  // Sort descending
+      }).sort((a, b) => b.y - a.y);
 
       setOptions({
         animationEnabled: true,
         theme: "light2",
         axisX: {
-          title: "Country",
+          title: groupedData[0]?.axisTitle || "Location",
           interval: 1,
           labelAngle: -45
         },
@@ -66,18 +43,16 @@ const DrilldownAqiChart = () => {
           contentFormatter: function (e) {
             let content = `<strong>${e.entries[0].dataPoint.label}</strong><br>`;
             e.entries.forEach(function (entry) {
-              const years = entry.dataPoint.yearly.map(y => y.AQI_YEAR).join(", ");
-              content += `Max PM2.5: ${CanvasJSReact.CanvasJS.formatNumber(entry.dataPoint.y, "#,###")} (µg/m^3) (${years})<br>`;
+              content += `Area: ${CanvasJSReact.CanvasJS.formatNumber(entry.dataPoint.y, "#,###")} µg/m^3<br>`;
             });
             return content;
           }
         },
         data: [{
           type: "column",
-          dataPoints: aggregatedData.map(item => ({
+          dataPoints: groupedData.map(item => ({
             label: item.label,
             y: item.y,
-            yearly: item.yearly,
             click: () => handleDrilldown(item)
           }))
         }]
@@ -88,27 +63,23 @@ const DrilldownAqiChart = () => {
   }, [dataFromRedux]);
 
   const handleDrilldown = (item) => {
-    const monthData = item.details.reduce((acc, detail) => {
-      const yearMonth = `${detail.AQI_YEAR}-${detail.AQI_MONTH}`;
-      if (!acc[yearMonth]) {
-        acc[yearMonth] = {
-          x: new Date(detail.AQI_YEAR, detail.AQI_MONTH - 1),
-          y: 0
-        };
-      }
-      acc[yearMonth].y = Math.max(acc[yearMonth].y, parseFloat(detail.AVG_PM25));
-      return acc;
-    }, {});
+    if (item.details.length === 0) return;
 
-    const dataPoints = Object.values(monthData).sort((a, b) => a.x - b.x);  // Sort ascending by date
+    const detailKey = item.details[0].AP_EN ? "AP_EN" : "PV_EN";
+    const axisTitle = detailKey === "AP_EN" ? "District" : "Province";
+
+    const detailData = item.details.map(detail => ({
+      label: detail[detailKey] || 'Unknown',
+      y: parseFloat(detail.AVG_PM25)
+    })).sort((a, b) => b.y - a.y);
 
     const drilldownOptions = {
       animationEnabled: true,
       theme: "light2",
       axisX: {
-        title: "Month",
+        title: axisTitle,
         interval: 1,
-        valueFormatString: "MMM YYYY"
+        labelAngle: -45
       },
       axisY: {
         title: "Avg PM2.5 (µg/m^3)",
@@ -119,16 +90,16 @@ const DrilldownAqiChart = () => {
       toolTip: {
         shared: true,
         contentFormatter: function (e) {
-          let content = `<strong>${item.label}</strong><br>`;
+          let content = `<strong>${e.entries[0].dataPoint.label}</strong><br>`;
           e.entries.forEach(function (entry) {
-            content += `Month ${entry.dataPoint.x.toLocaleDateString('default', { month: 'short', year: 'numeric' })}: ${CanvasJSReact.CanvasJS.formatNumber(entry.dataPoint.y, "#,###")} µg/m^3<br>`;
+            content += `Area: ${CanvasJSReact.CanvasJS.formatNumber(entry.dataPoint.y, "#,###")} µg/m^3<br>`;
           });
           return content;
         }
       },
       data: [{
-        type: "line",
-        dataPoints
+        type: "column",
+        dataPoints: detailData
       }]
     };
     setDrilldownData(drilldownOptions);
@@ -142,7 +113,7 @@ const DrilldownAqiChart = () => {
     <Grid container spacing={3}>
       <Grid item xs={12}>
         <Typography variant="h4" component="div" gutterBottom>
-         Air Quality
+          Air Quality
         </Typography>
         <Button onClick={handleBack} disabled={!drilldownData}>Back</Button>
       </Grid>
@@ -153,4 +124,4 @@ const DrilldownAqiChart = () => {
   );
 };
 
-export default DrilldownAqiChart;
+export default DrilldownChart;
