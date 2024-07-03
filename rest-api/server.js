@@ -797,7 +797,7 @@ server.get("/rida-api/api/get-province", async (req, res) => {
   let sql = `SELECT DISTINCT 
   b.ISO3 AS ISO3, b.PV_EN AS PV_EN, l.LATITUDE AS LATITUDE, l.LONGITUDE AS LONGITUDE 
   FROM ${table} INNER JOIN LOCATION_INFO l ON b.PV_EN = l.PV_EN AND b.ISO3 = l.ISO3
-  WHERE b.ISO3 = ? AND l.LOCATION_LEVEL = 'Major' 
+  WHERE b.ISO3 = ? AND l.LOCATION_LEVEL IN ('Major', 'Admin') 
   ORDER BY b.PV_EN`;
 
   try {
