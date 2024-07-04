@@ -5,8 +5,7 @@ import './custom.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchBurntScarPolygon, getMax } from '../reducers/burntScarSlice';
 import { setLoadingMap } from '../reducers/uiSlice';
-
-const colors = ['#FFCCCC', '#FFB2B2', '#FF9999', '#FF7F7F', '#FF6666', '#FF4C4C', '#FF3232', '#FF1919', '#FF0000'];
+import { getColorByFrequency } from '../utils/colorUtils'; // Import the utility function
 
 const MapBurnScar = () => {
   const dispatch = useDispatch();
@@ -14,17 +13,6 @@ const MapBurnScar = () => {
   const max_freq = useSelector(state => state.burnScar.max);
   const sidebarForm = useSelector(state => state.ui.sidebarForm);
   const map = useMap();
-
-  let fillOpacity, polygonColor;
-
-  if (max_freq === 1) {
-    fillOpacity = 0.5;
-    polygonColor = '#FF6666';
-  } else {
-    fillOpacity = 1 / max_freq;
-    const colorIndex = Math.min(colors.length - 1, Math.floor(max_freq * (colors.length - 1) / 10)); // Adjusting to fit the colors array
-    polygonColor = colors[colorIndex];
-  }
 
   useEffect(() => {
     dispatch(setLoadingMap(true));
@@ -45,13 +33,14 @@ const MapBurnScar = () => {
         }
       });
     });
-  }, [dispatch, sidebarForm, burntScarData, map, fillOpacity]);
+  }, [dispatch, sidebarForm, burntScarData, map]);
 
-  const style = () => {
+  const style = (feature) => {
+    const frequency_times = feature.properties.frequency_times;
     return {
-      color: 'red',
-      weight: 0,
-      fillOpacity: fillOpacity
+      color: getColorByFrequency(frequency_times, max_freq),
+      weight: 0.5,
+      fillOpacity: 0.7
     };
   };
 
@@ -62,7 +51,6 @@ const MapBurnScar = () => {
       return date.toLocaleDateString('en-US', options);
     };
 
-    // const formattedDate = formatDate(feature.properties.FIRE_DATE);
     let frequencyDates = feature.properties.FREQUENCY_DATE ? feature.properties.FREQUENCY_DATE.split(',') : [feature.properties.FIRE_DATE];
     const formattedFrequencyDates = frequencyDates.map(formatDate).join('<br>');
     const times = frequencyDates.length;

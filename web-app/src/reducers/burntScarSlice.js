@@ -1,4 +1,3 @@
-// src/reducers/burntScarSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import * as topojson from 'topojson-client';
 import CONFIG from '../config';
@@ -31,11 +30,14 @@ export const getMax = createAsyncThunk('burntScar/getMax', async (filter) => {
   return data;
 });
 
-
-
 const burntScarSlice = createSlice({
   name: 'burntScar',
-  initialState: { data: [], loading: false, max:5 },
+  initialState: { data: [], loading: false, max: 2 },
+  reducers: {
+    clearData: (state) => {
+      state.data = [];
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchBurntScarData.pending, (state) => {
@@ -64,5 +66,7 @@ const burntScarSlice = createSlice({
       });
   },
 });
+
+export const { clearData } = burntScarSlice.actions;
 
 export default burntScarSlice.reducer;

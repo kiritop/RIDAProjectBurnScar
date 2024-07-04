@@ -855,7 +855,10 @@ server.get('/rida-api/api/get-burnt-from-date', async (req, res) => {
   let sql = `
     SELECT 
       BURNT_SCAR_ID, AP_EN, PV_EN, FIRE_DATE, AREA, COUNTRY, LATITUDE, LONGITUDE, 
-      CONCAT('[', REPLACE(REPLACE(GEOMETRY_DATA, '(', '['), ')', ']'), ']') AS GEOMETRY_DATA, GEOMETRY_TYPE, FREQUENCY_DATE
+      CONCAT('[', REPLACE(REPLACE(GEOMETRY_DATA, '(', '['), ')', ']'), ']') AS GEOMETRY_DATA, 
+      GEOMETRY_TYPE, 
+      COALESCE(FREQUENCY_DATE, FIRE_DATE) AS FREQUENCY_DATE,
+      COALESCE((LENGTH(FREQUENCY_DATE) - LENGTH(REPLACE(FREQUENCY_DATE, ',', '')) + 1), 1) AS frequency_times
     FROM 
       BURNT_SCAR_INFO 
     WHERE 
@@ -868,6 +871,8 @@ server.get('/rida-api/api/get-burnt-from-date', async (req, res) => {
   if (province && province !== 'ALL') {
     sql += ` AND PV_EN = ?`;
   }
+
+  sql += ` ORDER BY frequency_times ASC, AREA DESC`;
 
   const queryParams = [startDate, endDate];
   if (country && country !== 'ALL') queryParams.push(country);
@@ -898,6 +903,10 @@ server.get('/rida-api/api/get-burnt-from-date', async (req, res) => {
           coordinates = [];
         }
 
+        // Check if FREQUENCY_DATE is null and set it to FIRE_DATE if so
+        const frequencyDate = item.FREQUENCY_DATE || item.FIRE_DATE;
+        const frequencyTimes = item.FREQUENCY_DATE ? item.frequency_times : 1;
+
         return {
           type: "Feature",
           properties: {
@@ -909,7 +918,8 @@ server.get('/rida-api/api/get-burnt-from-date', async (req, res) => {
             FIRE_DATE: item.FIRE_DATE,
             LATITUDE: item.LATITUDE,
             LONGITUDE: item.LONGITUDE,
-            FREQUENCY_DATE: item.FREQUENCY_DATE
+            FREQUENCY_DATE: frequencyDate,
+            frequency_times: frequencyTimes
           },
           geometry: {
             type: item.GEOMETRY_TYPE,

@@ -2,14 +2,14 @@ import React, { useState } from "react";
 import MapContent from "../components/MapContent";
 import { Box, Card, CardContent, CircularProgress, Typography, useMediaQuery } from "@mui/material";
 import ColorBar from "../components/ColorBar";
-import ColorBarPoint from "../components/ColorBarPoint";
+import AirQualityColorBar from "../components/AirQualityColorBar";
 import { useSelector } from 'react-redux';
 import FilterCard from "../components/FilterCard";
 import { useTheme } from '@mui/material/styles';
 
 function Map() {
   const [isOpen, setIsOpen] = useState(false);
-  const { burntScar, burntScarPoint } = useSelector(state => state.ui);
+  const { burntScar, burntScarPoint, aqi } = useSelector(state => state.ui);
   const loadingMap = useSelector(state => state.ui.loadingMap);
 
   const theme = useTheme();
@@ -53,7 +53,7 @@ function Map() {
               </CardContent>
             </Card>
           )}
-          {burntScarPoint && (
+          {aqi && (
             <Card
               sx={{
                 position: "absolute",
@@ -66,7 +66,7 @@ function Map() {
               }}
             >
               <CardContent sx={{ padding: 1 }}>
-                <ColorBarPoint />
+                <AirQualityColorBar />
               </CardContent>
             </Card>
           )}

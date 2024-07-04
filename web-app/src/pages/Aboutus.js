@@ -327,7 +327,7 @@ function AboutUS() {
                   }}
                 />
                 <Typography variant="body1" mt={4}>
-                  Email: ce.itschool@mfu.ac.th
+                  Email: aie.itschool@mfu.ac.th
                 </Typography>
                 <Typography variant="body1" mt={4}>
                   Address : 333 Moo 1, Thasud , Muang , Chiang Rai, Thailand 57100 

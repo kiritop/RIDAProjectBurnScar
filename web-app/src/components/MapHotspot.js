@@ -3,6 +3,7 @@ import {CircleMarker} from "react-leaflet";
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchHotSpot } from '../reducers/hotSpotSlice';
 import { setLoadingMap } from '../reducers/uiSlice';
+import { clearData } from '../reducers/burntScarSlice';
 
 const MapHotspot = () => {
   const hotSpotData = useSelector(state => state.hotSpot.dataHotSpot);
@@ -11,6 +12,7 @@ const MapHotspot = () => {
 
 
   useEffect(() => {
+    dispatch(clearData(true));
     dispatch(setLoadingMap(true));
     dispatch(fetchHotSpot(sidebarForm))
     .finally(() => {

@@ -49,7 +49,11 @@ export const fetchHotSpot = createAsyncThunk('hotSpot/fetchHotSpot', async (filt
 const hotSpotSlice = createSlice({
   name: 'hotSpot',
   initialState: { data: [], loading: false, dataHotSpot: [] },
-  reducers: {},
+  reducers: {
+    clearData: (state) => {
+      state.data = [];
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchHotSpotData.pending, (state) => {
@@ -68,5 +72,7 @@ const hotSpotSlice = createSlice({
       });
   },
 });
+
+export const { clearData } = hotSpotSlice.actions;
 
 export default hotSpotSlice.reducer;

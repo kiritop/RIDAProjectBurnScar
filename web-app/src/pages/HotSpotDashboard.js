@@ -400,7 +400,7 @@ function HotSpotDashboard() {
                     <CircleMarker
                       key={index}
                       center={[area.LATITUDE, area.LONGITUDE]}
-                      radius={20 * Math.log(area.SUM_HOTSPOT / 500)}
+                      radius={20 * Math.log(area.SUM_HOTSPOT / 100)}
                       fillOpacity={0.5}
                       fillColor={getColor(index)}
                       stroke={false}

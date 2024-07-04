@@ -68,6 +68,9 @@ export const aqiSlice = createSlice({
   initialState: { data: [], loading: false, filter: '', aqiData: [] },
   reducers: {
     setFilter: (state, action) => { state.filter = action.payload; },
+    clearData: (state) => {
+      state.data = [];
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -88,6 +91,6 @@ export const aqiSlice = createSlice({
   },
 });
 
-export const { setFilter } = aqiSlice.actions;
+export const { setFilter, clearData } = aqiSlice.actions;
 
 export default aqiSlice.reducer;
