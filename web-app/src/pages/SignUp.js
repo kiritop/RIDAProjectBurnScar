@@ -5,6 +5,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import LoadingScreen from '../components/LoadingScreen';
 import { registerUser } from '../reducers/authSlice';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 export default function SignUp() {
   const [firstName, setFirstName] = useState('');
@@ -27,7 +28,14 @@ export default function SignUp() {
     dispatch(registerUser({ username, name: firstName, surname: lastName, email, password }))
       .unwrap()
       .then(() => {
-        navigate('/');
+        Swal.fire({
+          title: 'Sign Up Successful',
+          text: 'Welcome to our website! You can login using your email and password. Press OK to go to the main page.',
+          icon: 'success',
+          confirmButtonText: 'OK'
+        }).then(() => {
+          navigate('/');
+        });
       })
       .catch((error) => {
         setError(error.message);
@@ -36,23 +44,6 @@ export default function SignUp() {
 
   if (loading) {
     return <LoadingScreen />;
-  }
-
-  if (success) {
-    return (
-      <Box
-        sx={{
-          marginTop: 2,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}
-      >
-        <Alert severity="success" sx={{ mb: 2 }}>
-          Welcome to our website! You can login using your email and password. Redirecting to the main page...
-        </Alert>
-      </Box>
-    );
   }
 
   return (
