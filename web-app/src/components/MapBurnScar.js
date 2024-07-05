@@ -10,34 +10,46 @@ const MapBurnScar = () => {
   const dispatch = useDispatch();
   const burntScarData = useSelector(state => state.burnScar.data);
   const max_freq = useSelector(state => state.burnScar.max);
-  const sidebarForm = useSelector(state => state.ui.sidebarForm);
   const map = useMap();
   const layersRef = React.useRef([]);
 
   useEffect(() => {
-    dispatch(setLoadingMap(true));
+    const addLayers = () => {
+      dispatch(setLoadingMap(true));
+      let layersAdded = 0;
 
-    burntScarData.forEach((data) => {
-      const geoJsonLayer = L.geoJSON(data, {
-        style: feature => style(feature),
-        coordsToLatLng: coords => new L.LatLng(coords[1], coords[0]),
-        onEachFeature: onEachFeature
-      }).addTo(map);
+      // Clear existing layers
+      layersRef.current.forEach(layer => map.removeLayer(layer));
+      layersRef.current = [];
 
-      layersRef.current.push(geoJsonLayer);
+      burntScarData.forEach((data, index) => {
+        const geoJsonLayer = L.geoJSON(data, {
+          style: feature => style(feature),
+          coordsToLatLng: coords => new L.LatLng(coords[1], coords[0]),
+          onEachFeature: onEachFeature
+        }).addTo(map);
 
-      geoJsonLayer.on('add', () => {
-        if (layersRef.current.length === burntScarData.length) {
-          dispatch(setLoadingMap(false));
-        }
+        geoJsonLayer._leaflet_id = `burntScarLayer-${index}`; // Ensure unique key for each layer
+        layersRef.current.push(geoJsonLayer);
+
+        geoJsonLayer.on('add', () => {
+          layersAdded++;
+          if (layersAdded === burntScarData.length) {
+            dispatch(setLoadingMap(false));
+          }
+        });
       });
-    });
+    };
 
+    // Add layers on mount
+    addLayers();
+
+    // Clear layers on unmount or when dependencies change
     return () => {
       layersRef.current.forEach(layer => map.removeLayer(layer));
       layersRef.current = [];
     };
-  }, [dispatch, sidebarForm, burntScarData, map]);
+  }, [dispatch, burntScarData, map]);
 
   const style = (feature) => {
     const frequency_times = feature.properties.frequency_times;
@@ -49,7 +61,7 @@ const MapBurnScar = () => {
   };
 
   const calculatePercentage = (times, max_freq) => {
-    return ((times / max_freq) * 100).toFixed(3);
+    return ((times / max_freq) * 100).toFixed(2);
   }
 
   const onEachFeature = (feature, layer) => {

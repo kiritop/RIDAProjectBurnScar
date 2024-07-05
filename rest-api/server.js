@@ -811,6 +811,7 @@ server.get("/rida-api/api/get-province", async (req, res) => {
 
 server.get("/rida-api/api/get-max-freq", async (req, res) => {
   const { startDate, endDate, country, province } = req.query;
+
   let sql = `WITH RECURSIVE split_dates AS (
                 SELECT 
                     BURNT_SCAR_ID,
@@ -823,21 +824,31 @@ server.get("/rida-api/api/get-max-freq", async (req, res) => {
                     (SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 
                     UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10) numbers 
                 ON CHAR_LENGTH(FREQUENCY_DATE) - CHAR_LENGTH(REPLACE(FREQUENCY_DATE, ',', '')) >= numbers.n - 1
-                WHERE FIRE_DATE BETWEEN ? AND ? ${country ? 'AND ISO3 = ?' : ''} ${province ? 'AND PV_EN = ?' : ''}
+                WHERE FIRE_DATE BETWEEN ? AND ?
+                  ${country && country !== 'ALL' ? 'AND ISO3 = ?' : ''}
+                  ${province && province !== 'ALL' ? 'AND PV_EN = ?' : ''}
+            ),
+            filtered_dates AS (
+                SELECT 
+                    BURNT_SCAR_ID,
+                    date
+                FROM split_dates
+                WHERE date BETWEEN ? AND ?
             ),
             unique_date_counts AS (
                 SELECT 
                     BURNT_SCAR_ID,
                     COUNT(DISTINCT date) AS unique_date_count
-                FROM split_dates
+                FROM filtered_dates
                 GROUP BY BURNT_SCAR_ID
             )
             SELECT MAX(unique_date_count) AS max_unique_date_count
             FROM unique_date_counts;`;
 
   const queryParams = [startDate, endDate];
-  if (country && country != 'ALL') queryParams.push(country);
-  if (province && province != 'ALL') queryParams.push(province);
+  if (country && country !== 'ALL') queryParams.push(country);
+  if (province && province !== 'ALL') queryParams.push(province);
+  queryParams.push(startDate, endDate);
 
   try {
     const results = await executeQuery(sql, queryParams);
@@ -848,6 +859,7 @@ server.get("/rida-api/api/get-max-freq", async (req, res) => {
     res.status(500).send('Internal server error');
   }
 });
+
 
 server.get('/rida-api/api/get-burnt-from-date', async (req, res) => {
   const { startDate, endDate, country, province } = req.query;
@@ -903,9 +915,16 @@ server.get('/rida-api/api/get-burnt-from-date', async (req, res) => {
           coordinates = [];
         }
 
+        // Split FREQUENCY_DATE into individual dates and filter them within the specified range
+        let frequencyDates = [];
+        if (item.FREQUENCY_DATE) {
+          frequencyDates = item.FREQUENCY_DATE.split(',')
+            .filter(date => date >= startDate && date <= endDate);
+        }
+
         // Check if FREQUENCY_DATE is null and set it to FIRE_DATE if so
-        const frequencyDate = item.FREQUENCY_DATE || item.FIRE_DATE;
-        const frequencyTimes = item.FREQUENCY_DATE ? item.frequency_times : 1;
+        const frequencyDate = frequencyDates.length ? frequencyDates.join(',') : item.FIRE_DATE;
+        const frequencyTimes = frequencyDates.length ? frequencyDates.length : 1;
 
         return {
           type: "Feature",
@@ -935,6 +954,7 @@ server.get('/rida-api/api/get-burnt-from-date', async (req, res) => {
     res.status(500).send('Internal server error');
   }
 });
+
 
 server.get('/rida-api/api/get-burnt-scar-polygon', async (req, res) => {
   const { startDate, endDate, country, province, api_key } = req.query;
