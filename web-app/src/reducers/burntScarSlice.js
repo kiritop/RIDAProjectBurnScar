@@ -1,5 +1,4 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import * as topojson from 'topojson-client';
 import CONFIG from '../config';
 
 export const fetchBurntScarData = createAsyncThunk('burntScar/fetchBurntScarData', async (filter) => {

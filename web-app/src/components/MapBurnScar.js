@@ -1,11 +1,10 @@
 import React, { useEffect } from "react";
 import { useMap } from "react-leaflet";
-import L from "leaflet"; // import Leaflet library
+import L from "leaflet";
 import './custom.css';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchBurntScarPolygon, getMax } from '../reducers/burntScarSlice';
 import { setLoadingMap } from '../reducers/uiSlice';
-import { getColorByFrequency } from '../utils/colorUtils'; // Import the utility function
+import { getColorByFrequency } from '../utils/colorUtils';
 
 const MapBurnScar = () => {
   const dispatch = useDispatch();
@@ -13,11 +12,10 @@ const MapBurnScar = () => {
   const max_freq = useSelector(state => state.burnScar.max);
   const sidebarForm = useSelector(state => state.ui.sidebarForm);
   const map = useMap();
+  const layersRef = React.useRef([]);
 
   useEffect(() => {
     dispatch(setLoadingMap(true));
-
-    let layersAdded = 0;
 
     burntScarData.forEach((data) => {
       const geoJsonLayer = L.geoJSON(data, {
@@ -26,13 +24,19 @@ const MapBurnScar = () => {
         onEachFeature: onEachFeature
       }).addTo(map);
 
+      layersRef.current.push(geoJsonLayer);
+
       geoJsonLayer.on('add', () => {
-        layersAdded++;
-        if (layersAdded === burntScarData.length) {
+        if (layersRef.current.length === burntScarData.length) {
           dispatch(setLoadingMap(false));
         }
       });
     });
+
+    return () => {
+      layersRef.current.forEach(layer => map.removeLayer(layer));
+      layersRef.current = [];
+    };
   }, [dispatch, sidebarForm, burntScarData, map]);
 
   const style = (feature) => {
@@ -44,6 +48,10 @@ const MapBurnScar = () => {
     };
   };
 
+  const calculatePercentage = (times, max_freq) => {
+    return ((times / max_freq) * 100).toFixed(3);
+  }
+
   const onEachFeature = (feature, layer) => {
     const formatDate = (dateString) => {
       const date = new Date(dateString);
@@ -53,7 +61,7 @@ const MapBurnScar = () => {
 
     let frequencyDates = feature.properties.FREQUENCY_DATE ? feature.properties.FREQUENCY_DATE.split(',') : [feature.properties.FIRE_DATE];
     const formattedFrequencyDates = frequencyDates.map(formatDate).join('<br>');
-    const times = frequencyDates.length;
+    const times = feature.properties.frequency_times;
     const formattedArea = `${new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(feature.properties.AREA)} sq m`;
 
     let popupContent = ` <div style="font-family: Arial, sans-serif; padding: 10px; border-radius: 5px;">
@@ -61,6 +69,7 @@ const MapBurnScar = () => {
       <table>
         <tr><td><strong>Latitude:</strong></td><td style="text-align:right">${feature.properties.LATITUDE}</td></tr>
         <tr><td><strong>Longitude:</strong></td><td style="text-align:right">${feature.properties.LONGITUDE}</td></tr>
+        <tr><td><strong>Burnt ratio :</strong></td><td style="background-color:${getColorByFrequency(times, max_freq)};text-align:right;color:#000000;">${calculatePercentage(times, max_freq)}% </td></tr>
         <tr><td><strong>Burnt frequency (time/max) :</strong></td><td style="text-align:right">${times}/${max_freq}</td></tr>
         <tr><td><strong>Burnt date :</strong></td><td style="text-align:right">${formattedFrequencyDates}</td></tr>
         <tr><td><strong>Area M :</strong></td><td style="text-align:right">${formattedArea}</td></tr>
@@ -70,7 +79,7 @@ const MapBurnScar = () => {
     layer.bindPopup(popupContent, { className: 'custom-popup' });
   };
 
-  return null; // No need to return JSX as layers are directly added to the map
+  return null;
 };
 
 export default MapBurnScar;

@@ -5,7 +5,7 @@ import {
 import FormHelperText from '@mui/joy/FormHelperText';
 import { useDispatch, useSelector } from 'react-redux';
 import { saveLayerSettings, setLoadingMap, fetchProvinceByCountry } from '../reducers/uiSlice';
-import { fetchBurntScarPolygon, getMax } from '../reducers/burntScarSlice';
+import { fetchBurntScarPolygon, getMax, clearData } from '../reducers/burntScarSlice';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
@@ -142,6 +142,8 @@ function FilterCard() {
             dispatch(setLoadingMap(false));
           });
       });
+    }else{
+      dispatch(clearData(true))
     }
   };
 

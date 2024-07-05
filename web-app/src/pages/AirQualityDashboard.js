@@ -26,7 +26,7 @@ function AirQualityDashboard() {
   const dataAqiBubbleMap = useSelector((state) => state.dashboard.dataAqiBubbleMap ?? []);
   const [country, setCountry] = useState("ALL");
   const [province, setProvince] = useState("ALL");
-  const [totalPoint, setTotalPoint] = useState(0);
+  const [totalPoint, setTotalPoint] = useState("0");
   const [dataShow, setDataShow] = useState([]);
   const [tableData, setTableData] = useState([]);
 
@@ -103,7 +103,7 @@ function AirQualityDashboard() {
       const dataShowNewFormat = dataShow.map((item, index) => [index+1, ...item]);
       const newTableDataNewFormat = newTableData.map((item, index) => [index+1, ...item]);
       const totalRowsSum = dataWithNumericSumArea.reduce((sum, item) => sum + item.AVG_PM25, 0);
-      const avg = totalRowsSum/dataWithNumericSumArea.length
+      const avg = ((totalRowsSum / dataWithNumericSumArea.length)).toFixed(2)
       const formattedAvg = new Intl.NumberFormat('en-US').format(avg);
       setTableData(newTableDataNewFormat);
       setTotalPoint(formattedAvg);

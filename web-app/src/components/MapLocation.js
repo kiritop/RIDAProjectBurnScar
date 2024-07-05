@@ -6,7 +6,6 @@ import "leaflet/dist/leaflet.css";
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAqi } from '../reducers/aqiSlice';
 import { setLoadingMap } from '../reducers/uiSlice';
-import { clearData } from '../reducers/burntScarSlice';
 
 const MapLocation = () => {
   const dispatch = useDispatch();
@@ -14,7 +13,6 @@ const MapLocation = () => {
   const sidebarForm = useSelector(state => state.ui.sidebarForm);
 
   useEffect(() => {
-    dispatch(clearData(true));
     dispatch(setLoadingMap(true));
     dispatch(fetchAqi(sidebarForm))
     .finally(() => {
