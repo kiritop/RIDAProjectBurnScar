@@ -4,15 +4,15 @@ import { LayersControl, TileLayer } from "react-leaflet";
 const BaseMap = () => {
   return (
     <LayersControl position="topright">
-      <LayersControl.BaseLayer name="Open Street Map" >
+      <LayersControl.BaseLayer name="Open Street Map"checked>
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
       </LayersControl.BaseLayer>
       
-      <LayersControl.BaseLayer name="Stadia_StamenTonerLite" checked>
+      {/* <LayersControl.BaseLayer name="Stadia_StamenTonerLite" checked>
         <TileLayer 
           ext='png'
           url=" https://tiles.stadiamaps.com/tiles/stamen_toner_lite/{z}/{x}/{y}{r}.png" />
-      </LayersControl.BaseLayer>
+      </LayersControl.BaseLayer> */}
 
       <LayersControl.BaseLayer name="Arc GIS" >
         <TileLayer

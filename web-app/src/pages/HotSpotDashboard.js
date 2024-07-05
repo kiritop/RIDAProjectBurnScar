@@ -4,7 +4,7 @@ import Typography from "@mui/material/Typography";
 import MUIDataTable from "mui-datatables";
 import { Container, CircularProgress, TableCell, InputLabel, FormControl, Select, MenuItem, Grid, Card, CardContent, Button } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProvinceByCountry, fetchHotspotDataTable, fetchHotspotChart } from '../reducers/dashboardSlice';
+import { fetchProvinceByCountry, fetchHotspotDataTable, fetchHotspotChart, fetchDDHotspotChart, fetchBubbleHotspotMap } from '../reducers/dashboardSlice';
 import { format } from 'date-fns';
 import LineChartHotspot from '../components/LineChartHotspot';
 import CONFIG from '../config';
@@ -13,25 +13,29 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
-
+import DrilldownHotspotChart from '../components/DrilldownHotspotChart';
+import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
 
 
 function HotSpotDashboard() {
   const dispatch = useDispatch();
   const dataProvince = useSelector((state) => state.dashboard.dataProvince ?? []);
   const dataHotspotTable = useSelector((state) => state.dashboard.dataHotspotTable ?? []);
+  const dataHotspotBubbleMap = useSelector((state) => state.dashboard.dataHotspotBubbleMap ?? []);
   const [country, setCountry] = useState("ALL");
   const [province, setProvince] = useState("ALL");
   const [totalPoint, setTotalPoint] = useState(0);
   const [dataShow, setDataShow] = useState([]);
   const [tableData, setTableData] = useState([]);
 
-  const [countryText, setCountryText] = useState("All");
-  const [provinceText, setProvinceText] = useState("All");
+  const [countryText, setCountryText] = useState("ALL");
+  const [provinceText, setProvinceText] = useState("ALL");
 
 
   const [startDate, setStartDate] = useState(dayjs(new Date().setFullYear(new Date().getFullYear() - 1)).format('YYYY-MM-DD'));
   const [endDate, setEndDate] = useState(dayjs(new Date()).format('YYYY-MM-DD'));
+  const [loadingMap, setLoadingMap] = useState(true);
 
 
   const handleStartDateChange = (date) => {
@@ -55,12 +59,26 @@ function HotSpotDashboard() {
       startDate: startDate,
       endDate: endDate
     }
+  
     if (country) {
-      dispatch(fetchProvinceByCountry({country: country, module:'hotspot'}));
+      dispatch(fetchProvinceByCountry({ country: country, module: 'hotspot' }));
     }
-    dispatch(fetchHotspotChart(obj));
-    dispatch(fetchHotspotDataTable(obj));
-    
+  
+    setLoadingMap(true);
+  
+    dispatch(fetchHotspotChart(obj))
+      .finally(() => {
+        dispatch(fetchHotspotDataTable(obj))
+          .finally(() => {
+            dispatch(fetchDDHotspotChart(obj))
+              .finally(() => {
+                dispatch(fetchBubbleHotspotMap(obj))
+                  .finally(() => {
+                    setLoadingMap(false);
+                  });
+              });
+          });
+      });
   }, [dispatch, country, province, startDate, endDate]);
 
   // Update chart data when dataHotspotC changes
@@ -119,7 +137,7 @@ function HotSpotDashboard() {
       },
     },
     {
-      name: "Hot Spot total (Point)",
+      name: "Hotspot total (Point)",
       options: {
         customHeadRender: ({ index, ...column }) => {
           return (
@@ -173,6 +191,9 @@ function HotSpotDashboard() {
       case 'MMR':
         setCountryText("Myanmar");
         break;
+      case 'ALL':
+        setProvince("ALL");
+        break;
       default:
         break;
     }
@@ -215,6 +236,16 @@ function HotSpotDashboard() {
       })
       .catch(error => console.error('Error:', error));
   }
+
+  const center = [15, 105]; // Center of the map (Indochina Peninsula)
+  const zoom = 5; // Zoom level
+
+  const getColor = (index) => {
+    const colors = [
+      '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF', '#800000', '#008000', '#000080', '#808000', '#800080', '#008080'
+    ];
+    return colors[index % colors.length];
+  };
 
 
   return (
@@ -302,13 +333,13 @@ function HotSpotDashboard() {
             </Card>
           </Grid>
           <Grid item xs={12} md={5}>
-            <Card sx={{ borderRadius: 3, overflow: "hidden", height:'400px' }} variant="outlined">
+            <Card sx={{ borderRadius: 3, overflow: "hidden", height:'540px' }} variant="outlined">
               <CardContent>
                 <Typography  variant="h4" component="div">
-                  {provinceText != 'All' ? provinceText : countryText} Hot Spot
+                  Hotspot Summary
                 </Typography>
                 <Typography  variant="subtitle1" color="text.secondary">
-                  {provinceText != 'All' ? provinceText +', '+ countryText : countryText} Hot Spot (  {format(new Date(startDate),'MMM dd yyyy')} - {format(new Date(endDate),'MMM dd yyyy')} )
+                  {provinceText != 'All' ? provinceText +', '+ countryText : countryText} Hotspot (  {format(new Date(startDate),'MMM dd yyyy')} - {format(new Date(endDate),'MMM dd yyyy')} )
                 </Typography>
                 <Box height={50}/>
                 <Typography  variant="h3" component="div">
@@ -338,7 +369,53 @@ function HotSpotDashboard() {
           <Grid item xs={12} md={7}>
             <Card sx={{ borderRadius: 3, overflow: "hidden" }} variant="outlined">
               <CardContent>
-                <LineChartHotspot/>              
+                <DrilldownHotspotChart />
+              </CardContent>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12}>
+            <Card sx={{ borderRadius: 3, overflow: "hidden" }} variant="outlined">
+              <CardContent>
+                <Typography variant="h4" component="div" gutterBottom>
+                  Hotspot By Time
+                </Typography>
+                <LineChartHotspot/>   
+              </CardContent>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12}>
+            <Card sx={{ borderRadius: 3, overflow: "hidden" }} variant="outlined">
+              <CardContent>
+                <Typography variant="h4" component="div" gutterBottom>
+                Hotspot By Location
+                </Typography>
+                <MapContainer center={center} zoom={zoom} style={{ height: "500px", width: "100%" }}>
+                  <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  />
+                  {dataHotspotBubbleMap.map((area, index) => (
+                    <CircleMarker
+                      key={index}
+                      center={[area.LATITUDE, area.LONGITUDE]}
+                      radius={20 * Math.log(area.SUM_HOTSPOT / 100)}
+                      fillOpacity={0.5}
+                      fillColor={getColor(index)}
+                      stroke={false}
+                    >
+                      <Popup>
+                        <Typography variant="subtitle1">
+                          {area.AP_EN || area.PV_EN || area.ISO3}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Hotspot total: {new Intl.NumberFormat('en-US').format(area.SUM_HOTSPOT)} points
+                        </Typography>
+                      </Popup>
+                    </CircleMarker>
+                  ))}
+                </MapContainer>
               </CardContent>
             </Card>
           </Grid>
@@ -346,7 +423,7 @@ function HotSpotDashboard() {
           <Grid item xs={12} md={12}>
             <Box sx={{ borderRadius: 3, overflow: "hidden", flex: 1}}>
                 <MUIDataTable
-                  title={<h3>Hot Spot Ranking {format(new Date(startDate),'MMM dd yyyy')} - {format(new Date(endDate),'MMM dd yyyy')}</h3>}
+                  title={<h4>Hotspot Ranking {format(new Date(startDate),'MMM dd yyyy')} - {format(new Date(endDate),'MMM dd yyyy')}</h4>}
                   data={tableData}
                   columns={columns}
                   options={options}
@@ -355,6 +432,26 @@ function HotSpotDashboard() {
           </Grid>
         </Grid>
       </Container>
+      {loadingMap && (
+        <Box
+          display="flex"
+          flexDirection="column"
+          justifyContent="center"
+          alignItems="center"
+          width="100%"
+          height="100%"
+          position="fixed"
+          top={0}
+          left={0}
+          zIndex={1050}
+          bgcolor="rgba(0, 0, 0, 0.5)"
+        >
+          <CircularProgress />
+          <Typography variant="h6" color="white">
+            Loading...
+          </Typography>
+        </Box>
+      )}
     </>
   );
 }

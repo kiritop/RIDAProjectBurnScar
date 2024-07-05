@@ -1,4 +1,3 @@
-// src/reducers/burntScarSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import CONFIG from '../config';
 
@@ -9,22 +8,35 @@ export const fetchBurntScarData = createAsyncThunk('burntScar/fetchBurntScarData
 });
 
 export const fetchBurntScarPolygon = createAsyncThunk('burntScar/fetchBurntScarPolygon', async (filter) => {
-  const response = await fetch(`${CONFIG.API_URL}/get-burnt-from-date?startDate=${filter.startDate}&endDate=${filter.endDate}${filter.country==='All'?'': '&country='+filter.iso3}${(filter.city==="All")?'': '&province='+filter.city}`);
+  const response = await fetch(`${CONFIG.API_URL}/get-burnt-from-date?startDate=${filter.startDate}&endDate=${filter.endDate}${filter.country === 'ALL' ? '' : '&country=' + filter.country}${(filter.province === "All") ? '' : '&province=' + filter.province}`);
   const data = await response.json();
   return data;
 });
+
+// export const fetchBurntScarPolygon = createAsyncThunk('burntScar/fetchBurntScarPolygon', async (filter) => {
+//   const response = await fetch(`${CONFIG.API_URL}/get-burnt-from-date-topo?startDate=${filter.startDate}&endDate=${filter.endDate}${filter.country === 'ALL' ? '' : '&country=' + filter.country}${(filter.province === "All") ? '' : '&province=' + filter.province}`);
+//   const data = await response.json();
+
+//   // Convert TopoJSON to GeoJSON
+//   const geojson = topojson.feature(data, data.objects.collection); // Adjust the object name based on your topology structure
+
+//   return geojson;
+// });
 
 export const getMax = createAsyncThunk('burntScar/getMax', async (filter) => {
-  const response = await fetch(`${CONFIG.API_URL}/get-max-freq?startDate=${filter.startDate}&endDate=${filter.endDate}${filter.country==='All'?'': '&country='+filter.iso3}${(filter.city==="All")?'': '&province='+filter.city}`);
+  const response = await fetch(`${CONFIG.API_URL}/get-max-freq?startDate=${filter.startDate}&endDate=${filter.endDate}${filter.country==='ALL'?'': '&country='+filter.country}${(filter.province==="ALL")?'': '&province='+filter.province}`);
   const data = await response.json();
   return data;
 });
-
-
 
 const burntScarSlice = createSlice({
   name: 'burntScar',
-  initialState: { data: [], loading: false, max:1 },
+  initialState: { data: [], loading: false, max: 2 },
+  reducers: {
+    clearData: (state) => {
+      state.data = [];
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchBurntScarData.pending, (state) => {
@@ -48,10 +60,12 @@ const burntScarSlice = createSlice({
         state.loading = true;
       })
       .addCase(getMax.fulfilled, (state, action) => {
-        state.max = action.payload.max_count;
+        state.max = action.payload.max_unique_date_count;
         state.loading = false;
       });
   },
 });
+
+export const { clearData } = burntScarSlice.actions;
 
 export default burntScarSlice.reducer;

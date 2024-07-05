@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  react:
+    container_name: react_production
+    image: nginx
+    volumes:
+      - ./build:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - '3000:80'
+      # - '4000:80'

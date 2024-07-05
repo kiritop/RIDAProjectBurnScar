@@ -7,7 +7,7 @@ import CONFIG from '../config';
 
 
 export const fetchAqi = createAsyncThunk('aqi/fetchAqi', async (filter) => {
-  const response = await fetch(`${CONFIG.API_URL}/get-air-quality-from-date?date=${filter.date}${filter.country==='All'?'': '&country='+filter.iso3}${(filter.city==="All")?'': '&province='+filter.city}`);
+  const response = await fetch(`${CONFIG.API_URL}/get-air-quality-from-date?date=${filter.date}${filter.country==='ALL'?'': '&country='+filter.country}${(filter.province==="ALL")?'': '&province='+filter.province}`);
   const data = await response.json();
   return data;
 });
@@ -40,10 +40,8 @@ export const fetchAqiData = createAsyncThunk('aqi/fetchAqiData', async (filter) 
       if(valueCity === "All"){
         data_to_use = data.filter(country => country.country === valueCountry);
       }else{
-        console.log("valueCity", valueCity)
         data_to_use = data.filter(country => country.admin_name === valueCity);
       }
-      console.log("data_to_use", data_to_use)
       const promises = data_to_use.map(async (location) => {
           const url = `https://api.waqi.info/feed/geo:${location.lat};${location.lng}/?token=${CONFIG.AQI_API_KEY}`;
           try {
@@ -70,6 +68,9 @@ export const aqiSlice = createSlice({
   initialState: { data: [], loading: false, filter: '', aqiData: [] },
   reducers: {
     setFilter: (state, action) => { state.filter = action.payload; },
+    clearData: (state) => {
+      state.data = [];
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -90,6 +91,6 @@ export const aqiSlice = createSlice({
   },
 });
 
-export const { setFilter } = aqiSlice.actions;
+export const { setFilter, clearData } = aqiSlice.actions;
 
 export default aqiSlice.reducer;

@@ -4,7 +4,7 @@ import CONFIG from '../config';
 
 export const fetchUsers = createAsyncThunk("users/fetchUsers", async () => {
   const user = JSON.parse(localStorage.getItem("myData"));
-  const response = await fetch(`${CONFIG.API_URL}/get-users?email=${user}`);
+  const response = await fetch(`${CONFIG.API_URL}/get-users?email=${user.email}`);
   const data = await response.json();
 
   return data;

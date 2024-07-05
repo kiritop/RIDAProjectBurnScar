@@ -3,25 +3,23 @@ import { Box } from '@mui/system';
 import { Typography } from '@mui/material';
 import { styled } from '@mui/system';
 import { useSelector } from 'react-redux';
+import { colors, getColorByFrequency } from '../utils/colorUtils'; // Import the utility function
 
 const ColorBar = () => {
   const max_freq = useSelector(state => state.burnScar.max);
 
-  // Calculate the step size for fillOpacity
-  const stepSize = 1 / max_freq;
+  // Generate colorIntensityArray dynamically based on max_freq
+  const generateColorIntensityArray = (max_freq) => {
+    const intensityArray = [];
+    for (let i = 1; i <= max_freq; i++) {
+      intensityArray.push({
+        color: getColorByFrequency(i, max_freq)
+      });
+    }
+    return intensityArray;
+  };
 
-  // Adjust colorIntensityArray dynamically based on stepSize
-  const colorIntensityArray = [
-    { fillOpacity: stepSize * 0.2, color: '#FFCCCC' },
-    { fillOpacity: stepSize * 0.3, color: '#FFB2B2' },
-    { fillOpacity: stepSize * 0.4, color: '#FF9999' },
-    { fillOpacity: stepSize * 0.5, color: '#FF7F7F' },
-    { fillOpacity: stepSize * 0.6, color: '#FF6666' },
-    { fillOpacity: stepSize * 0.7, color: '#FF4C4C' },
-    { fillOpacity: stepSize * 0.8, color: '#FF3232' },
-    { fillOpacity: stepSize * 0.9, color: '#FF1919' },
-    { fillOpacity: stepSize * 1.0, color: '#FF0000' }
-  ];
+  const colorIntensityArray = generateColorIntensityArray(max_freq);
 
   const GradientBar = styled('div')(({ theme }) => ({
     height: '30vh',
@@ -41,7 +39,6 @@ const ColorBar = () => {
             width="100%"
             height={`${100 / colorIntensityArray.length}%`}
             bgcolor={item.color}
-            style={{ opacity: item.fillOpacity }}
           >
             {index === 0 || index === colorIntensityArray.length - 1 ? (
               <center>

@@ -15,8 +15,6 @@ function Dashboard() {
   const [chartData, setChartData] = useState([["Country", "Count"]]);
   const [tableData, setTableData] = useState([]);
 
-  console.log(dataHotspotC);
-
   // แยก fetchHotspotData
   useEffect(() => {
     dispatch(fetchHotspotData());

@@ -109,7 +109,7 @@ function AboutUS() {
       name: "Dr.Kampanat Deeudomchan",
       role: "Specialist",
       institution: "Chief of Division, Geo-Informatics Management and Solutions Office, GISTDA",
-      imageUrl: "",
+      imageUrl: "p_pepsi.jpeg",
     },
     {
       name: "Jittisak Yodcum",
@@ -181,7 +181,7 @@ function AboutUS() {
             Purpose
           </Typography>
         </Grid>
-        <Typography variant="h5">
+        <Typography variant="h6">
           <p>
             1. The prototype of the burnt scar profiling system and associated libraries of programs implementing:
             data loading, data pre-processing, burnt scar detection, aggregation of temporal-based detection
@@ -304,7 +304,7 @@ function AboutUS() {
             sx={{ backgroundColor: "#023e8a", padding: 1, borderRadius: 3, boxShadow: 1 }}
           >
             <Typography variant="h3" color="#fff" sx={{ fontFamily: "monospace" }}>
-              Contact US
+              Contact Us
             </Typography>
           </Grid>
           <Grid spacing={0} my={5}>
@@ -327,10 +327,10 @@ function AboutUS() {
                   }}
                 />
                 <Typography variant="body1" mt={4}>
-                  Email: ce.itschool@mfu.ac.th
+                  Email: aie.itschool@mfu.ac.th
                 </Typography>
                 <Typography variant="body1" mt={4}>
-                  Address : 333 m 1 Thah sud , mueng , chiang rai 57100 
+                  Address : 333 Moo 1, Thasud , Muang , Chiang Rai, Thailand 57100 
                 </Typography>
               </center>
             </Container>

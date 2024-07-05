@@ -2,20 +2,26 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const morgan = require("morgan");
 const cors = require("cors");
-const mysql = require("mysql2");
+const mysql = require("mysql2/promise");
 const crypto = require("crypto");
-
+const bcrypt = require("bcrypt");
+const nodemailer = require("nodemailer");
 const port = process.env.PORT || 4000;
 
-// Create connection to MySQL
-const db = mysql.createConnection({
-  host: "10.1.29.33",
-  port: '3306',
-  user: "root",
-  password: "gdkll,@MFU2024",
-  database: "RidaDB",
+// Create connection pool to MySQL
+const pool = mysql.createPool({
+  host: process.env.DB_HOST || 'localhost',
+  port: process.env.DB_PORT || '3306',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || 'gdkll,@MFU2024',
+  database: process.env.DB_NAME || 'RidaDB',
+  waitForConnections: true,
+  connectionLimit: 20,
+  queueLimit: 100
+});
+
   // host: process.env.DB_HOST || 'localhost',
-  // // port: process.env.DB_PORT || '3306',
+  // port: process.env.DB_PORT || '3306',
   // user: process.env.DB_USER || 'root',
   // password: process.env.DB_PASSWORD || 'gdkll,@MFU2024',
   // database: process.env.DB_NAME || 'RidaDB'
@@ -23,478 +29,945 @@ const db = mysql.createConnection({
   // user: "root",
   // password: "root1234",
   // database: "RidaDB",
-});
 
-// Connect to MySQL
-db.connect((err) => {
-  if (err) throw err;
-  console.log("Connected to the database.");
-});
-
+// Middleware setup
 let server = express();
 server.use(bodyParser.json()); // ให้ server(express) ใช้งานการ parse json
 server.use(morgan("dev")); // ให้ server(express) ใช้งานการ morgam module
 server.use(cors()); // ให้ server(express) ใช้งานการ cors module
 
+const executeQuery = async (query, params) => {
+  let connection;
+  try {
+    connection = await pool.getConnection();
+    const [results] = await connection.query(query, params);
+    return results;
+  } catch (error) {
+    throw error;
+  } finally {
+    if (connection) connection.release();
+  }
+};
 
 
-server.get('/api/line-chart', (req, res) => {
-  const country = req.query.country;
-  const startDate = req.query.startDate;
-  const endDate = req.query.endDate;
-  const province = req.query.province;
+server.get('/rida-api/api/drildown-chart', async (req, res) => {
+  const { country, startDate, endDate, province } = req.query;
 
-  let firstQuery ='';
+  let firstQuery = '';
+  let firstQueryParams = [startDate, endDate];
 
-  if(country=='ALL'&&province =='ALL'){
-    firstQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ? GROUP BY COUNTRY, FIRE_YEAR; `;
-  }else if (country!='ALL'&&province =='ALL'){
-    firstQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR, PV_EN FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ?  ${country ? 'AND ISO3 = ?' : ''} GROUP BY  COUNTRY, FIRE_YEAR, PV_EN; `;
-  }else if (country!='ALL'&&province !='ALL'){
-    firstQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR, AP_EN FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ?  ${country ? 'AND ISO3 = ?' : ''} ${province ? 'AND PV_EN = ?' : ''} GROUP BY  COUNTRY, FIRE_YEAR, AP_EN; `;
+  if (country === 'ALL' && province === 'ALL') {
+    firstQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ? GROUP BY COUNTRY;`;
+  } else if (country !== 'ALL' && province === 'ALL') {
+    firstQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, PV_EN FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ? ${country ? 'AND ISO3 = ?' : ''} GROUP BY COUNTRY, PV_EN;`;
+    if (country) firstQueryParams.push(country);
+  } else if (country !== 'ALL' && province !== 'ALL') {
+    firstQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, AP_EN FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ? ${country ? 'AND ISO3 = ?' : ''} ${province ? 'AND PV_EN = ?' : ''} GROUP BY COUNTRY, AP_EN;`;
+    if (country) firstQueryParams.push(country);
+    if (province) firstQueryParams.push(province);
   }
 
+  try {
+    const firstResults = await executeQuery(firstQuery, firstQueryParams);
+
+    if (country === 'ALL' && province === 'ALL') {
+      secondQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, PV_EN FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ?  GROUP BY COUNTRY, PV_EN;`;
+    } else if (country !== 'ALL' && province === 'ALL') {
+      secondQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, PV_EN, AP_EN FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ? ${country ? 'AND ISO3 = ?' : ''} GROUP BY COUNTRY, PV_EN, AP_EN;`;
+    }
+
+    const secondResults = await executeQuery(secondQuery, firstQueryParams);
+
+    const transformedData = firstResults.map(row => {
+      const { FIRE_YEAR, COUNTRY, PV_EN, AP_EN } = row;
+      let details = [];
+      if (country === 'ALL' && province === 'ALL') {
+        details = secondResults.filter(secondRow => secondRow.COUNTRY === COUNTRY);
+      } else if (country !== 'ALL' && province === 'ALL') {
+        details = secondResults.filter(secondRow => secondRow.PV_EN === PV_EN);
+      } else if (country !== 'ALL' && province !== 'ALL') {
+        details = []
+      }
+
+      return {
+        yearly: row,
+        details
+      };
+
+    });
+
+    res.json(transformedData);
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send('Internal server error');
+  }
+});
+
+
+server.get('/rida-api/api/drildown-chart-hotspot', async (req, res) => {
+  const { country, startDate, endDate, province } = req.query;
+
+  let firstQuery = '';
+  let firstQueryParams = [startDate, endDate];
+
+  if (country === 'ALL' && province === 'ALL') {
+    firstQuery = `SELECT COUNT(*) AS SUM_HOTSPOT, COUNTRY FROM HOT_SPOT WHERE HOT_SPOT_DATE BETWEEN ? AND ? GROUP BY COUNTRY;`;
+  } else if (country !== 'ALL' && province === 'ALL') {
+    firstQuery = `SELECT COUNT(*) AS SUM_HOTSPOT, COUNTRY, PV_EN FROM HOT_SPOT WHERE HOT_SPOT_DATE BETWEEN ? AND ? ${country ? 'AND ISO3 = ?' : ''} GROUP BY COUNTRY, PV_EN;`;
+    if (country) firstQueryParams.push(country);
+  } else if (country !== 'ALL' && province !== 'ALL') {
+    firstQuery = `SELECT COUNT(*) AS SUM_HOTSPOT, COUNTRY, AP_EN FROM HOT_SPOT WHERE HOT_SPOT_DATE BETWEEN ? AND ? ${country ? 'AND ISO3 = ?' : ''} ${province ? 'AND PV_EN = ?' : ''} GROUP BY COUNTRY, AP_EN;`;
+    if (country) firstQueryParams.push(country);
+    if (province) firstQueryParams.push(province);
+  }
+
+  try {
+    const firstResults = await executeQuery(firstQuery, firstQueryParams);
+
+    if (country === 'ALL' && province === 'ALL') {
+      secondQuery = `SELECT COUNT(*) AS SUM_HOTSPOT, COUNTRY, PV_EN FROM HOT_SPOT WHERE HOT_SPOT_DATE BETWEEN ? AND ?  GROUP BY COUNTRY, PV_EN;`;
+    } else if (country !== 'ALL' && province === 'ALL') {
+      secondQuery = `SELECT COUNT(*) AS SUM_HOTSPOT, COUNTRY, PV_EN, AP_EN FROM HOT_SPOT WHERE HOT_SPOT_DATE BETWEEN ? AND ? ${country ? 'AND ISO3 = ?' : ''} GROUP BY COUNTRY, PV_EN, AP_EN;`;
+    }
+
+    const secondResults = await executeQuery(secondQuery, firstQueryParams);
+
+    const transformedData = firstResults.map(row => {
+      const { COUNTRY, PV_EN } = row;
+      let details = [];
+      if (country === 'ALL' && province === 'ALL') {
+        details = secondResults.filter(secondRow => secondRow.COUNTRY === COUNTRY);
+      } else if (country !== 'ALL' && province === 'ALL') {
+        details = secondResults.filter(secondRow => secondRow.PV_EN === PV_EN);
+      } else if (country !== 'ALL' && province !== 'ALL') {
+        details = []
+      }
+
+      return {
+        yearly: row,
+        details
+      };
+
+    });
+
+    res.json(transformedData);
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send('Internal server error');
+  }
+});
+
+server.get('/rida-api/api/drildown-chart-aqi', async (req, res) => {
+  const { country, startDate, endDate, province } = req.query;
+
+  let firstQuery = '';
+  let firstQueryParams = [startDate, endDate];
+
+  if (country === 'ALL' && province === 'ALL') {
+    firstQuery = `SELECT ROUND(AVG(PM25), 2) AS AVG_PM25, COUNTRY FROM AIR_QUALITY WHERE AQI_DATE BETWEEN ? AND ? GROUP BY COUNTRY;`;
+  } else if (country !== 'ALL' && province === 'ALL') {
+    firstQuery = `SELECT ROUND(AVG(PM25), 2) AS AVG_PM25, COUNTRY, PV_EN FROM AIR_QUALITY WHERE AQI_DATE BETWEEN ? AND ? ${country ? 'AND ISO3 = ?' : ''} GROUP BY COUNTRY, PV_EN;`;
+    if (country) firstQueryParams.push(country);
+  } else if (country !== 'ALL' && province !== 'ALL') {
+    firstQuery = `SELECT ROUND(AVG(PM25), 2) AS AVG_PM25, COUNTRY, AP_EN FROM AIR_QUALITY WHERE AQI_DATE BETWEEN ? AND ? ${country ? 'AND ISO3 = ?' : ''} ${province ? 'AND PV_EN = ?' : ''} GROUP BY COUNTRY, AP_EN;`;
+    if (country) firstQueryParams.push(country);
+    if (province) firstQueryParams.push(province);
+  }
+
+  try {
+    const firstResults = await executeQuery(firstQuery, firstQueryParams);
+
+    if (country === 'ALL' && province === 'ALL') {
+      secondQuery = `SELECT ROUND(AVG(PM25), 2) AS AVG_PM25, COUNTRY, PV_EN FROM AIR_QUALITY WHERE AQI_DATE BETWEEN ? AND ?  GROUP BY COUNTRY, PV_EN;`;
+    } else if (country !== 'ALL' && province === 'ALL') {
+      secondQuery = `SELECT ROUND(AVG(PM25), 2) AS AVG_PM25, COUNTRY, PV_EN, AP_EN FROM AIR_QUALITY WHERE AQI_DATE BETWEEN ? AND ? ${country ? 'AND ISO3 = ?' : ''} GROUP BY COUNTRY, PV_EN, AP_EN;`;
+    }
+
+    const secondResults = await executeQuery(secondQuery, firstQueryParams);
+
+    const transformedData = firstResults.map(row => {
+      const { COUNTRY, PV_EN } = row;
+      let details = [];
+      if (country === 'ALL' && province === 'ALL') {
+        details = secondResults.filter(secondRow => secondRow.COUNTRY === COUNTRY);
+      } else if (country !== 'ALL' && province === 'ALL') {
+        details = secondResults.filter(secondRow => secondRow.PV_EN === PV_EN);
+      } else if (country !== 'ALL' && province !== 'ALL') {
+        details = []
+      }
+
+      return {
+        yearly: row,
+        details
+      };
+
+    });
+
+    res.json(transformedData);
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send('Internal server error');
+  }
+});
+
+server.get('/rida-api/api/line-chart', async (req, res) => {
+  const { country, startDate, endDate, province } = req.query;
+
+  let firstQuery = '';
+  let firstQueryParams = [startDate, endDate];
+
+  if (country === 'ALL' && province === 'ALL') {
+    firstQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ? GROUP BY COUNTRY, FIRE_YEAR;`;
+  } else if (country !== 'ALL' && province === 'ALL') {
+    firstQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR, PV_EN FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ? ${country ? 'AND ISO3 = ?' : ''} GROUP BY COUNTRY, FIRE_YEAR, PV_EN;`;
+    if (country) firstQueryParams.push(country);
+  } else if (country !== 'ALL' && province !== 'ALL') {
+    firstQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR, AP_EN FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ? ${country ? 'AND ISO3 = ?' : ''} ${province ? 'AND PV_EN = ?' : ''} GROUP BY COUNTRY, FIRE_YEAR, AP_EN;`;
+    if (country) firstQueryParams.push(country);
+    if (province) firstQueryParams.push(province);
+  }
+
+  try {
+    const firstResults = await executeQuery(firstQuery, firstQueryParams);
+
+    const fireYear = firstResults.map(row => row.FIRE_YEAR);
+    const uniqueFireYear = [...new Set(fireYear)];
+
+    let secondQuery = '';
+    let secondQueryParams = [uniqueFireYear];
+
+    if (country === 'ALL' && province === 'ALL') {
+      secondQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR, MONTH(FIRE_DATE) AS FIRE_MONTH FROM BURNT_SCAR_INFO WHERE YEAR(FIRE_DATE) IN (?) GROUP BY COUNTRY, FIRE_YEAR, FIRE_MONTH;`;
+    } else if (country !== 'ALL' && province === 'ALL') {
+      secondQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR, MONTH(FIRE_DATE) AS FIRE_MONTH, PV_EN FROM BURNT_SCAR_INFO WHERE YEAR(FIRE_DATE) IN (?) ${country ? 'AND ISO3 = ?' : ''} GROUP BY COUNTRY, FIRE_YEAR, FIRE_MONTH, PV_EN;`;
+      if (country) secondQueryParams.push(country);
+    } else if (country !== 'ALL' && province !== 'ALL') {
+      secondQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR, MONTH(FIRE_DATE) AS FIRE_MONTH, AP_EN FROM BURNT_SCAR_INFO WHERE YEAR(FIRE_DATE) IN (?) ${country ? 'AND ISO3 = ?' : ''} ${province ? 'AND PV_EN = ?' : ''} GROUP BY COUNTRY, FIRE_YEAR, FIRE_MONTH, AP_EN;`;
+      if (country) secondQueryParams.push(country);
+      if (province) secondQueryParams.push(province);
+    }
+
+    const secondResults = await executeQuery(secondQuery, secondQueryParams);
+
+    const transformedData = firstResults.map(row => {
+      const { FIRE_YEAR, COUNTRY, PV_EN, AP_EN } = row;
+      let details = [];
+      if (country === 'ALL' && province === 'ALL') {
+        details = secondResults.filter(secondRow => secondRow.FIRE_YEAR === FIRE_YEAR && secondRow.COUNTRY === COUNTRY);
+      } else if (country !== 'ALL' && province === 'ALL') {
+        details = secondResults.filter(secondRow => secondRow.FIRE_YEAR === FIRE_YEAR && secondRow.PV_EN === PV_EN);
+      } else if (country !== 'ALL' && province !== 'ALL') {
+        details = secondResults.filter(secondRow => secondRow.FIRE_YEAR === FIRE_YEAR && secondRow.AP_EN === AP_EN);
+      }
+
+      return {
+        yearly: row,
+        details
+      };
+    });
+
+    res.json(transformedData);
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send('Internal server error');
+  }
+});
+
+
+server.get('/rida-api/api/burnt-bubble-chart', async (req, res) => {
+  const { country, startDate, endDate, province } = req.query;
+
+  let query = '';
   const queryParameters = [startDate, endDate];
-  if (country && country!='ALL') {
+
+  if (country && country !== 'ALL') {
     queryParameters.push(country);
   }
-  if (province && province!='ALL') {
+  if (province && province !== 'ALL') {
     queryParameters.push(province);
   }
 
-  db.query(firstQuery, queryParameters, (error, results) => {
-    if (error) {
-      console.error('Error executing first query:', error);
-      res.status(500).send('Internal server error');
-      return;
-    }
+  if (country === 'ALL' && province === 'ALL') {
+    query = `
+      SELECT 
+          b.ISO3,
+          ROUND(SUM(b.AREA), 3) AS TOTAL_AREA,
+          l.LATITUDE,
+          l.LONGITUDE
+      FROM 
+          BURNT_SCAR_INFO b
+      JOIN 
+          LOCATION_INFO l
+      ON 
+          b.ISO3 = l.ISO3
+      WHERE 
+          b.FIRE_DATE BETWEEN ? AND ?
+          AND l.LOCATION_LEVEL = 'Admin'
+      GROUP BY 
+          b.ISO3, l.LATITUDE, l.LONGITUDE;
+    `;
+  } else if (country !== 'ALL' && province === 'ALL') {
+    query = `
+      SELECT 
+          b.ISO3,
+          b.PV_EN,
+          ROUND(SUM(b.AREA), 3) AS TOTAL_AREA,
+          l.LATITUDE,
+          l.LONGITUDE
+      FROM 
+          BURNT_SCAR_INFO b
+      JOIN 
+          LOCATION_INFO l
+      ON 
+          b.PV_EN = l.PV_EN AND b.ISO3 = l.ISO3
+      WHERE 
+          b.FIRE_DATE BETWEEN ? AND ?
+          AND b.ISO3 = ?
+          AND l.LOCATION_LEVEL = 'Major'
+      GROUP BY 
+          b.ISO3, b.PV_EN, l.LATITUDE, l.LONGITUDE;
+    `;
+  } else if (country !== 'ALL' && province !== 'ALL') {
+    query = `
+      SELECT 
+          b.ISO3,
+          b.PV_EN,
+          b.AP_EN,
+          ROUND(SUM(b.AREA), 3) AS TOTAL_AREA,
+          l.LATITUDE,
+          l.LONGITUDE
+      FROM 
+          BURNT_SCAR_INFO b
+      JOIN 
+          LOCATION_INFO l
+      ON 
+          b.AP_EN = l.AP_EN AND b.PV_EN = l.PV_EN AND b.ISO3 = l.ISO3
+      WHERE 
+          b.FIRE_DATE BETWEEN ? AND ?
+          AND b.ISO3 = ?
+          AND b.PV_EN = ?
+      GROUP BY 
+          b.ISO3, b.PV_EN, b.AP_EN, l.LATITUDE, l.LONGITUDE;
+    `;
+  }
 
-    let secondQuery ='';
-
-    if(country=='ALL'&&province =='ALL'){
-      secondQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR, MONTH(FIRE_DATE) AS FIRE_MONTH FROM BURNT_SCAR_INFO WHERE YEAR(FIRE_DATE) IN (?) GROUP BY COUNTRY, FIRE_YEAR, FIRE_MONTH; `;
-    }else if (country!='ALL'&&province =='ALL'){
-      secondQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR, MONTH(FIRE_DATE) AS FIRE_MONTH, PV_EN FROM BURNT_SCAR_INFO WHERE YEAR(FIRE_DATE) IN (?)  ${country ? 'AND ISO3 = ?' : ''} GROUP BY  COUNTRY, FIRE_YEAR, FIRE_MONTH, PV_EN; `;
-    }else if (country!='ALL'&&province !='ALL'){
-      secondQuery = `SELECT ROUND(SUM(AREA), 2) AS SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR, MONTH(FIRE_DATE) AS FIRE_MONTH, AP_EN FROM BURNT_SCAR_INFO WHERE YEAR(FIRE_DATE) IN (?)  ${country ? 'AND ISO3 = ?' : ''} ${province ? 'AND PV_EN = ?' : ''} GROUP BY  COUNTRY, FIRE_YEAR, FIRE_MONTH, AP_EN; `;
-    }
-
-
-    const fireYear = results.map((row) => row.FIRE_YEAR);
-    const uniqueFireYear = fireYear.filter((year, index) => {
-      return fireYear.indexOf(year) === index;
-    });
-
-    const secondQueryParameters = [uniqueFireYear];
-    if (country && country!='ALL') {
-      secondQueryParameters.push(country);
-    }
-    if (province && province!='ALL') {
-      secondQueryParameters.push(province);
-    }
-
-
-
-    db.query(secondQuery, secondQueryParameters, (error, secondResults) => {
-      if (error) {
-        console.error('Error executing second query:', error);
-        res.status(500).send('Internal server error');
-        return;
-      }
-
-
-      const transformedData = [];
-
-      results.forEach((row) => {
-        const { FIRE_YEAR, COUNTRY, PV_EN, AP_EN } = row;
-        const yearly = row; // directly use the current row for summary
-        let details = []
-        if(country=='ALL'&&province =='ALL'){
-          details = secondResults.filter((secondRow) => secondRow.FIRE_YEAR === FIRE_YEAR && secondRow.COUNTRY === COUNTRY);
-        }else if(country!='ALL'&&province =='ALL'){
-          details = secondResults.filter((secondRow) => secondRow.FIRE_YEAR === FIRE_YEAR && secondRow.PV_EN === PV_EN);
-        }else if(country!='ALL'&&province !='ALL'){
-          details = secondResults.filter((secondRow) => secondRow.FIRE_YEAR === FIRE_YEAR && secondRow.AP_EN === AP_EN);
-        }
-
-        const transformedYearData = {
-          yearly,
-          details
-        };
-        transformedData.push(transformedYearData)
-        
-
-      });
-
-      res.json(transformedData);
-    });
-  });
+  try {
+    const results = await executeQuery(query, queryParameters);
+    res.json(results);
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send('Internal server error');
+  }
 });
 
-server.get('/api/line-chart-pm25', (req, res) => {
-  const country = req.query.country;
-  const startDate = req.query.startDate;
-  const endDate = req.query.endDate;
-  const province = req.query.province;
+server.get('/rida-api/api/aqi-bubble-chart', async (req, res) => {
+  const { country, startDate, endDate, province } = req.query;
 
-  let firstQuery ='';
-
-  if(country=='ALL'&&province =='ALL'){
-    firstQuery = `SELECT ROUND(MAX(PM25), 2) AS MAX_PM25, COUNTRY, YEAR(AQI_DATE) AS AQI_YEAR FROM AIR_QUALITY WHERE AQI_DATE BETWEEN ? AND ? GROUP BY COUNTRY, AQI_YEAR `;
-  }else if (country!='ALL'&&province =='ALL'){
-    firstQuery = `SELECT ROUND(MAX(PM25), 2) AS MAX_PM25, YEAR(AQI_DATE) AS AQI_YEAR, PV_EN FROM AIR_QUALITY WHERE AQI_DATE BETWEEN ? AND ?  ${country ? 'AND ISO3 = ?' : ''} GROUP BY  COUNTRY, AQI_YEAR, PV_EN; `;
-  }else if (country!='ALL'&&province !='ALL'){
-    firstQuery = `SELECT ROUND(MAX(PM25), 2) AS MAX_PM25, YEAR(AQI_DATE) AS AQI_YEAR, AP_EN FROM AIR_QUALITY WHERE AQI_DATE BETWEEN ? AND ?  ${country ? 'AND ISO3 = ?' : ''} ${province ? 'AND PV_EN = ?' : ''} GROUP BY  COUNTRY, AQI_YEAR, AP_EN; `;
-  }
-
+  let query = '';
   const queryParameters = [startDate, endDate];
-  if (country && country!='ALL') {
+
+  if (country && country !== 'ALL') {
     queryParameters.push(country);
   }
-  if (province && province!='ALL') {
+  if (province && province !== 'ALL') {
     queryParameters.push(province);
   }
 
-  db.query(firstQuery, queryParameters, (error, results) => {
-    if (error) {
-      console.error('Error executing first query:', error);
-      res.status(500).send('Internal server error');
-      return;
-    }
+  if (country === 'ALL' && province === 'ALL') {
+    query = `
+      SELECT 
+          b.ISO3,
+          ROUND(AVG(PM25), 2) AS AVG_PM25,
+          l.LATITUDE,
+          l.LONGITUDE
+      FROM 
+          AIR_QUALITY b
+      JOIN 
+          LOCATION_INFO l
+      ON 
+          b.ISO3 = l.ISO3
+      WHERE 
+          b.AQI_DATE BETWEEN ? AND ?
+          AND l.LOCATION_LEVEL = 'Admin'
+      GROUP BY 
+          b.ISO3, l.LATITUDE, l.LONGITUDE;
+    `;
+  } else if (country !== 'ALL' && province === 'ALL') {
+    query = `
+      SELECT 
+          b.ISO3,
+          b.PV_EN,
+          ROUND(AVG(PM25), 2) AS AVG_PM25,
+          l.LATITUDE,
+          l.LONGITUDE
+      FROM 
+          AIR_QUALITY b
+      JOIN 
+          LOCATION_INFO l
+      ON 
+          b.PV_EN = l.PV_EN AND b.ISO3 = l.ISO3
+      WHERE 
+          b.AQI_DATE BETWEEN ? AND ?
+          AND b.ISO3 = ?
+          AND l.LOCATION_LEVEL = 'Major'
+      GROUP BY 
+          b.ISO3, b.PV_EN, l.LATITUDE, l.LONGITUDE;
+    `;
+  } else if (country !== 'ALL' && province !== 'ALL') {
+    query = `
+      SELECT 
+          b.ISO3,
+          b.PV_EN,
+          b.AP_EN,
+          ROUND(AVG(PM25), 2) AS AVG_PM25,
+          l.LATITUDE,
+          l.LONGITUDE
+      FROM 
+          AIR_QUALITY b
+      JOIN 
+          LOCATION_INFO l
+      ON 
+          b.AP_EN = l.AP_EN AND b.PV_EN = l.PV_EN AND b.ISO3 = l.ISO3
+      WHERE 
+          b.AQI_DATE BETWEEN ? AND ?
+          AND b.ISO3 = ?
+          AND b.PV_EN = ?
+      GROUP BY 
+          b.ISO3, b.PV_EN, b.AP_EN, l.LATITUDE, l.LONGITUDE;
+    `;
+  }
 
-    let secondQuery ='';
-
-    if(country=='ALL'&&province =='ALL'){
-      secondQuery = `SELECT ROUND(MAX(PM25), 2) AS MAX_PM25, COUNTRY, YEAR(AQI_DATE) AS AQI_YEAR, MONTH(AQI_DATE) AS AQI_MONTH FROM AIR_QUALITY WHERE YEAR(AQI_DATE) IN (?) GROUP BY COUNTRY, AQI_YEAR, AQI_MONTH; `;
-    }else if (country!='ALL'&&province =='ALL'){
-      secondQuery = `SELECT ROUND(MAX(PM25), 2) AS MAX_PM25, COUNTRY, YEAR(AQI_DATE) AS AQI_YEAR, MONTH(AQI_DATE) AS AQI_MONTH, PV_EN FROM AIR_QUALITY WHERE YEAR(AQI_DATE) IN (?)  ${country ? 'AND ISO3 = ?' : ''} GROUP BY  COUNTRY, AQI_YEAR, AQI_MONTH, PV_EN; `;
-    }else if (country!='ALL'&&province !='ALL'){
-      secondQuery = `SELECT ROUND(MAX(PM25), 2) AS MAX_PM25, COUNTRY, YEAR(AQI_DATE) AS AQI_YEAR, MONTH(AQI_DATE) AS AQI_MONTH, AP_EN FROM AIR_QUALITY WHERE YEAR(AQI_DATE) IN (?)  ${country ? 'AND ISO3 = ?' : ''} ${province ? 'AND PV_EN = ?' : ''} GROUP BY  COUNTRY, AQI_YEAR, AQI_MONTH, AP_EN; `;
-    }
-
-
-    const aqiYear = results.map((row) => row.AQI_YEAR);
-    const uniqueAqiYear = aqiYear.filter((year, index) => {
-      return aqiYear.indexOf(year) === index;
-    });
-
-    const secondQueryParameters = [uniqueAqiYear];
-    if (country && country!='ALL') {
-      secondQueryParameters.push(country);
-    }
-    if (province && province!='ALL') {
-      secondQueryParameters.push(province);
-    }
-
-
-
-    db.query(secondQuery, secondQueryParameters, (error, secondResults) => {
-      if (error) {
-        console.error('Error executing second query:', error);
-        res.status(500).send('Internal server error');
-        return;
-      }
-
-
-      const transformedData = [];
-
-      results.forEach((row) => {
-        const { AQI_YEAR, COUNTRY, PV_EN, AP_EN } = row;
-        const yearly = row; // directly use the current row for summary
-        let details = []
-        if(country=='ALL'&&province =='ALL'){
-          details = secondResults.filter((secondRow) => secondRow.AQI_YEAR === AQI_YEAR && secondRow.COUNTRY === COUNTRY);
-        }else if(country!='ALL'&&province =='ALL'){
-          details = secondResults.filter((secondRow) => secondRow.AQI_YEAR === AQI_YEAR && secondRow.PV_EN === PV_EN);
-        }else if(country!='ALL'&&province !='ALL'){
-          details = secondResults.filter((secondRow) => secondRow.AQI_YEAR === AQI_YEAR && secondRow.AP_EN === AP_EN);
-        }
-
-        const transformedYearData = {
-          yearly,
-          details
-        };
-        transformedData.push(transformedYearData)
-        
-
-      });
-
-      res.json(transformedData);
-    });
-  });
+  try {
+    const results = await executeQuery(query, queryParameters);
+    res.json(results);
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send('Internal server error');
+  }
 });
 
-server.get('/api/line-chart-hot-spot', (req, res) => {
-  const country = req.query.country;
-  const startDate = req.query.startDate;
-  const endDate = req.query.endDate;
-  const province = req.query.province;
+server.get('/rida-api/api/hotspot-bubble-chart', async (req, res) => {
+  const { country, startDate, endDate, province } = req.query;
 
-  let firstQuery ='';
-
-  if(country=='ALL'&&province =='ALL'){
-    firstQuery = `SELECT COUNT(*) AS SUM_HOTSPOT, COUNTRY, YEAR(HOT_SPOT_DATE) AS HOT_SPOT_YEAR FROM HOT_SPOT WHERE HOT_SPOT_DATE BETWEEN ? AND ? GROUP BY COUNTRY, HOT_SPOT_YEAR; `;
-  }else if (country!='ALL'&&province =='ALL'){
-    firstQuery = `SELECT COUNT(*) AS SUM_HOTSPOT, COUNTRY, YEAR(HOT_SPOT_DATE) AS HOT_SPOT_YEAR, PV_EN FROM HOT_SPOT WHERE HOT_SPOT_DATE BETWEEN ? AND ?  ${country ? 'AND ISO3 = ?' : ''} GROUP BY  COUNTRY, HOT_SPOT_YEAR, PV_EN; `;
-  }else if (country!='ALL'&&province !='ALL'){
-    firstQuery = `SELECT COUNT(*) AS SUM_HOTSPOT, COUNTRY, YEAR(HOT_SPOT_DATE) AS HOT_SPOT_YEAR, AP_EN FROM HOT_SPOT WHERE HOT_SPOT_DATE BETWEEN ? AND ?  ${country ? 'AND ISO3 = ?' : ''} ${province ? 'AND PV_EN = ?' : ''} GROUP BY  COUNTRY, HOT_SPOT_YEAR, AP_EN; `;
-  }
-
+  let query = '';
   const queryParameters = [startDate, endDate];
-  if (country && country!='ALL') {
+
+  if (country && country !== 'ALL') {
     queryParameters.push(country);
   }
-  if (province && province!='ALL') {
+  if (province && province !== 'ALL') {
     queryParameters.push(province);
   }
 
-  db.query(firstQuery, queryParameters, (error, results) => {
-    if (error) {
-      console.error('Error executing first query:', error);
-      res.status(500).send('Internal server error');
-      return;
-    }
+  if (country === 'ALL' && province === 'ALL') {
+    query = `
+      SELECT 
+          b.ISO3,
+          COUNT(*) AS SUM_HOTSPOT,
+          l.LATITUDE,
+          l.LONGITUDE
+      FROM 
+          HOT_SPOT b
+      JOIN 
+          LOCATION_INFO l
+      ON 
+          b.ISO3 = l.ISO3
+      WHERE 
+          b.HOT_SPOT_DATE BETWEEN ? AND ?
+          AND l.LOCATION_LEVEL = 'Admin'
+      GROUP BY 
+          b.ISO3, l.LATITUDE, l.LONGITUDE;
+    `;
+  } else if (country !== 'ALL' && province === 'ALL') {
+    query = `
+      SELECT 
+          b.ISO3,
+          b.PV_EN,
+          COUNT(*) AS SUM_HOTSPOT,
+          l.LATITUDE,
+          l.LONGITUDE
+      FROM 
+          HOT_SPOT b
+      JOIN 
+          LOCATION_INFO l
+      ON 
+          b.PV_EN = l.PV_EN AND b.ISO3 = l.ISO3
+      WHERE 
+          b.HOT_SPOT_DATE BETWEEN ? AND ?
+          AND b.ISO3 = ?
+          AND l.LOCATION_LEVEL = 'Major'
+      GROUP BY 
+          b.ISO3, b.PV_EN, l.LATITUDE, l.LONGITUDE;
+    `;
+  } else if (country !== 'ALL' && province !== 'ALL') {
+    query = `
+      SELECT 
+          b.ISO3,
+          b.PV_EN,
+          b.AP_EN,
+          COUNT(*) AS SUM_HOTSPOT,
+          l.LATITUDE,
+          l.LONGITUDE
+      FROM 
+          HOT_SPOT b
+      JOIN 
+          LOCATION_INFO l
+      ON 
+          b.AP_EN = l.AP_EN AND b.PV_EN = l.PV_EN AND b.ISO3 = l.ISO3
+      WHERE 
+          b.HOT_SPOT_DATE BETWEEN ? AND ?
+          AND b.ISO3 = ?
+          AND b.PV_EN = ?
+      GROUP BY 
+          b.ISO3, b.PV_EN, b.AP_EN, l.LATITUDE, l.LONGITUDE;
+    `;
+  }
 
-    let secondQuery ='';
-
-    if(country=='ALL'&&province =='ALL'){
-      secondQuery = `SELECT COUNT(*) AS SUM_HOTSPOT, COUNTRY, YEAR(HOT_SPOT_DATE) AS HOT_SPOT_YEAR, MONTH(HOT_SPOT_DATE) AS HOT_SPOT_MONTH FROM HOT_SPOT WHERE YEAR(HOT_SPOT_DATE) IN (?) GROUP BY COUNTRY, HOT_SPOT_YEAR, HOT_SPOT_MONTH; `;
-    }else if (country!='ALL'&&province =='ALL'){
-      secondQuery = `SELECT COUNT(*) AS SUM_HOTSPOT, COUNTRY, YEAR(HOT_SPOT_DATE) AS HOT_SPOT_YEAR, MONTH(HOT_SPOT_DATE) AS HOT_SPOT_MONTH, PV_EN FROM HOT_SPOT WHERE YEAR(HOT_SPOT_DATE) IN (?)  ${country ? 'AND ISO3 = ?' : ''} GROUP BY  COUNTRY, HOT_SPOT_YEAR, HOT_SPOT_MONTH, PV_EN; `;
-    }else if (country!='ALL'&&province !='ALL'){
-      secondQuery = `SELECT COUNT(*) AS SUM_HOTSPOT, COUNTRY, YEAR(HOT_SPOT_DATE) AS HOT_SPOT_YEAR, MONTH(HOT_SPOT_DATE) AS HOT_SPOT_MONTH, AP_EN FROM HOT_SPOT WHERE YEAR(HOT_SPOT_DATE) IN (?)  ${country ? 'AND ISO3 = ?' : ''} ${province ? 'AND PV_EN = ?' : ''} GROUP BY  COUNTRY, HOT_SPOT_YEAR, HOT_SPOT_MONTH, AP_EN; `;
-    }
-
-
-    const hotspotYear = results.map((row) => row.HOT_SPOT_YEAR);
-    const uniqueHotspotYear = hotspotYear.filter((year, index) => {
-      return hotspotYear.indexOf(year) === index;
-    });
-
-    const secondQueryParameters = [uniqueHotspotYear];
-    if (country && country!='ALL') {
-      secondQueryParameters.push(country);
-    }
-    if (province && province!='ALL') {
-      secondQueryParameters.push(province);
-    }
-
-
-
-    db.query(secondQuery, secondQueryParameters, (error, secondResults) => {
-      if (error) {
-        console.error('Error executing second query:', error);
-        res.status(500).send('Internal server error');
-        return;
-      }
-
-
-      const transformedData = [];
-
-      results.forEach((row) => {
-        const { HOT_SPOT_YEAR, COUNTRY, PV_EN, AP_EN } = row;
-        const yearly = row; // directly use the current row for summary
-        let details = []
-        if(country=='ALL'&&province =='ALL'){
-          details = secondResults.filter((secondRow) => secondRow.HOT_SPOT_YEAR === HOT_SPOT_YEAR && secondRow.COUNTRY === COUNTRY);
-        }else if(country!='ALL'&&province =='ALL'){
-          details = secondResults.filter((secondRow) => secondRow.HOT_SPOT_YEAR === HOT_SPOT_YEAR && secondRow.PV_EN === PV_EN);
-        }else if(country!='ALL'&&province !='ALL'){
-          details = secondResults.filter((secondRow) => secondRow.HOT_SPOT_YEAR === HOT_SPOT_YEAR && secondRow.AP_EN === AP_EN);
-        }
-
-        const transformedYearData = {
-          yearly,
-          details
-        };
-        transformedData.push(transformedYearData)
-        
-
-      });
-
-      res.json(transformedData);
-    });
-  });
+  try {
+    const results = await executeQuery(query, queryParameters);
+    res.json(results);
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send('Internal server error');
+  }
 });
 
-server.get("/api/overview-table-hot-spot", async (req, res) => {
+
+server.get('/rida-api/api/line-chart-pm25', async (req, res) => {
+  const { country, startDate, endDate, province } = req.query;
+
+  let firstQuery = '';
+  let firstQueryParams = [startDate, endDate];
+
+  if (country === 'ALL' && province === 'ALL') {
+    firstQuery = `SELECT ROUND(AVG(PM25), 2) AS AVG_PM25, COUNTRY, YEAR(AQI_DATE) AS AQI_YEAR FROM AIR_QUALITY WHERE AQI_DATE BETWEEN ? AND ? GROUP BY COUNTRY, AQI_YEAR;`;
+  } else if (country !== 'ALL' && province === 'ALL') {
+    firstQuery = `SELECT ROUND(AVG(PM25), 2) AS AVG_PM25, YEAR(AQI_DATE) AS AQI_YEAR, PV_EN FROM AIR_QUALITY WHERE AQI_DATE BETWEEN ? AND ? ${country ? 'AND ISO3 = ?' : ''} GROUP BY COUNTRY, AQI_YEAR, PV_EN;`;
+    if (country) firstQueryParams.push(country);
+  } else if (country !== 'ALL' && province !== 'ALL') {
+    firstQuery = `SELECT ROUND(AVG(PM25), 2) AS AVG_PM25, YEAR(AQI_DATE) AS AQI_YEAR, AP_EN FROM AIR_QUALITY WHERE AQI_DATE BETWEEN ? AND ? ${country ? 'AND ISO3 = ?' : ''} ${province ? 'AND PV_EN = ?' : ''} GROUP BY COUNTRY, AQI_YEAR, AP_EN;`;
+    if (country) firstQueryParams.push(country);
+    if (province) firstQueryParams.push(province);
+  }
+
+  try {
+    const firstResults = await executeQuery(firstQuery, firstQueryParams);
+
+    const aqiYear = firstResults.map(row => row.AQI_YEAR);
+    const uniqueAqiYear = [...new Set(aqiYear)];
+
+    let secondQuery = '';
+    let secondQueryParams = [uniqueAqiYear];
+
+    if (country === 'ALL' && province === 'ALL') {
+      secondQuery = `SELECT ROUND(AVG(PM25), 2) AS AVG_PM25, COUNTRY, YEAR(AQI_DATE) AS AQI_YEAR, MONTH(AQI_DATE) AS AQI_MONTH FROM AIR_QUALITY WHERE YEAR(AQI_DATE) IN (?) GROUP BY COUNTRY, AQI_YEAR, AQI_MONTH;`;
+    } else if (country !== 'ALL' && province === 'ALL') {
+      secondQuery = `SELECT ROUND(AVG(PM25), 2) AS AVG_PM25, COUNTRY, YEAR(AQI_DATE) AS AQI_YEAR, MONTH(AQI_DATE) AS AQI_MONTH, PV_EN FROM AIR_QUALITY WHERE YEAR(AQI_DATE) IN (?) ${country ? 'AND ISO3 = ?' : ''} GROUP BY COUNTRY, AQI_YEAR, AQI_MONTH, PV_EN;`;
+      if (country) secondQueryParams.push(country);
+    } else if (country !== 'ALL' && province !== 'ALL') {
+      secondQuery = `SELECT ROUND(AVG(PM25), 2) AS AVG_PM25, COUNTRY, YEAR(AQI_DATE) AS AQI_YEAR, MONTH(AQI_DATE) AS AQI_MONTH, AP_EN FROM AIR_QUALITY WHERE YEAR(AQI_DATE) IN (?) ${country ? 'AND ISO3 = ?' : ''} ${province ? 'AND PV_EN = ?' : ''} GROUP BY COUNTRY, AQI_YEAR, AQI_MONTH, AP_EN;`;
+      if (country) secondQueryParams.push(country);
+      if (province) secondQueryParams.push(province);
+    }
+
+    const secondResults = await executeQuery(secondQuery, secondQueryParams);
+
+    const transformedData = firstResults.map(row => {
+      const { AQI_YEAR, COUNTRY, PV_EN, AP_EN } = row;
+      let details = [];
+      if (country === 'ALL' && province === 'ALL') {
+        details = secondResults.filter(secondRow => secondRow.AQI_YEAR === AQI_YEAR && secondRow.COUNTRY === COUNTRY);
+      } else if (country !== 'ALL' && province === 'ALL') {
+        details = secondResults.filter(secondRow => secondRow.AQI_YEAR === AQI_YEAR && secondRow.PV_EN === PV_EN);
+      } else if (country !== 'ALL' && province !== 'ALL') {
+        details = secondResults.filter(secondRow => secondRow.AQI_YEAR === AQI_YEAR && secondRow.AP_EN === AP_EN);
+      }
+
+      return {
+        yearly: row,
+        details
+      };
+    });
+
+    res.json(transformedData);
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send('Internal server error');
+  }
+});
+
+server.get('/rida-api/api/line-chart-hot-spot', async (req, res) => {
+  const { country, startDate, endDate, province } = req.query;
+
+  let firstQuery = '';
+  let firstQueryParams = [startDate, endDate];
+
+  if (country === 'ALL' && province === 'ALL') {
+    firstQuery = `SELECT COUNT(*) AS SUM_HOTSPOT, COUNTRY, YEAR(HOT_SPOT_DATE) AS HOT_SPOT_YEAR FROM HOT_SPOT WHERE HOT_SPOT_DATE BETWEEN ? AND ? GROUP BY COUNTRY, HOT_SPOT_YEAR;`;
+  } else if (country !== 'ALL' && province === 'ALL') {
+    firstQuery = `SELECT COUNT(*) AS SUM_HOTSPOT, COUNTRY, YEAR(HOT_SPOT_DATE) AS HOT_SPOT_YEAR, PV_EN FROM HOT_SPOT WHERE HOT_SPOT_DATE BETWEEN ? AND ? ${country ? 'AND ISO3 = ?' : ''} GROUP BY COUNTRY, HOT_SPOT_YEAR, PV_EN;`;
+    if (country) firstQueryParams.push(country);
+  } else if (country !== 'ALL' && province !== 'ALL') {
+    firstQuery = `SELECT COUNT(*) AS SUM_HOTSPOT, COUNTRY, YEAR(HOT_SPOT_DATE) AS HOT_SPOT_YEAR, AP_EN FROM HOT_SPOT WHERE HOT_SPOT_DATE BETWEEN ? AND ? ${country ? 'AND ISO3 = ?' : ''} ${province ? 'AND PV_EN = ?' : ''} GROUP BY COUNTRY, HOT_SPOT_YEAR, AP_EN;`;
+    if (country) firstQueryParams.push(country);
+    if (province) firstQueryParams.push(province);
+  }
+
+  try {
+    const firstResults = await executeQuery(firstQuery, firstQueryParams);
+
+    const hotspotYear = firstResults.map(row => row.HOT_SPOT_YEAR);
+    const uniqueHotspotYear = [...new Set(hotspotYear)];
+
+    let secondQuery = '';
+    let secondQueryParams = [uniqueHotspotYear];
+
+    if (country === 'ALL' && province === 'ALL') {
+      secondQuery = `SELECT COUNT(*) AS SUM_HOTSPOT, COUNTRY, YEAR(HOT_SPOT_DATE) AS HOT_SPOT_YEAR, MONTH(HOT_SPOT_DATE) AS HOT_SPOT_MONTH FROM HOT_SPOT WHERE YEAR(HOT_SPOT_DATE) IN (?) GROUP BY COUNTRY, HOT_SPOT_YEAR, HOT_SPOT_MONTH;`;
+    } else if (country !== 'ALL' && province === 'ALL') {
+      secondQuery = `SELECT COUNT(*) AS SUM_HOTSPOT, COUNTRY, YEAR(HOT_SPOT_DATE) AS HOT_SPOT_YEAR, MONTH(HOT_SPOT_DATE) AS HOT_SPOT_MONTH, PV_EN FROM HOT_SPOT WHERE YEAR(HOT_SPOT_DATE) IN (?) ${country ? 'AND ISO3 = ?' : ''} GROUP BY COUNTRY, HOT_SPOT_YEAR, HOT_SPOT_MONTH, PV_EN;`;
+      if (country) secondQueryParams.push(country);
+    } else if (country !== 'ALL' && province !== 'ALL') {
+      secondQuery = `SELECT COUNT(*) AS SUM_HOTSPOT, COUNTRY, YEAR(HOT_SPOT_DATE) AS HOT_SPOT_YEAR, MONTH(HOT_SPOT_DATE) AS HOT_SPOT_MONTH, AP_EN FROM HOT_SPOT WHERE YEAR(HOT_SPOT_DATE) IN (?) ${country ? 'AND ISO3 = ?' : ''} ${province ? 'AND PV_EN = ?' : ''} GROUP BY COUNTRY, HOT_SPOT_YEAR, HOT_SPOT_MONTH, AP_EN;`;
+      if (country) secondQueryParams.push(country);
+      if (province) secondQueryParams.push(province);
+    }
+
+    const secondResults = await executeQuery(secondQuery, secondQueryParams);
+
+    const transformedData = firstResults.map(row => {
+      const { HOT_SPOT_YEAR, COUNTRY, PV_EN, AP_EN } = row;
+      let details = [];
+      if (country === 'ALL' && province === 'ALL') {
+        details = secondResults.filter(secondRow => secondRow.HOT_SPOT_YEAR === HOT_SPOT_YEAR && secondRow.COUNTRY === COUNTRY);
+      } else if (country !== 'ALL' && province === 'ALL') {
+        details = secondResults.filter(secondRow => secondRow.HOT_SPOT_YEAR === HOT_SPOT_YEAR && secondRow.PV_EN === PV_EN);
+      } else if (country !== 'ALL' && province !== 'ALL') {
+        details = secondResults.filter(secondRow => secondRow.HOT_SPOT_YEAR === HOT_SPOT_YEAR && secondRow.AP_EN === AP_EN);
+      }
+
+      return {
+        yearly: row,
+        details
+      };
+    });
+
+    res.json(transformedData);
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send('Internal server error');
+  }
+});
+
+server.get("/rida-api/api/overview-table-hot-spot", async (req, res) => {
   const { fromDate, toDate, country, province } = req.query;
 
   let sql = '';
 
   if(country=='ALL'&&province =='ALL'){
     sql = `SELECT COUNT(*) AS COUNT_ROWS, COUNTRY as NAME_LIST, ISO3 
-          FROM RidaDB.HOT_SPOT 
-          WHERE HOT_SPOT_DATE BETWEEN '${fromDate}' AND '${toDate}' 
+          FROM HOT_SPOT 
+          WHERE HOT_SPOT_DATE BETWEEN ? AND ? 
           GROUP BY COUNTRY, ISO3 
           ORDER BY COUNT_ROWS DESC`;
   }else if (country!='ALL'&&province =='ALL'){
     sql = `SELECT COUNT(*) AS COUNT_ROWS, PV_EN as NAME_LIST, ISO3 
-          FROM RidaDB.HOT_SPOT 
-          WHERE ISO3 = '${country}' AND HOT_SPOT_DATE BETWEEN '${fromDate}' AND '${toDate}' 
+          FROM HOT_SPOT 
+          WHERE HOT_SPOT_DATE BETWEEN ? AND ? AND ISO3 = ?
           GROUP BY PV_EN, ISO3 
           ORDER BY COUNT_ROWS DESC`;
   }else if (country!='ALL'&&province !='ALL'){
     sql = `SELECT COUNT(*) AS COUNT_ROWS, AP_EN as NAME_LIST, ISO3 
-          FROM RidaDB.HOT_SPOT 
-          WHERE ISO3 = '${country}' AND PV_EN = '${province}' AND HOT_SPOT_DATE BETWEEN '${fromDate}' AND '${toDate}' 
+          FROM HOT_SPOT 
+          WHERE HOT_SPOT_DATE BETWEEN ? AND ? AND ISO3 = ? AND PV_EN = ?
           GROUP BY AP_EN, ISO3 
           ORDER BY COUNT_ROWS DESC`;
   }
 
+  const queryParams = [fromDate, toDate];
+  if (country && country != 'ALL') queryParams.push(country);
+  if (province && province != 'ALL') queryParams.push(province);
 
-  db.query(sql, [fromDate, toDate], (err, results) => {
-    if (err) throw err;
+  try {
+    const results = await executeQuery(sql, queryParams);
     res.send(results);
-  });
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send('Internal server error');
+  }
 });
 
-
-server.get("/api/overview-table-pm25", async (req, res) => {
+server.get("/rida-api/api/overview-table-pm25", async (req, res) => {
   const { fromDate, toDate, country, province } = req.query;
 
   let sql = '';
 
   if(country=='ALL'&&province =='ALL'){
-    sql = `SELECT ROUND(MAX(PM25), 2) AS MAX_PM25, COUNTRY as NAME_LIST, ISO3 
-          FROM RidaDB.AIR_QUALITY 
-          WHERE AQI_DATE BETWEEN '${fromDate}' AND '${toDate}' 
+    sql = `SELECT ROUND(AVG(PM25), 2) AS AVG_PM25, COUNTRY as NAME_LIST, ISO3 
+          FROM AIR_QUALITY 
+          WHERE AQI_DATE BETWEEN ? AND ? 
           GROUP BY COUNTRY, ISO3 
-          ORDER BY MAX_PM25 DESC`;
+          ORDER BY AVG_PM25 DESC`;
   }else if (country!='ALL'&&province =='ALL'){
-    sql = `SELECT ROUND(MAX(PM25), 2) AS MAX_PM25, PV_EN as NAME_LIST, ISO3 
-          FROM RidaDB.AIR_QUALITY 
-          WHERE ISO3 = '${country}' AND AQI_DATE BETWEEN '${fromDate}' AND '${toDate}' 
+    sql = `SELECT ROUND(AVG(PM25), 2) AS AVG_PM25, PV_EN as NAME_LIST, ISO3 
+          FROM AIR_QUALITY 
+          WHERE AQI_DATE BETWEEN ? AND ? AND ISO3 = ?
           GROUP BY PV_EN, ISO3 
-          ORDER BY MAX_PM25 DESC`;
+          ORDER BY AVG_PM25 DESC`;
   }else if (country!='ALL'&&province !='ALL'){
-    sql = `SELECT ROUND(MAX(PM25), 2) AS MAX_PM25, AP_EN as NAME_LIST, ISO3 
-          FROM RidaDB.AIR_QUALITY 
-          WHERE ISO3 = '${country}' AND PV_EN = '${province}' AND AQI_DATE BETWEEN '${fromDate}' AND '${toDate}' 
+    sql = `SELECT ROUND(AVG(PM25), 2) AS AVG_PM25, AP_EN as NAME_LIST, ISO3 
+          FROM AIR_QUALITY 
+          WHERE AQI_DATE BETWEEN ? AND ? AND ISO3 = ? AND PV_EN = ?
           GROUP BY AP_EN, ISO3 
-          ORDER BY MAX_PM25 DESC`;
+          ORDER BY AVG_PM25 DESC`;
   }
 
+  const queryParams = [fromDate, toDate];
+  if (country && country != 'ALL') queryParams.push(country);
+  if (province && province != 'ALL') queryParams.push(province);
 
-  db.query(sql, [fromDate, toDate], (err, results) => {
-    if (err) throw err;
+  try {
+    const results = await executeQuery(sql, queryParams);
     res.send(results);
-  });
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send('Internal server error');
+  }
 });
 
-
-
-server.get("/api/overview-table", async (req, res) => {
+server.get("/rida-api/api/overview-table", async (req, res) => {
   const { fromDate, toDate, country, province } = req.query;
 
   let sql = '';
 
   if(country=='ALL'&&province =='ALL'){
-    sql = `SELECT ROUND(SUM(AREA),2) as SUM_AREA, COUNTRY as NAME_LIST, ISO3 FROM RidaDB.BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN '${fromDate}' AND '${toDate}' GROUP BY COUNTRY, ISO3 ORDER BY SUM_AREA DESC `;
+    sql = `SELECT ROUND(SUM(AREA),2) as SUM_AREA, COUNTRY as NAME_LIST, ISO3 FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ? GROUP BY COUNTRY, ISO3 ORDER BY SUM_AREA DESC `;
   }else if (country!='ALL'&&province =='ALL'){
-    sql = `SELECT ROUND(SUM(AREA),2) as SUM_AREA, PV_EN as NAME_LIST, ISO3 FROM RidaDB.BURNT_SCAR_INFO WHERE ISO3 = '${country}' AND FIRE_DATE BETWEEN '${fromDate}' AND '${toDate}' GROUP BY PV_EN ORDER BY SUM_AREA DESC` ;
+    sql = `SELECT ROUND(SUM(AREA),2) as SUM_AREA, PV_EN as NAME_LIST, ISO3 FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ? AND ISO3 = ? GROUP BY PV_EN ORDER BY SUM_AREA DESC` ;
   }else if (country!='ALL'&&province !='ALL'){
-    sql = `SELECT ROUND(SUM(AREA),2) as SUM_AREA, AP_EN as NAME_LIST, ISO3 FROM RidaDB.BURNT_SCAR_INFO WHERE ISO3 = '${country}' AND PV_EN='${province}' AND FIRE_DATE BETWEEN '${fromDate}' AND '${toDate}' GROUP BY AP_EN ORDER BY SUM_AREA DESC` ;
+    sql = `SELECT ROUND(SUM(AREA),2) as SUM_AREA, AP_EN as NAME_LIST, ISO3 FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ? AND ISO3 = ? AND PV_EN=? GROUP BY AP_EN ORDER BY SUM_AREA DESC` ;
   }
 
-
-  db.query(sql, [fromDate, toDate], (err, results) => {
-    if (err) throw err;
+  const queryParams = [fromDate, toDate];
+  if (country && country != 'ALL') queryParams.push(country);
+  if (province && province != 'ALL') queryParams.push(province);
+  try {
+    const results = await executeQuery(sql, queryParams);
     res.send(results);
-  });
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send('Internal server error');
+  }
 });
 
-
-
-
-
-server.get("/api/overview-chart", async (req, res) => {
+server.get("/rida-api/api/overview-chart", async (req, res) => {
   const { fromDate, toDate, country, province } = req.query;
-  let sql = `SELECT ROUND(SUM(AREA),2) as SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR, PV_EN, AP_EN FROM RidaDB.BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN '${fromDate}' AND '${toDate}' `;
+  let sql = `SELECT ROUND(SUM(AREA),2) as SUM_AREA, COUNTRY, YEAR(FIRE_DATE) AS FIRE_YEAR, PV_EN, AP_EN FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ? `;
 
-  if (country && country!='ALL') {
-    sql += ` AND ISO3 = '${country}'`;
+  if (country && country != 'ALL') {
+    sql += ` AND ISO3 = ?`;
   }
-  if (province && province!='ALL') {
-    sql += ` AND PV_EN = '${province}'`;
+  if (province && province != 'ALL') {
+    sql += ` AND PV_EN = ?`;
   }
   sql += ` GROUP BY COUNTRY, FIRE_YEAR, PV_EN, AP_EN  `;
 
-  db.query(sql, [fromDate, toDate], (err, results) => {
-    if (err) throw err;
+  const queryParams = [fromDate, toDate];
+  if (country && country != 'ALL') queryParams.push(country);
+  if (province && province != 'ALL') queryParams.push(province);
+
+  try {
+    const results = await executeQuery(sql, queryParams);
     res.send(results);
-  });
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send('Internal server error');
+  }
 });
 
-
-server.get("/api/get-province", async (req, res) => {
+server.get("/rida-api/api/get-province", async (req, res) => {
   const { country, module } = req.query;
-  let table = 'RidaDB.BURNT_SCAR_INFO' ;
+  let table = 'BURNT_SCAR_INFO b';
   if(module === "aqi"){
-    table = 'RidaDB.AIR_QUALITY'
+    table = 'AIR_QUALITY b';
   }else if(module === "hotspot"){
-    table = 'RidaDB.HOT_SPOT'
+    table = 'HOT_SPOT b';
   }
-  let sql = `SELECT DISTINCT PV_EN FROM ${table} WHERE ISO3 = ? ORDER BY PV_EN`;
-  db.query(sql, [country], (err, results) => {
-    if (err) throw err;
+
+  let sql = `SELECT DISTINCT 
+  b.ISO3 AS ISO3, b.PV_EN AS PV_EN, l.LATITUDE AS LATITUDE, l.LONGITUDE AS LONGITUDE 
+  FROM ${table} INNER JOIN LOCATION_INFO l ON b.PV_EN = l.PV_EN AND b.ISO3 = l.ISO3
+  WHERE b.ISO3 = ? AND l.LOCATION_LEVEL IN ('Major', 'Admin') 
+  ORDER BY b.PV_EN`;
+
+  try {
+    const results = await executeQuery(sql, [country]);
     res.send(results);
-  });
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send('Internal server error');
+  }
 });
 
-
-server.get("/api/get-max-freq", async (req, res) => {
+server.get("/rida-api/api/get-max-freq", async (req, res) => {
   const { startDate, endDate, country, province } = req.query;
-  let sql = `SELECT COALESCE(MAX(count), 1) AS max_count FROM ( SELECT COUNT(*) AS count FROM BURNT_SCAR_POINT WHERE FIRE_DATE BETWEEN '${startDate}' AND '${endDate}' `;
-  
+  let sql = `WITH RECURSIVE split_dates AS (
+                SELECT 
+                    BURNT_SCAR_ID,
+                    SUBSTRING_INDEX(SUBSTRING_INDEX(FREQUENCY_DATE, ',', numbers.n), ',', -1) AS date,
+                    FREQUENCY_DATE,
+                    FIRE_DATE
+                FROM 
+                    RidaDB.BURNT_SCAR_INFO
+                JOIN 
+                    (SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 
+                    UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10) numbers 
+                ON CHAR_LENGTH(FREQUENCY_DATE) - CHAR_LENGTH(REPLACE(FREQUENCY_DATE, ',', '')) >= numbers.n - 1
+                WHERE FIRE_DATE BETWEEN ? AND ? ${country ? 'AND ISO3 = ?' : ''} ${province ? 'AND PV_EN = ?' : ''}
+            ),
+            unique_date_counts AS (
+                SELECT 
+                    BURNT_SCAR_ID,
+                    COUNT(DISTINCT date) AS unique_date_count
+                FROM split_dates
+                GROUP BY BURNT_SCAR_ID
+            )
+            SELECT MAX(unique_date_count) AS max_unique_date_count
+            FROM unique_date_counts;`;
+
+  const queryParams = [startDate, endDate];
+  if (country && country != 'ALL') queryParams.push(country);
+  if (province && province != 'ALL') queryParams.push(province);
+
+  try {
+    const results = await executeQuery(sql, queryParams);
+    const maxUniqueDateCount = results[0]?.max_unique_date_count || 1; // Handle possible empty results
+    res.json({ max_unique_date_count: maxUniqueDateCount });
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send('Internal server error');
+  }
+});
+
+server.get('/rida-api/api/get-burnt-from-date', async (req, res) => {
+  const { startDate, endDate, country, province } = req.query;
+
+  let sql = `
+    SELECT 
+      BURNT_SCAR_ID, AP_EN, PV_EN, FIRE_DATE, AREA, COUNTRY, LATITUDE, LONGITUDE, 
+      CONCAT('[', REPLACE(REPLACE(GEOMETRY_DATA, '(', '['), ')', ']'), ']') AS GEOMETRY_DATA, 
+      GEOMETRY_TYPE, 
+      COALESCE(FREQUENCY_DATE, FIRE_DATE) AS FREQUENCY_DATE,
+      COALESCE((LENGTH(FREQUENCY_DATE) - LENGTH(REPLACE(FREQUENCY_DATE, ',', '')) + 1), 1) AS frequency_times
+    FROM 
+      BURNT_SCAR_INFO 
+    WHERE 
+      FIRE_DATE BETWEEN ? AND ?
+  `;
+
   if (country && country !== 'ALL') {
-    sql += ` AND ISO3 = '${country}'`;
+    sql += ` AND ISO3 = ?`;
   }
-  
   if (province && province !== 'ALL') {
-    sql += ` AND PV_EN = '${province}'`;
+    sql += ` AND PV_EN = ?`;
   }
-  
-  sql += ` GROUP BY LATITUDE, LONGITUDE ) AS subquery;`;
 
-  console.log('sql', sql);
+  sql += ` ORDER BY frequency_times ASC, AREA DESC`;
 
-  db.query(sql, [startDate, endDate], (err, results) => {
-    if (err) {
-      console.error('Database error:', err);
-      res.status(500).send('Database error');
+  const queryParams = [startDate, endDate];
+  if (country && country !== 'ALL') queryParams.push(country);
+  if (province && province !== 'ALL') queryParams.push(province);
+
+  try {
+    const results = await executeQuery(sql, queryParams);
+
+    let geojson = {
+      type: "FeatureCollection",
+      features: results.map(item => {
+        let coordinates;
+        try {
+          // Validate and parse coordinates
+          coordinates = JSON.parse(item.GEOMETRY_DATA);
+
+          // Ensure coordinates are in the correct format for GeoJSON
+          if (item.GEOMETRY_TYPE === 'Polygon') {
+            // Example: Check if coordinates is an array of linear rings
+            if (!Array.isArray(coordinates) || !Array.isArray(coordinates[0])) {
+              throw new Error('Invalid Polygon coordinates format');
+            }
+          }
+
+          // Add other geometry type validations if needed
+        } catch (error) {
+          console.error('Invalid geometry data:', item.GEOMETRY_DATA, 'Error:', error);
+          coordinates = [];
+        }
+
+        // Check if FREQUENCY_DATE is null and set it to FIRE_DATE if so
+        const frequencyDate = item.FREQUENCY_DATE || item.FIRE_DATE;
+        const frequencyTimes = item.FREQUENCY_DATE ? item.frequency_times : 1;
+
+        return {
+          type: "Feature",
+          properties: {
+            BURNT_SCAR_ID: item.BURNT_SCAR_ID,
+            AP_EN: item.AP_EN,
+            PV_EN: item.PV_EN,
+            COUNTRY: item.COUNTRY,
+            AREA: item.AREA,
+            FIRE_DATE: item.FIRE_DATE,
+            LATITUDE: item.LATITUDE,
+            LONGITUDE: item.LONGITUDE,
+            FREQUENCY_DATE: frequencyDate,
+            frequency_times: frequencyTimes
+          },
+          geometry: {
+            type: item.GEOMETRY_TYPE,
+            coordinates: coordinates
+          }
+        };
+      })
+    };
+
+    res.json(geojson);
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send('Internal server error');
+  }
+});
+
+server.get('/rida-api/api/get-burnt-scar-polygon', async (req, res) => {
+  const { startDate, endDate, country, province, api_key } = req.query;
+
+  let sql = "SELECT * FROM users WHERE api_key = ?";
+  try {
+    const userResults = await executeQuery(sql, [api_key]);
+    if (userResults.length === 0) {
+      res.status(404).send("Invalid API key");
       return;
     }
 
-    // Assuming results will always contain a single row due to MAX aggregation
-    const maxCount = results[0].max_count || 1; // Use 1 if max_count is null
+    sql = ` SELECT 
+          BURNT_SCAR_ID, AP_EN, PV_EN, FIRE_DATE, AREA, COUNTRY, LATITUDE, LONGITUDE, 
+          CONCAT('[', REPLACE(REPLACE(GEOMETRY_DATA, '(', '['), ')', ']'), ']') AS GEOMETRY_DATA, GEOMETRY_TYPE 
+        FROM 
+          BURNT_SCAR_INFO 
+        WHERE 
+          FIRE_DATE BETWEEN ? AND ?
+      `;
+    if (country && country!='ALL') {
+      sql += ` AND ISO3 = ?`;
+    }
+    if (province && province!='ALL') {
+      sql += ` AND PV_EN = ?`;
+    }
 
-    res.send({ max_count: maxCount });
-  });
-});
+    const queryParams = [startDate, endDate];
+    if (country && country != 'ALL') queryParams.push(country);
+    if (province && province != 'ALL') queryParams.push(province);
 
+    const results = await executeQuery(sql, queryParams);
 
-// สร้าง endpoint สำหรับ query ข้อมูลตามช่วงวันที่
-server.get('/api/get-burnt-from-date', (req, res) => {
-  let startDate = req.query.startDate; // Get the start date from the query parameter
-  let endDate = req.query.endDate; // Get the end date from the query parameter
-  let country = req.query.country;
-  let province = req.query.province;
-
-  // Construct the SQL query
-  let sql = `SELECT BURNT_SCAR_ID, AP_EN, PV_EN, FIRE_DATE, AREA, COUNTRY, LATITUDE, LONGITUDE, REPLACE(REPLACE(GEOMETRY_DATA, '(', '['), ')', ']') AS GEOMETRY_DATA, GEOMETRY_TYPE FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN '${startDate}' AND '${endDate}'`;
-
-  // Add conditions for country and province if they are provided
-  if (country && country!='All') {
-    sql += ` AND ISO3 = '${country}'`;
-  }
-  if (province && province!='All') {
-    sql += ` AND PV_EN = '${province}'`;
-  }
-  db.query(sql, (err, results) => {
-    if (err) throw err;
-
-    // Convert data to GeoJSON format
     let geojson = {
       type: "FeatureCollection",
       features: results.map(item => ({
@@ -516,163 +989,94 @@ server.get('/api/get-burnt-from-date', (req, res) => {
       }))
     };
 
-    // Send the data back to the client
     res.json(geojson);
-  });
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send('Internal server error');
+  }
 });
 
-//use api_key
-server.get('/api/get-burnt-scar-polygon', (req, res) => {
-  let startDate = req.query.startDate; // Get the start date from the query parameter
-  let endDate = req.query.endDate; // Get the end date from the query parameter
-  let country = req.query.country;
-  let province = req.query.province;
-  let api_key = req.query.api_key;
-
-  let sql = "SELECT * FROM users WHERE api_key = ?";
-  db.query(sql, [api_key], (err, results) => {
-    if (err) {
-      throw err;
-    } else if (results.length === 0) {
-      // If no user with the provided API key is found, send a 404 or 500 response
-      res.status(404).send("Invalid API key");
-    } else {
-
-      // Construct the SQL query
-      let sql = `SELECT BURNT_SCAR_ID, AP_EN, PV_EN, FIRE_DATE, AREA, COUNTRY, LATITUDE, LONGITUDE, REPLACE(REPLACE(GEOMETRY_DATA, '(', '['), ')', ']') AS GEOMETRY_DATA, GEOMETRY_TYPE FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN '${startDate}' AND '${endDate}'`;
-
-      // Add conditions for country and province if they are provided
-      if (country && country!='All') {
-        sql += ` AND ISO3 = '${country}'`;
-      }
-      if (province && province!='All') {
-        sql += ` AND PV_EN = '${province}'`;
-      }
-      db.query(sql, (err, results) => {
-        if (err) throw err;
-
-        // Convert data to GeoJSON format
-        let geojson = {
-          type: "FeatureCollection",
-          features: results.map(item => ({
-            type: "Feature",
-            properties: {
-              BURNT_SCAR_ID: item.BURNT_SCAR_ID,
-              AP_EN: item.AP_EN,
-              PV_EN: item.PV_EN,
-              COUNTRY: item.COUNTRY,
-              AREA: item.AREA,
-              FIRE_DATE: item.FIRE_DATE,
-              LATITUDE: item.LATITUDE,
-              LONGITUDE: item.LONGITUDE,
-            },
-            geometry: {
-              type: item.GEOMETRY_TYPE,
-              coordinates: JSON.parse(item.GEOMETRY_DATA)
-            }
-          }))
-        };
-
-        // Send the data back to the client
-        res.json(geojson);
-      });
-    }
-  })
-});
-
-
-
-//use api_key
-server.get("/api/get-burnt-scar-point", async (req, res) => {
+server.get("/rida-api/api/get-burnt-scar-point", async (req, res) => {
   const { startDate, endDate, country, province, api_key } = req.query;
 
   let sql = "SELECT * FROM users WHERE api_key = ?";
-  db.query(sql, [api_key], (err, results) => {
-    if (err) {
-      throw err;
-    } else if (results.length === 0) {
-      // If no user with the provided API key is found, send a 404 or 500 response
+  try {
+    const userResults = await executeQuery(sql, [api_key]);
+    if (userResults.length === 0) {
       res.status(404).send("Invalid API key");
-    } else {
-
-      let sqlQuery = `
-        SELECT *, CONCAT(latitude, ',', longitude) AS coordinates, FIRE_DATE
-        FROM BURNT_SCAR_POINT
-        WHERE FIRE_DATE BETWEEN ? AND ?`;
-
-      const queryParams = [startDate, endDate];
-
-      if (country) {
-        sqlQuery += ` AND ISO3 LIKE ?`;
-        queryParams.push(`%${country}%`);
-      }
-
-      if (province) {
-        sqlQuery += ` AND pv_en LIKE ?`;
-        queryParams.push(`%${province}%`);
-      }
-
-      db.query(sqlQuery, queryParams, (err, results) => {
-        if (err) {
-          console.error(err);
-          res.status(500).send("An error occurred while processing the data.");
-          return;
-        }
-
-        // Use a Map to reduce data
-        let reducedData = new Map();
-
-        results.forEach(current => {
-          let key = current.coordinates;
-          if (!reducedData.has(key)) {
-            reducedData.set(key, {
-              ...current,
-              count: 1,
-              frequency_date: [current.FIRE_DATE]
-            });
-          } else {
-            let existing = reducedData.get(key);
-            existing.count++;
-            existing.frequency_date.push(current.FIRE_DATE);
-            reducedData.set(key, existing);
-          }
-        });
-
-        // Find max count
-        let maxCount = 0;
-        reducedData.forEach(item => {
-          if (item.count > maxCount) {
-            maxCount = item.count;
-          }
-        });
-
-        // Transform reduced data to final format
-        let finalData = Array.from(reducedData.values()).map(item => {
-          let percent = ((item.count / maxCount) * 100).toFixed(2);
-          return {
-            type: 'Feature',
-            coordinates: item.coordinates,
-            properties: {
-              ...item,
-              frequency: item.count,
-              frequency_date: item.frequency_date.join(', '),
-              max_count: maxCount,
-              percent: percent // Add percent to properties
-            },
-            geometry: {
-              type: 'Point',
-              coordinates: [parseFloat(item.LONGITUDE), parseFloat(item.LATITUDE)]
-            }
-          };
-        });
-
-        res.json(finalData);
-      });
+      return;
     }
-  })
+
+    let sqlQuery = `
+      SELECT *, CONCAT(latitude, ',', longitude) AS coordinates, FIRE_DATE
+      FROM BURNT_SCAR_POINT
+      WHERE FIRE_DATE BETWEEN ? AND ?`;
+
+    const queryParams = [startDate, endDate];
+
+    if (country) {
+      sqlQuery += ` AND ISO3 LIKE ?`;
+      queryParams.push(`%${country}%`);
+    }
+
+    if (province) {
+      sqlQuery += ` AND pv_en LIKE ?`;
+      queryParams.push(`%${province}%`);
+    }
+
+    const results = await executeQuery(sqlQuery, queryParams);
+
+    let reducedData = new Map();
+    results.forEach(current => {
+      let key = current.coordinates;
+      if (!reducedData.has(key)) {
+        reducedData.set(key, {
+          ...current,
+          count: 1,
+          frequency_date: [current.FIRE_DATE]
+        });
+      } else {
+        let existing = reducedData.get(key);
+        existing.count++;
+        existing.frequency_date.push(current.FIRE_DATE);
+        reducedData.set(key, existing);
+      }
+    });
+
+    let maxCount = 0;
+    reducedData.forEach(item => {
+      if (item.count > maxCount) {
+        maxCount = item.count;
+      }
+    });
+
+    let finalData = Array.from(reducedData.values()).map(item => {
+      let percent = ((item.count / maxCount) * 100).toFixed(2);
+      return {
+        type: 'Feature',
+        coordinates: item.coordinates,
+        properties: {
+          ...item,
+          frequency: item.count,
+          frequency_date: item.frequency_date.join(', '),
+          max_count: maxCount,
+          percent: percent
+        },
+        geometry: {
+          type: 'Point',
+          coordinates: [parseFloat(item.LONGITUDE), parseFloat(item.LATITUDE)]
+        }
+      };
+    });
+
+    res.json(finalData);
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send('Internal server error');
+  }
 });
 
-server.get("/api/get-burnt-point-from-date", async (req, res) => {
+server.get("/rida-api/api/get-burnt-point-from-date", async (req, res) => {
   const { startDate, endDate, country, province } = req.query;
 
   let sqlQuery = `
@@ -692,16 +1096,10 @@ server.get("/api/get-burnt-point-from-date", async (req, res) => {
     queryParams.push(`%${province}%`);
   }
 
-  db.query(sqlQuery, queryParams, (err, results) => {
-    if (err) {
-      console.error(err);
-      res.status(500).send("An error occurred while processing the data.");
-      return;
-    }
+  try {
+    const results = await executeQuery(sqlQuery, queryParams);
 
-    // Use a Map to reduce data
     let reducedData = new Map();
-
     results.forEach(current => {
       let key = current.coordinates;
       if (!reducedData.has(key)) {
@@ -718,7 +1116,6 @@ server.get("/api/get-burnt-point-from-date", async (req, res) => {
       }
     });
 
-    // Find max count
     let maxCount = 0;
     reducedData.forEach(item => {
       if (item.count > maxCount) {
@@ -726,7 +1123,6 @@ server.get("/api/get-burnt-point-from-date", async (req, res) => {
       }
     });
 
-    // Transform reduced data to final format
     let finalData = Array.from(reducedData.values()).map(item => {
       let percent = ((item.count / maxCount) * 100).toFixed(2);
       return {
@@ -737,7 +1133,7 @@ server.get("/api/get-burnt-point-from-date", async (req, res) => {
           frequency: item.count,
           frequency_date: item.frequency_date.join(', '),
           max_count: maxCount,
-          percent: percent // Add percent to properties
+          percent: percent
         },
         geometry: {
           type: 'Point',
@@ -747,47 +1143,49 @@ server.get("/api/get-burnt-point-from-date", async (req, res) => {
     });
 
     res.json(finalData);
-  });
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send('Internal server error');
+  }
 });
 
-
-server.get("/api/get-air-quality", async (req, res) => {
+server.get("/rida-api/api/get-air-quality", async (req, res) => {
   const { date, country, province, api_key } = req.query;
   let sql = "SELECT * FROM users WHERE api_key = ?";
-  db.query(sql, [api_key], (err, results) => {
-    if (err) {
-      throw err;
-    } else if (results.length === 0) {
-      // If no user with the provided API key is found, send a 404 or 500 response
+  try {
+    const userResults = await executeQuery(sql, [api_key]);
+    if (userResults.length === 0) {
       res.status(404).send("Invalid API key");
-    } else {
-      let sqlQuery = `SELECT * FROM RidaDB.AIR_QUALITY 
-      WHERE AQI_DATE = ? `;
-
-      const queryParams = [date];
-
-      if (country) {
-        sqlQuery += ` AND ISO3 LIKE ?`;
-        queryParams.push(`%${country}%`);
-      }
-
-      if (province) {
-        sqlQuery += ` AND pv_en LIKE ?`;
-        queryParams.push(`%${province}%`);
-      }
-
-      db.query(sqlQuery, queryParams, (err, results) => {
-        if (err) throw err;
-        res.send(results);
-      });
+      return;
     }
-  })
+
+    let sqlQuery = `SELECT * FROM AIR_QUALITY 
+    WHERE AQI_DATE = ? `;
+
+    const queryParams = [date];
+
+    if (country) {
+      sqlQuery += ` AND ISO3 LIKE ?`;
+      queryParams.push(`%${country}%`);
+    }
+
+    if (province) {
+      sqlQuery += ` AND pv_en LIKE ?`;
+      queryParams.push(`%${province}%`);
+    }
+
+    const results = await executeQuery(sqlQuery, queryParams);
+    res.send(results);
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send('Internal server error');
+  }
 });
 
-server.get("/api/get-air-quality-from-date", async (req, res) => {
+server.get("/rida-api/api/get-air-quality-from-date", async (req, res) => {
   const { date, country, province } = req.query;
 
-  let sqlQuery = `SELECT * FROM RidaDB.AIR_QUALITY 
+  let sqlQuery = `SELECT * FROM AIR_QUALITY 
   WHERE AQI_DATE = ? `;
 
   const queryParams = [date];
@@ -802,52 +1200,52 @@ server.get("/api/get-air-quality-from-date", async (req, res) => {
     queryParams.push(`%${province}%`);
   }
 
-  db.query(sqlQuery, queryParams, (err, results) => {
-    if (err) throw err;
+  try {
+    const results = await executeQuery(sqlQuery, queryParams);
     res.send(results);
-  });
-
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send('Internal server error');
+  }
 });
 
-
-
-server.get("/api/get-hotspot", async (req, res) => {
+server.get("/rida-api/api/get-hotspot", async (req, res) => {
   const { date, country, province, api_key } = req.query;
   let sql = "SELECT * FROM users WHERE api_key = ?";
-  db.query(sql, [api_key], (err, results) => {
-    if (err) {
-      throw err;
-    } else if (results.length === 0) {
-      // If no user with the provided API key is found, send a 404 or 500 response
+  try {
+    const userResults = await executeQuery(sql, [api_key]);
+    if (userResults.length === 0) {
       res.status(404).send("Invalid API key");
-    } else {
-      let sqlQuery = `SELECT * FROM RidaDB.HOT_SPOT 
-      WHERE HOT_SPOT_DATE = ? `;
-
-      const queryParams = [date];
-
-      if (country) {
-        sqlQuery += ` AND ISO3 LIKE ?`;
-        queryParams.push(`%${country}%`);
-      }
-
-      if (province) {
-        sqlQuery += ` AND pv_en LIKE ?`;
-        queryParams.push(`%${province}%`);
-      }
-
-      db.query(sqlQuery, queryParams, (err, results) => {
-        if (err) throw err;
-        res.send(results);
-      });
+      return;
     }
-  })
+
+    let sqlQuery = `SELECT * FROM HOT_SPOT 
+    WHERE HOT_SPOT_DATE = ? `;
+
+    const queryParams = [date];
+
+    if (country) {
+      sqlQuery += ` AND ISO3 LIKE ?`;
+      queryParams.push(`%${country}%`);
+    }
+
+    if (province) {
+      sqlQuery += ` AND pv_en LIKE ?`;
+      queryParams.push(`%${province}%`);
+    }
+
+    const results = await executeQuery(sqlQuery, queryParams);
+    res.send(results);
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send('Internal server error');
+  }
 });
 
-server.get("/api/get-hotspot-from-date", async (req, res) => {
+server.get("/rida-api/api/get-hotspot-from-date", async (req, res) => {
   const { date, country, province } = req.query;
 
-  let sqlQuery = `SELECT * FROM RidaDB.HOT_SPOT 
+  let sqlQuery = `SELECT * FROM HOT_SPOT 
   WHERE HOT_SPOT_DATE = ? `;
 
   const queryParams = [date];
@@ -862,198 +1260,274 @@ server.get("/api/get-hotspot-from-date", async (req, res) => {
     queryParams.push(`%${province}%`);
   }
 
-  db.query(sqlQuery, queryParams, (err, results) => {
-    if (err) throw err;
+  try {
+    const results = await executeQuery(sqlQuery, queryParams);
     res.send(results);
-  });
-
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send('Internal server error');
+  }
 });
 
-
-server.get('/api/get-csv', (req, res) => {
-  let startDate = req.query.startDate; // Get the start date from the query parameter
-  let endDate = req.query.endDate; // Get the end date from the query parameter
-  let country = req.query.country;
-  let province = req.query.province;
+server.get('/rida-api/api/get-csv', async (req, res) => {
+  const { startDate, endDate, country, province } = req.query;
   const { stringify } = require('csv-stringify');
 
-  // Construct the SQL query
-  let sql = `SELECT BURNT_SCAR_ID, AP_EN, PV_EN, FIRE_DATE, AREA, COUNTRY, LATITUDE, LONGITUDE, REPLACE(REPLACE(GEOMETRY_DATA, '(', '['), ')', ']') AS GEOMETRY_DATA, GEOMETRY_TYPE FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN '${startDate}' AND '${endDate}'`;
+  let sql = `SELECT DATE_FORMAT(FIRE_DATE, '%d-%m-%Y') as FIRE_DATE, AP_EN, PV_EN, COUNTRY, AREA, LATITUDE, LONGITUDE, REPLACE(REPLACE(GEOMETRY_DATA, '(', '['), ')', ']') AS GEOMETRY_DATA, GEOMETRY_TYPE FROM BURNT_SCAR_INFO WHERE FIRE_DATE BETWEEN ? AND ?`;
 
-  // Add conditions for country and province if they are provided
-  if (country && country!='All') {
-    sql += ` AND ISO3 = '${country}'`;
+  if (country && country != 'ALL') {
+    sql += ` AND ISO3 = ?`;
   }
-  if (province && province!='All') {
-    sql += ` AND PV_EN = '${province}'`;
+  if (province && province != 'ALL') {
+    sql += ` AND PV_EN = ?`;
   }
 
-  db.query(sql, (err, results) => {
-    if (err) {
-      res.status(500).send('Server error');
-    } else {
-      // กำหนด headers สำหรับ response เพื่อบอก browser ว่าจะ download ไฟล์
-      res.setHeader('Content-Type', 'text/csv');
-      res.setHeader('Content-Disposition', 'attachment; filename=\"burnt_data.csv\"');
+  const queryParams = [startDate, endDate];
+  if (country && country != 'ALL') queryParams.push(country);
+  if (province && province != 'ALL') queryParams.push(province);
 
-      // ใช้ csv-stringify เพื่อแปลงข้อมูลเป็น CSV
-      stringify(results, { header: true }, (err, output) => {
-        if (err) {
-          res.status(500).send('Error converting data to CSV');
-        } else {
-          res.send(output);
-        }
-      });
-    }
-  });
+  try {
+    const results = await executeQuery(sql, queryParams);
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename="burnt_data.csv"');
+
+    stringify(results, { header: true }, (err, output) => {
+      if (err) {
+        res.status(500).send('Error converting data to CSV');
+      } else {
+        res.send(output);
+      }
+    });
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send('Internal server error');
+  }
 });
 
-server.get('/api/get-csv-hot-spot', (req, res) => {
-  let startDate = req.query.startDate; // Get the start date from the query parameter
-  let endDate = req.query.endDate; // Get the end date from the query parameter
-  let country = req.query.country;
-  let province = req.query.province;
+server.get('/rida-api/api/get-csv-hot-spot', async (req, res) => {
+  const { startDate, endDate, country, province } = req.query;
   const { stringify } = require('csv-stringify');
 
-  // Construct the SQL query
-  let sql = `SELECT * FROM HOT_SPOT WHERE HOT_SPOT_DATE BETWEEN '${startDate}' AND '${endDate}'`;
+  let sql = `SELECT DATE_FORMAT(HOT_SPOT_DATE, '%d-%m-%Y') as HOT_SPOT_DATE, AP_EN, PV_EN, COUNTRY, ISO3, LATITUDE, LONGITUDE FROM HOT_SPOT WHERE HOT_SPOT_DATE BETWEEN ? AND ?`;
 
-  // Add conditions for country and province if they are provided
-  if (country && country!='All') {
-    sql += ` AND ISO3 = '${country}'`;
+  if (country && country != 'ALL') {
+    sql += ` AND ISO3 = ?`;
   }
-  if (province && province!='All') {
-    sql += ` AND PV_EN = '${province}'`;
+  if (province && province != 'ALL') {
+    sql += ` AND PV_EN = ?`;
   }
 
-  db.query(sql, (err, results) => {
-    if (err) {
-      res.status(500).send('Server error');
-    } else {
-      // กำหนด headers สำหรับ response เพื่อบอก browser ว่าจะ download ไฟล์
-      res.setHeader('Content-Type', 'text/csv');
-      res.setHeader('Content-Disposition', 'attachment; filename=\"burnt_data.csv\"');
+  const queryParams = [startDate, endDate];
+  if (country && country != 'ALL') queryParams.push(country);
+  if (province && province != 'ALL') queryParams.push(province);
 
-      // ใช้ csv-stringify เพื่อแปลงข้อมูลเป็น CSV
-      stringify(results, { header: true }, (err, output) => {
-        if (err) {
-          res.status(500).send('Error converting data to CSV');
-        } else {
-          res.send(output);
-        }
-      });
-    }
-  });
+  try {
+    const results = await executeQuery(sql, queryParams);
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename="hotspot_data.csv"');
+
+    stringify(results, { header: true }, (err, output) => {
+      if (err) {
+        res.status(500).send('Error converting data to CSV');
+      } else {
+        res.send(output);
+      }
+    });
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send('Internal server error');
+  }
 });
 
-
-server.get('/api/get-csv-pm25', (req, res) => {
-  let startDate = req.query.startDate; // Get the start date from the query parameter
-  let endDate = req.query.endDate; // Get the end date from the query parameter
-  let country = req.query.country;
-  let province = req.query.province;
+server.get('/rida-api/api/get-csv-pm25', async (req, res) => {
+  const { startDate, endDate, country, province } = req.query;
   const { stringify } = require('csv-stringify');
 
-  // Construct the SQL query
-  let sql = `SELECT * FROM AIR_QUALITY WHERE AQI_DATE BETWEEN '${startDate}' AND '${endDate}'`;
+  let sql = `SELECT DATE_FORMAT(AQI_DATE, '%d-%m-%Y') as AQI_DATE, AP_EN, PV_EN, COUNTRY, ISO3, LATITUDE, LONGITUDE, PM25 FROM AIR_QUALITY WHERE AQI_DATE BETWEEN ? AND ?`;
 
-  // Add conditions for country and province if they are provided
-  if (country && country!='All') {
-    sql += ` AND ISO3 = '${country}'`;
+  if (country && country != 'ALL') {
+    sql += ` AND ISO3 = ?`;
   }
-  if (province && province!='All') {
-    sql += ` AND PV_EN = '${province}'`;
+  if (province && province != 'ALL') {
+    sql += ` AND PV_EN = ?`;
   }
 
-  db.query(sql, (err, results) => {
-    if (err) {
-      res.status(500).send('Server error');
-    } else {
-      // กำหนด headers สำหรับ response เพื่อบอก browser ว่าจะ download ไฟล์
-      res.setHeader('Content-Type', 'text/csv');
-      res.setHeader('Content-Disposition', 'attachment; filename=\"burnt_data.csv\"');
+  const queryParams = [startDate, endDate];
+  if (country && country != 'ALL') queryParams.push(country);
+  if (province && province != 'ALL') queryParams.push(province);
 
-      // ใช้ csv-stringify เพื่อแปลงข้อมูลเป็น CSV
-      stringify(results, { header: true }, (err, output) => {
-        if (err) {
-          res.status(500).send('Error converting data to CSV');
-        } else {
-          res.send(output);
-        }
-      });
-    }
-  });
+  try {
+    const results = await executeQuery(sql, queryParams);
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename="aqi_data.csv"');
+
+    stringify(results, { header: true }, (err, output) => {
+      if (err) {
+        res.status(500).send('Error converting data to CSV');
+      } else {
+        res.send(output);
+      }
+    });
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send('Internal server error');
+  }
 });
 
-
-
-
-server.get("/api/get-users", (req, res) => {
+server.get("/rida-api/api/get-users", async (req, res) => {
   const { email } = req.query;
   let sql = "SELECT * FROM users WHERE email = ?";
-  db.query(sql, [email], (err, results) => {
-    if (err) throw err;
+  try {
+    const results = await executeQuery(sql, [email]);
     res.send(results);
-  });
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send('Internal server error');
+  }
 });
 
-server.post("/api/login", (req, res) => {
-  const { username, name, email } = req.body;
 
-  let sql = "SELECT * FROM users WHERE email = ?";
-  db.query(sql, [email], (err, results) => {
-    if (err) {
-      console.error(err);
-      res.status(500).send("Server error");
-      return;
-    }
-
-    if (results.length > 0) {
-      res.send("Logged in successfully");
-    } else {
-      sql = "INSERT INTO users (username, name, email) VALUES (?, ?, ?)";
-
-      db.query(sql, [username, name, email], (err, results) => {
-        if (err) {
-          console.error(err);
-          res.status(500).send("Server error");
-        } else {
-          res.send("User created successfully");
-        }
-      });
-    }
-  });
-});
-
-// Generate API Key
-server.post("/api/generate", (req, res) => {
+// Generate API key
+server.post("/rida-api/api/generate", async (req, res) => {
   const { email } = req.body;
   const apiKey = crypto.randomBytes(20).toString("hex");
   let sql = "SELECT api_key FROM users WHERE email = ?";
-  db.query(sql, [email], (err, results) => {
-    if (err) {
-      console.error(err);
-      res.status(500).send("Server error");
-      return;
-    }
-
+  try {
+    const results = await executeQuery(sql, [email]);
     if (results.length > 0 && results[0].api_key) {
       res.send("API key already exists");
     } else {
       sql = "UPDATE users SET api_key = ? WHERE email = ?";
-      db.query(sql, [apiKey, email], (err, results) => {
-        if (err) {
-          console.error(err);
-          res.status(500).send("Server error");
-        } else {
-          res.send("API key generated...");
-        }
-      });
+      await executeQuery(sql, [apiKey, email]);
+      res.send("API key generated...");
     }
-  });
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send("Server error");
+  }
 });
 
 
+// Nodemailer setup
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'your-email@gmail.com',
+    pass: 'your-email-password'
+  }
+});
+
+// Register new user
+server.post("/rida-api/api/register", async (req, res) => {
+  const { username, name, surname, email, password } = req.body;
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const sql = "INSERT INTO users (username, name, surname, email, password) VALUES (?, ?, ?, ?, ?)";
+    await executeQuery(sql, [username, name, surname, email, hashedPassword]);
+    res.send("User registered successfully");
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send("Server error");
+  }
+});
+
+// Login user
+server.post("/rida-api/api/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  let sql = "SELECT * FROM users WHERE email = ?";
+  try {
+    const results = await executeQuery(sql, [email]);
+    if (results.length > 0) {
+      const user = results[0];
+      const match = await bcrypt.compare(password, user.password);
+      if (match) {
+        res.json({
+          message: "Logged in successfully",
+          user: {
+            id: user.id,
+            name: user.name,
+            surname: user.surname,
+            email: user.email,
+          },
+        });
+      } else {
+        res.status(400).json({ message: "Invalid email or password" });
+      }
+    } else {
+      res.status(400).json({ message: "Invalid email or password" });
+    }
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Reset password
+server.post("/rida-api/api/reset-password", async (req, res) => {
+  const { email } = req.body;
+  const newPassword = crypto.randomBytes(8).toString("hex"); // Generate a random new password
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  let sql = "UPDATE users SET password = ? WHERE email = ?";
+  try {
+    await executeQuery(sql, [hashedPassword, email]);
+
+    const mailOptions = {
+      from: 'your-email@gmail.com',
+      to: email,
+      subject: 'Password Reset',
+      text: `Your new password is: ${newPassword}`
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('Error sending email:', error);
+        res.status(500).send("Error sending email");
+      } else {
+        res.send("Password reset successfully. Check your email for the new password.");
+      }
+    });
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send("Server error");
+  }
+});
+
+// Edit user details
+server.put("/rida-api/api/edit-user", async (req, res) => {
+  const { id, username, name, surname, email, password } = req.body;
+
+  try {
+    let hashedPassword;
+    if (password) {
+      hashedPassword = await bcrypt.hash(password, 10);
+    }
+
+    const sql = `UPDATE users SET
+                 username = ?,
+                 name = ?,
+                 surname = ?,
+                 email = ?${password ? ', password = ?' : ''}
+                 WHERE id = ?`;
+
+    const params = [username, name, surname, email];
+    if (password) {
+      params.push(hashedPassword);
+    }
+    params.push(id);
+
+    await executeQuery(sql, params);
+    res.send("User updated successfully");
+  } catch (error) {
+    console.error('Error executing query:', error);
+    res.status(500).send("Server error");
+  }
+});
 
 server.listen(port, function () {
   console.log(`Server is running on port ${port}`);

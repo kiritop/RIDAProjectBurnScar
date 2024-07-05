@@ -9,7 +9,6 @@ export const fetchHotSpotData = createAsyncThunk('hotSpot/fetchHotSpotData', asy
     const year = currentDate.getFullYear();
     const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // เดือนเริ่มต้นที่ 0
     const day = String(currentDate.getDate()).padStart(2, '0');
-    console.log("filter", filter)
     
     // Fetch the CSV data from the API URL
     if(filter.iso3){
@@ -42,7 +41,7 @@ export const fetchHotSpotData = createAsyncThunk('hotSpot/fetchHotSpotData', asy
 });
 
 export const fetchHotSpot = createAsyncThunk('hotSpot/fetchHotSpot', async (filter) => {
-  const response = await fetch(`${CONFIG.API_URL}/get-hotspot-from-date?date=${filter.date}${filter.country==='All'?'': '&country='+filter.iso3}${(filter.city==="All")?'': '&province='+filter.city}`);
+  const response = await fetch(`${CONFIG.API_URL}/get-hotspot-from-date?date=${filter.date}${filter.country==='ALL'?'': '&country='+filter.country}${(filter.province==="ALL")?'': '&province='+filter.province}`);
   const data = await response.json();
   return data;
 });
@@ -50,7 +49,11 @@ export const fetchHotSpot = createAsyncThunk('hotSpot/fetchHotSpot', async (filt
 const hotSpotSlice = createSlice({
   name: 'hotSpot',
   initialState: { data: [], loading: false, dataHotSpot: [] },
-  reducers: {},
+  reducers: {
+    clearData: (state) => {
+      state.data = [];
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchHotSpotData.pending, (state) => {
@@ -69,5 +72,7 @@ const hotSpotSlice = createSlice({
       });
   },
 });
+
+export const { clearData } = hotSpotSlice.actions;
 
 export default hotSpotSlice.reducer;

@@ -4,7 +4,7 @@ import Typography from "@mui/material/Typography";
 import MUIDataTable from "mui-datatables";
 import { Container, CircularProgress, TableCell, InputLabel, FormControl, Select, MenuItem, Grid, Card, CardContent, Button } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProvinceByCountry, fetchAqiDataTable, fetchAqiChart } from '../reducers/dashboardSlice';
+import { fetchProvinceByCountry, fetchAqiDataTable, fetchAqiChart, fetchDDAqiChart, fetchBubbleAqiMap } from '../reducers/dashboardSlice';
 import { format } from 'date-fns';
 import LineChartAqi from '../components/LineChartAqi';
 import CONFIG from '../config';
@@ -13,6 +13,9 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
+import DrilldownAqiChart from '../components/DrilldownAqiChart';
+import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
 
 
 
@@ -20,9 +23,10 @@ function AirQualityDashboard() {
   const dispatch = useDispatch();
   const dataProvince = useSelector((state) => state.dashboard.dataProvince ?? []);
   const dataAqiTable = useSelector((state) => state.dashboard.dataAqiTable ?? []);
+  const dataAqiBubbleMap = useSelector((state) => state.dashboard.dataAqiBubbleMap ?? []);
   const [country, setCountry] = useState("ALL");
   const [province, setProvince] = useState("ALL");
-  const [totalPoint, setTotalPoint] = useState(0);
+  const [totalPoint, setTotalPoint] = useState("0");
   const [dataShow, setDataShow] = useState([]);
   const [tableData, setTableData] = useState([]);
 
@@ -32,6 +36,7 @@ function AirQualityDashboard() {
 
   const [startDate, setStartDate] = useState(dayjs(new Date().setFullYear(new Date().getFullYear() - 1)).format('YYYY-MM-DD'));
   const [endDate, setEndDate] = useState(dayjs(new Date()).format('YYYY-MM-DD'));
+  const [loadingMap, setLoadingMap] = useState(true);
 
 
   const handleStartDateChange = (date) => {
@@ -55,13 +60,29 @@ function AirQualityDashboard() {
       startDate: startDate,
       endDate: endDate
     }
+  
     if (country) {
-      dispatch(fetchProvinceByCountry({country: country, module:'aqi'}));
+      dispatch(fetchProvinceByCountry({ country: country, module: 'aqi' }));
     }
-    dispatch(fetchAqiChart(obj));
-    dispatch(fetchAqiDataTable(obj));
-    
+  
+    setLoadingMap(true);
+  
+    dispatch(fetchAqiChart(obj))
+      .finally(() => {
+        dispatch(fetchAqiDataTable(obj))
+          .finally(() => {
+            dispatch(fetchDDAqiChart(obj))
+              .finally(() => {
+                dispatch(fetchBubbleAqiMap(obj))
+                  .finally(() => {
+                    setLoadingMap(false);
+                  });
+              });
+          });
+      });
   }, [dispatch, country, province, startDate, endDate]);
+  
+  
 
   // Update chart data when dataHotspotC changes
   useEffect(() => {
@@ -69,20 +90,20 @@ function AirQualityDashboard() {
 
       const dataWithNumericSumArea = dataAqiTable.map(item => ({
         ...item,
-        MAX_PM25: Number(item.MAX_PM25)
+        AVG_PM25: Number(item.AVG_PM25)
       }));
       
-      const newTableData = [...dataWithNumericSumArea.map((item) => [item.NAME_LIST, item.MAX_PM25])];
+      const newTableData = [...dataWithNumericSumArea.map((item) => [item.NAME_LIST, item.AVG_PM25])];
       let dataShow = []
       if(country == 'ALL' && province=='ALL'){
-        dataShow = [...dataWithNumericSumArea.map((item) => [item.ISO3, item.MAX_PM25])];
+        dataShow = [...dataWithNumericSumArea.map((item) => [item.ISO3, item.AVG_PM25])];
       }else{
-        dataShow = [...dataWithNumericSumArea.map((item) => [item.NAME_LIST, item.MAX_PM25])];
+        dataShow = [...dataWithNumericSumArea.map((item) => [item.NAME_LIST, item.AVG_PM25])];
       }
       const dataShowNewFormat = dataShow.map((item, index) => [index+1, ...item]);
       const newTableDataNewFormat = newTableData.map((item, index) => [index+1, ...item]);
-      const totalRowsSum = dataWithNumericSumArea.reduce((sum, item) => sum + item.MAX_PM25, 0);
-      const avg = totalRowsSum/dataWithNumericSumArea.length
+      const totalRowsSum = dataWithNumericSumArea.reduce((sum, item) => sum + item.AVG_PM25, 0);
+      const avg = ((totalRowsSum / dataWithNumericSumArea.length)).toFixed(2)
       const formattedAvg = new Intl.NumberFormat('en-US').format(avg);
       setTableData(newTableDataNewFormat);
       setTotalPoint(formattedAvg);
@@ -120,7 +141,7 @@ function AirQualityDashboard() {
       },
     },
     {
-      name: "Max of PM2.5 (µg/m^3)",
+      name: "Avg of PM2.5 (µg/m^3)",
       options: {
         customHeadRender: ({ index, ...column }) => {
           return (
@@ -174,6 +195,9 @@ function AirQualityDashboard() {
       case 'MMR':
         setCountryText("Myanmar");
         break;
+      case 'ALL':
+        setProvince("ALL");
+        break;
       default:
         break;
     }
@@ -217,6 +241,15 @@ function AirQualityDashboard() {
       .catch(error => console.error('Error:', error));
   }
 
+  const center = [15, 105]; // Center of the map (Indochina Peninsula)
+  const zoom = 5; // Zoom level
+
+  const getColor = (index) => {
+    const colors = [
+      '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF', '#800000', '#008000', '#000080', '#808000', '#800080', '#008080'
+    ];
+    return colors[index % colors.length];
+  };
 
   return (
     <>
@@ -303,10 +336,10 @@ function AirQualityDashboard() {
             </Card>
           </Grid>
           <Grid item xs={12} md={5}>
-            <Card sx={{ borderRadius: 3, overflow: "hidden", height:'400px' }} variant="outlined">
+            <Card sx={{ borderRadius: 3, overflow: "hidden", height:'540px' }} variant="outlined">
               <CardContent>
                 <Typography  variant="h4" component="div">
-                  {provinceText != 'All' ? provinceText : countryText} air quality
+                  Air Quality Summary
                 </Typography>
                 <Typography  variant="subtitle1" color="text.secondary">
                   {provinceText != 'All' ? provinceText +', '+ countryText : countryText} air quality (  {format(new Date(startDate),'MMM dd yyyy')} - {format(new Date(endDate),'MMM dd yyyy')} )
@@ -339,7 +372,53 @@ function AirQualityDashboard() {
           <Grid item xs={12} md={7}>
             <Card sx={{ borderRadius: 3, overflow: "hidden" }} variant="outlined">
               <CardContent>
-                <LineChartAqi/>              
+                <DrilldownAqiChart/>              
+              </CardContent>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12}>
+            <Card sx={{ borderRadius: 3, overflow: "hidden" }} variant="outlined">
+              <CardContent>
+                <Typography variant="h4" component="div" gutterBottom>
+                  Air Quality By Time
+                </Typography>
+                <LineChartAqi/>      
+              </CardContent>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12}>
+            <Card sx={{ borderRadius: 3, overflow: "hidden" }} variant="outlined">
+              <CardContent>
+                <Typography variant="h4" component="div" gutterBottom>
+                  Air Quality By Location
+                </Typography>
+                <MapContainer center={center} zoom={zoom} style={{ height: "500px", width: "100%" }}>
+                  <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  />
+                  {dataAqiBubbleMap.map((area, index) => (
+                    <CircleMarker
+                      key={index}
+                      center={[area.LATITUDE, area.LONGITUDE]}
+                      radius={20 * Math.log(area.AVG_PM25 / 1)}
+                      fillOpacity={0.5}
+                      fillColor={getColor(index)}
+                      stroke={false}
+                    >
+                      <Popup>
+                        <Typography variant="subtitle1">
+                          {area.AP_EN || area.PV_EN || area.ISO3}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          average pm25 : {new Intl.NumberFormat('en-US').format(area.AVG_PM25)} µg/m^3
+                        </Typography>
+                      </Popup>
+                    </CircleMarker>
+                  ))}
+                </MapContainer>
               </CardContent>
             </Card>
           </Grid>
@@ -347,7 +426,7 @@ function AirQualityDashboard() {
           <Grid item xs={12} md={12}>
             <Box sx={{ borderRadius: 3, overflow: "hidden", flex: 1}}>
                 <MUIDataTable
-                  title={<h3>Burnt Scar Area Ranking {format(new Date(startDate),'MMM dd yyyy')} - {format(new Date(endDate),'MMM dd yyyy')}</h3>}
+                  title={<h4>Air Quality Ranking {format(new Date(startDate),'MMM dd yyyy')} - {format(new Date(endDate),'MMM dd yyyy')}</h4>}
                   data={tableData}
                   columns={columns}
                   options={options}
@@ -356,6 +435,26 @@ function AirQualityDashboard() {
           </Grid>
         </Grid>
       </Container>
+      {loadingMap && (
+        <Box
+          display="flex"
+          flexDirection="column"
+          justifyContent="center"
+          alignItems="center"
+          width="100%"
+          height="100%"
+          position="fixed"
+          top={0}
+          left={0}
+          zIndex={1050}
+          bgcolor="rgba(0, 0, 0, 0.5)"
+        >
+          <CircularProgress />
+          <Typography variant="h6" color="white">
+            Loading...
+          </Typography>
+        </Box>
+      )}
     </>
   );
 }

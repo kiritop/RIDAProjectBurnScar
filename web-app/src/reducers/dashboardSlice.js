@@ -8,7 +8,6 @@ import { geocode } from "react-geocode";
 const date = new Date();
 const formattedDate = date.toISOString().slice(0, 10);
 
-console.log(formattedDate);
 
 export const fetchProvinceByCountry = createAsyncThunk("dashboard/fetchProvinceByCountry", async (object) => {
   try{
@@ -34,9 +33,82 @@ export const fetchBurntChart = createAsyncThunk("dashboard/fetchBurntChart", asy
 
 });
 
+export const fetchDDBurntChart = createAsyncThunk("dashboard/fetchDDBurntChart", async (object) => {
+  try{
+    const response = await fetch(`${CONFIG.API_URL}/drildown-chart?country=${object.country}&province=${object.province}&startDate=${object.startDate}&endDate=${object.endDate}`);
+    const data = await response.json();
+    return data;
+  }catch (error){
+    console.error(error);
+    return null;
+  }
+
+});
+
+
+export const fetchBubbleBurntMap = createAsyncThunk("dashboard/fetchBubbleBurntMap", async (object) => {
+  try{
+    const response = await fetch(`${CONFIG.API_URL}/burnt-bubble-chart?country=${object.country}&province=${object.province}&startDate=${object.startDate}&endDate=${object.endDate}`);
+    const data = await response.json();
+    return data;
+  }catch (error){
+    console.error(error);
+    return null;
+  }
+
+});
+
+export const fetchBubbleAqiMap = createAsyncThunk("dashboard/fetchBubbleAqiMap", async (object) => {
+  try{
+    const response = await fetch(`${CONFIG.API_URL}/aqi-bubble-chart?country=${object.country}&province=${object.province}&startDate=${object.startDate}&endDate=${object.endDate}`);
+    const data = await response.json();
+    return data;
+  }catch (error){
+    console.error(error);
+    return null;
+  }
+
+});
+
+export const fetchBubbleHotspotMap = createAsyncThunk("dashboard/fetchBubbleHotspotMap", async (object) => {
+  try{
+    const response = await fetch(`${CONFIG.API_URL}/hotspot-bubble-chart?country=${object.country}&province=${object.province}&startDate=${object.startDate}&endDate=${object.endDate}`);
+    const data = await response.json();
+    return data;
+  }catch (error){
+    console.error(error);
+    return null;
+  }
+
+});
+
 export const fetchAqiChart = createAsyncThunk("dashboard/fetchAqiChart", async (object) => {
   try{
     const response = await fetch(`${CONFIG.API_URL}/line-chart-pm25?country=${object.country}&province=${object.province}&startDate=${object.startDate}&endDate=${object.endDate}`);
+    const data = await response.json();
+    return data;
+  }catch (error){
+    console.error(error);
+    return null;
+  }
+
+});
+
+export const fetchDDHotspotChart = createAsyncThunk("dashboard/fetchDDHotspotChart", async (object) => {
+  try{
+    const response = await fetch(`${CONFIG.API_URL}/drildown-chart-hotspot?country=${object.country}&province=${object.province}&startDate=${object.startDate}&endDate=${object.endDate}`);
+    const data = await response.json();
+    return data;
+  }catch (error){
+    console.error(error);
+    return null;
+  }
+
+});
+
+export const fetchDDAqiChart = createAsyncThunk("dashboard/fetchDDAqiChart", async (object) => {
+  try{
+    const response = await fetch(`${CONFIG.API_URL}/drildown-chart-aqi?country=${object.country}&province=${object.province}&startDate=${object.startDate}&endDate=${object.endDate}`);
     const data = await response.json();
     return data;
   }catch (error){
@@ -108,7 +180,13 @@ export const DashboardSlice = createSlice({
     dataBurntTable:[],
     dataBurntChart:[],
     dataAqiChart:[],
-    dataHotspotChart:[]
+    dataHotspotChart:[],
+    dataBurntBubbleMap:[],
+    dataAqiBubbleMap:[],
+    dataHotspotBubbleMap:[],
+    dataDDBurntChart:[],
+    dataDDAqiChart:[],
+    dataDDHotspotChart:[],
   },
   reducers: {
     setFilter: (state, action) => {
@@ -132,6 +210,13 @@ export const DashboardSlice = createSlice({
         state.dataBurntChart = action.payload;
         state.loading = false;
       })
+      .addCase(fetchDDBurntChart.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchDDBurntChart.fulfilled, (state, action) => {
+        state.dataDDBurntChart = action.payload;
+        state.loading = false;
+      })
       .addCase(fetchAqiChart.pending, (state) => {
         state.loading = true;
       })
@@ -144,6 +229,20 @@ export const DashboardSlice = createSlice({
       })
       .addCase(fetchHotspotChart.fulfilled, (state, action) => {
         state.dataHotspotChart = action.payload;
+        state.loading = false;
+      })
+      .addCase(fetchDDAqiChart.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchDDAqiChart.fulfilled, (state, action) => {
+        state.dataDDAqiChart = action.payload;
+        state.loading = false;
+      })
+      .addCase(fetchDDHotspotChart.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchDDHotspotChart.fulfilled, (state, action) => {
+        state.dataDDHotspotChart = action.payload;
         state.loading = false;
       })
       .addCase(fetchBurntDataTable.pending, (state) => {
@@ -167,6 +266,28 @@ export const DashboardSlice = createSlice({
         state.dataHotspotTable = action.payload;
         state.loading = false;
       })
+      .addCase(fetchBubbleBurntMap.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchBubbleBurntMap.fulfilled, (state, action) => {
+        state.dataBurntBubbleMap = action.payload;
+        state.loading = false;
+      })
+      .addCase(fetchBubbleAqiMap.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchBubbleAqiMap.fulfilled, (state, action) => {
+        state.dataAqiBubbleMap = action.payload;
+        state.loading = false;
+      })
+      .addCase(fetchBubbleHotspotMap.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchBubbleHotspotMap.fulfilled, (state, action) => {
+        state.dataHotspotBubbleMap = action.payload;
+        state.loading = false;
+      })
+      
   },
 });
 

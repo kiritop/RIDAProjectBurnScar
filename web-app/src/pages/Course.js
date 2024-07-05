@@ -1,135 +1,139 @@
 import * as React from "react";
 import { Container, Card, CardContent, Grid, Typography, CardMedia, CardActionArea, Button } from "@mui/material";
 import PlayCircleOutlineIcon from "@mui/icons-material/PlayCircleOutline";
+import { useNavigate } from "react-router-dom";
 
 const Carddetail = [
   {
-    img: "unit1.png",
+    img: "unit1.PNG",
     id: 1,
-    title: "Types and Characteristics of Satellites ",
+    title: "Types and Characteristics of Satellites",
+    pdf: "/CH1_.pdf",
     links: [
-      { EP: "EP 01 วงโคจรคืออะไร", yt: "https://www.youtube.com/watch?v=unTeFqxys7w" },
-      { EP: "EP 02 วงโคจรของดาวเทียม (Satellite orbit)", yt: "https://www.youtube.com/watch?v=NocgY3d7Ngo" },
-      { EP: "EP 03 ระดับวงโคจรของดาวเทียม", yt: "https://www.youtube.com/watch?v=SIKS17tIcy0" },
-      { EP: "EP 04 ดาวเทียมระบบ Passive และ Active", yt: "https://www.youtube.com/watch?v=kdiO_fnSE2Y" },
+      { EP: "EP 01 What is an orbit?", yt: "https://www.youtube.com/watch?v=N-JiWH2zKio" },
+      { EP: "EP 02 Satellite orbit", yt: "https://www.youtube.com/watch?v=mnAHec9-Akc" },
+      { EP: "EP 03 Satellite orbital levels", yt: "https://www.youtube.com/watch?v=woE0iM8ugeA" },
+      { EP: "EP 04 Passive and Active satellite systems", yt: "https://www.youtube.com/watch?v=KqcHy82FlX4" },
       {
-        EP: "EP 05 ความรู้เกี่ยวกับดาวเทียม (Landsat-8,Sentinel-1,Sentinel-2 )",
-        yt: "https://www.youtube.com/watch?v=6W4_L0RueLY",
+        EP: "EP 05 Knowledge about satellites (Landsat-8, Sentinel-1, Sentinel-2)",
+        yt: "https://www.youtube.com/watch?v=2JzrQ7c8c9Q",
       },
       {
-        EP: "EP 06 ตัวอย่างภาพถ่ายดาวเทียม (Landsat-8,Sentinel-1,Sentinel-2 )",
-        yt: "https://www.youtube.com/watch?v=DhWIf1vDh9Y",
+        EP: "EP 06 Examples of satellite images (Landsat-8, Sentinel-1, Sentinel-2)",
+        yt: "https://www.youtube.com/watch?v=4DvyiM4jwNA",
       },
+      { EP: "Chapter 01 Types and Characteristics of Satellites.pdf", yt: "/rida-project/CH1_.pdf" },
     ],
   },
   {
-    img: "unit2.png",
+    img: "unit2.PNG",
     id: 2,
     title: "Interpretation and Analysis of Satellite Data",
+    pdf: "/CH2_.pdf",
     links: [
-      { EP: "EP 01 สถานีภาคพื้นสามารถสื่อสารกับดาวเทียมได้อย่างไร", yt: "https://www.youtube.com/watch?v=_u_E3XCxUrQ" },
-      { EP: "EP 02 ลักษณะของข้อมูลจากภาพถ่ายดาวเทียม", yt: "https://www.youtube.com/watch?v=KkaXCU2QqC0" },
-      { EP: "EP 03 การนำภาพดาวเทียมมาวิเคราะห์โดยใช้ดัชนี", yt: "https://www.youtube.com/watch?v=97vVaI1qV1A" },
+      { EP: "EP 01 How can ground stations communicate with satellites?", yt: "https://www.youtube.com/watch?v=IGwlUxhU2kA" },
+      { EP: "EP 02 Characteristics of data from satellite images", yt: "https://www.youtube.com/watch?v=l8blwGOrTgs" },
+      { EP: "EP 03 Analyzing satellite images using indices", yt: "https://www.youtube.com/watch?v=RGOUn2DNvhg" },
+      { EP: "Chapter 02 Interpretation and Analysis of Satellite Data.pdf", yt: "/rida-project/CH2_.pdf" },
     ],
   },
   {
-    img: "unit3.png",
+    img: "unit3.PNG",
     id: 3,
     title: "Application of Satellite Data",
+    pdf: "/CH3_.pdf",
     links: [
-      { EP: "EP 01 เทคโนโลยีสารสนเทศ Geo-Informatics", yt: "https://www.youtube.com/watch?v=SF3xTIOFMYk" },
-      { EP: "EP 02 การสำรวจระยะไกล หรือ รีโมทเซนซิ่ง (Remote Sensing)", yt: "https://www.youtube.com/watch?v=0YTgEarG_Eo  " },
-      { EP: "EP 03 ระบบกำหนดตำแหน่งบนโลก", yt: "https://www.youtube.com/watch?v=2wsc97KvH40" },
+      { EP: "EP 01 Geo-Informatics technology", yt: "https://www.youtube.com/watch?v=lp2Uu23_qLY" },
+      { EP: "EP 02 Remote Sensing", yt: "https://www.youtube.com/watch?v=8KPA-wz64QY" },
+      { EP: "EP 03 Global Positioning System", yt: "https://www.youtube.com/watch?v=MpBb_h9ckNM" },
+      { EP: "Chapter 03 Application of Satellite Data.pdf", yt: "/rida-project/CH3_.pdf" },
     ],
   },
   {
-    img: "unit4.png",
+    img: "unit4.PNG",
     id: 4,
     title: "Machine Learning",
+    pdf: "/CH4_.pdf",
     links: [
-      { EP: "EP 01 Machine Learning คืออะไร?", yt: "https://www.youtube.com/watch?v=grHroUVZwgQ" },
-      { EP: "EP 02 คอนเซปของ Machine Learning", yt: "https://www.youtube.com/watch?v=l8r-VWJJL3g" },
-      { EP: "EP 03 ชนิดของ Machine learning", yt: "https://www.youtube.com/watch?v=e4SW5T8o58g" },
-      { EP: "EP 04 โมเดลและอัลกอริทึมของ Machine learning", yt: "https://www.youtube.com/watch?v=4hqhGBntsqA" },
-      { EP: "EP 05 งานของ Machine learning", yt: "https://www.youtube.com/watch?v=Y4afzOWGDic" },
+      { EP: "EP 01 What is Machine Learning?", yt: "https://www.youtube.com/watch?v=GUWELDMWS2Y" },
+      { EP: "EP 02 Machine Learning concepts", yt: "https://www.youtube.com/watch?v=iUAA9xvWrHM" },
+      { EP: "EP 03 Types of Machine Learning", yt: "https://www.youtube.com/watch?v=Hz1O-D1oPHI" },
+      { EP: "EP 04 Models and Algorithms of Machine Learning", yt: "https://www.youtube.com/watch?v=Mpnzvqp74bk" },
+      { EP: "EP 05 Applications of Machine Learning", yt: "https://www.youtube.com/watch?v=dfsMdUIZHrw" },
+      { EP: "Chapter 04 Machine Learning.pdf", yt: "/rida-project/CH4_.pdf" },
     ],
   },
 ];
 
 function Course() {
-  const handlePdfClick = (id) => {
-    // This function will open the PDF file when the card is clicked
-    // You can replace 'your-pdf-file.pdf' with the actual path to your PDF file
-    if (id === 1) {
-      window.open("/CH1_.pdf", "_blank");
-    } else if (id === 2) {
-      window.open("/CH2_.pdf", "_blank");
-    } else if (id === 3) {
-      window.open("/CH3_.pdf", "_blank");
-    } else if (id === 4) {
-      window.open("/CH4_.pdf", "_blank");
+  const navigate = useNavigate();
+
+  const handlePdfClick = (pdfLink) => {
+    if (pdfLink) {
+      window.open("/rida-project"+pdfLink, "_blank");
     }
   };
-  return (
-    <>
-      <Container maxWidth="xl">
-        <Grid
-          container
-          spacing={1}
-          direction="row"
-          justifyContent="center"
-          alignItems="center"
-          alignContent="center"
-          wrap="wrap"
-          my={5}
-          sx={{ backgroundColor: "#023e8a", padding: 3, borderRadius: 3, boxShadow: 1 }}
-        >
-          <Typography variant="h3" color="#fff" sx={{ fontFamily: "monospace" }}>
-            Learning Material
-          </Typography>
-        </Grid>
 
-        <Grid container spacing={3}>
-          {Carddetail.map((e, index) => (
-            <Grid item xs={3} key={index}>
-              <Card sx={{ maxWidth: 500, padding: "6px", borderRadius: 5, paddingBottom: 3 }}>
-                <CardActionArea>
-                  <CardMedia
-                    component="img"
-                    height="200"
-                    image={e.img}
-                    alt="unit1"
-                    sx={{ borderRadius: 5 }}
-                    onClick={() => handlePdfClick(e.id)}
-                  />
-                  <CardContent sx={{ height: "5vh" }}>
-                    <Typography variant="h6">Unit {index + 1}</Typography>
-                    <Typography variant="body2" color={"text.secondary"}>
-                      {e.title}
-                    </Typography>
-                  </CardContent>
-                  <CardContent>
-                    {e.links.map((link, index) => (
-                      <div key={index}>
-                          <Button
-                            variant="text"
-                            href={link.yt}
-                            target="_blank"
-                            sx={{ fontSize: "12px" }}
-                            startIcon={<PlayCircleOutlineIcon />}
-                          >
-                            {link.EP}
-                          </Button>
-                      </div>
-                    ))}
-                  </CardContent>
-                </CardActionArea>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-      </Container>
-    </>
+  const handleYoutubeClick = (youtubeLink) => {
+    window.open(youtubeLink, "_blank");
+  };
+
+  return (
+    <Container maxWidth="xl">
+      <Grid
+        container
+        spacing={1}
+        direction="row"
+        justifyContent="center"
+        alignItems="center"
+        alignContent="center"
+        wrap="wrap"
+        my={5}
+        sx={{ backgroundColor: "#023e8a", padding: 3, borderRadius: 3, boxShadow: 1 }}
+      >
+        <Typography variant="h3" color="#fff" sx={{ fontFamily: "monospace" }}>
+          Learning Materials
+        </Typography>
+      </Grid>
+
+      <Grid container spacing={3}>
+        {Carddetail.map((e, index) => (
+          <Grid item xs={3} key={index}>
+            <Card sx={{ maxWidth: 500, padding: "6px", borderRadius: 5, paddingBottom: 3 }}>
+              <CardActionArea onClick={() => handlePdfClick(e.pdf)}>
+                <CardMedia
+                  component="img"
+                  height="200"
+                  image={process.env.PUBLIC_URL + '/' + e.img}
+                  alt={`unit${index + 1}`}
+                  sx={{ borderRadius: 5 }}
+                />
+                <CardContent sx={{ height: "5vh" }}>
+                  <Typography variant="h6">Chapter {index + 1}</Typography>
+                  <Typography variant="body2" color={"text.secondary"}>
+                    {e.title}
+                  </Typography>
+                </CardContent>
+              </CardActionArea>
+              <CardContent>
+                {e.links.map((link, idx) => (
+                  <div key={idx}>
+                    <Button
+                      variant="text"
+                      onClick={() => handleYoutubeClick(link.yt)}
+                      sx={{ fontSize: "12px", textAlign: 'left' }}
+                      startIcon={<PlayCircleOutlineIcon />}
+                    >
+                      {link.EP}
+                    </Button>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+    </Container>
   );
 }
 
