@@ -96,20 +96,6 @@ def chop_and_save_tiles(cropped_raster, meta, tile_size, output_folder, original
     except Exception as e:
         logger.error(f"Failed to save tiles for {original_filename}: {e}")
 
-# def rename_file(original_name, folder_type):
-#     parts = original_name.split('_')
-#     if '20m' in original_name or '60m' in original_name:
-#         if 'B12' in original_name and folder_type == 'Before':
-#             new_name = f"{parts[0]}_B1210.jp2"
-#         else:
-#             parts[-2] = parts[-2].replace('20m', '10').replace('60m', '10')
-#             new_name = f"{parts[0]}_{parts[1]}_{parts[2]}10.jp2"
-#     elif folder_type == 'Before':
-#         new_name = f"{parts[0]}_{parts[2]}.jp2"
-#     else:  
-#         new_name = f"{parts[0]}_{parts[1]}_{parts[2]}.jp2"  
-#     return new_name
-
 
 def rename_file(original_name, folder_type):
     parts = original_name.split('_')
@@ -247,26 +233,3 @@ def data_preparation(folder_paths, output_folder_after):
 
     else:
         logger.error("No folder paths provided")
-
-# def server_predict(folder_paths, output_folder_after):
-#     if folder_paths:
-#         for folder_path in folder_paths:
-#             if os.path.isdir(folder_path):
-#                 logger.info(f"Processing folder: {folder_path}")
-#                 process_files_predict([folder_path], output_folder_after)
-#             else:
-#                 logger.error(f"Invalid folder path: {folder_path}")
-
-#         logger.info("Processing completed for all folders.")
-
-#         # Define the path to the subprocess script
-#         script_path = "Sentinel_Process.py"
-
-#         # Run the script as a subprocess
-#         try:
-#             result = subprocess.run(["python", script_path], capture_output=True, text=True, check=True)
-#             logger.info("Subprocess output:\n" + result.stdout)
-#         except subprocess.CalledProcessError as e:
-#             logger.error("Error during subprocess execution:\n" + e.stderr)
-#     else:
-#         logger.error("No folder paths provided")

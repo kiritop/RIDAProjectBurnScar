@@ -80,20 +80,10 @@ def main():
     os.makedirs('sentinel_process')
     os.makedirs('sentinel_process/Image')
     print(f"Created directory: sentinel_process/Image")
-    os.makedirs('sentinel_process/Image_Finish')
-    print(f"Created directory: sentinel_process/Image_Finish")
-    os.makedirs('sentinel_process/Image_Missing')
-    print(f"Created directory: sentinel_process/Image_Missing")
-    os.makedirs('sentinel_process/Image_pre')
-    print(f"Created directory: sentinel_process/Image_pre")
-    os.makedirs('sentinel_process/Output')
-    print(f"Created directory: sentinel_process/Output")
     os.makedirs('sentinel_process/Raster_Burncon')
     print(f"Created directory: sentinel_process/Raster_Burncon")
     os.makedirs('sentinel_process/Raster_burnshape')
-    print(f"Created directory: sentinel_process/Raster_burnshape")
-    os.makedirs('sentinel_process/Raster_burnlevel')
-    print(f"Created directory: sentinel_process/Raster_burnlevel")
+
 
     # Ensure these paths are correct and necessary
     raster_path = 'raster'
