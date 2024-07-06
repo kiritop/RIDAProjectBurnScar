@@ -177,7 +177,7 @@ scaler_path = r"model/min_max_scaler.pkl"
 model_path = r"model/Model_LGBM.sav"
 ```
 
-```python
+
 
 for file_name in os.listdir(raster_dir):
     if file_name.endswith(".tif"):
@@ -202,6 +202,44 @@ for file_name in os.listdir(raster_dir):
 
 ```
 
+
+```python
+# Step 1: Read the raster file
+input_raster_path = r"raster/T47QME_20210318T035539_combined_mask.tif"
+output_shapefile_path = r'polygon/burn_condition.shp'
+
+with rasterio.open(input_raster_path) as src:
+    raster_data = src.read(1)  # Read the first band
+    transform = src.transform  # Get the affine transform
+    crs = src.crs  # Get the CRS of the input raster
+
+    # Get the center coordinates of the raster
+    center_x = (src.bounds.left + src.bounds.right) / 2
+    center_y = (src.bounds.bottom + src.bounds.top) / 2
+
+# Create a transformer to convert from the raster's CRS to WGS84
+transformer = Transformer.from_crs(crs, "EPSG:4326", always_xy=True)
+
+# Convert center coordinates to WGS84
+center_lon, center_lat = transformer.transform(center_x, center_y)
+
+# Calculate the UTM zone
+utm_zone = math.floor((center_lon + 180) / 6) + 1
+hemisphere = 'north' if center_lat >= 0 else 'south'
+
+# Create a custom UTM CRS
+utm_crs = CRS.from_dict({
+    'proj': 'utm',
+    'zone': utm_zone,
+    'south': hemisphere == 'south'
+})
+
+# Create transformer from input CRS to the appropriate UTM CRS
+transformer_to_utm = Transformer.from_crs(crs, utm_crs, always_xy=True)
+
+# Use utm_crs instead of the fixed EPSG:32647
+projected_crs = utm_crs
+```
 
 ## Machine Learning
 ### Prerequisites
