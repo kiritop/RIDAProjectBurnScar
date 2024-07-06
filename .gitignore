@@ -26,7 +26,7 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-Sentinel_Process/
+sentinel_process/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
