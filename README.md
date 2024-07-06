@@ -178,7 +178,7 @@ model_path = r"model/Model_LGBM.sav"
 ```
 
 
-
+```python
 for file_name in os.listdir(raster_dir):
     if file_name.endswith(".tif"):
         file_path = os.path.join(raster_dir, file_name)
