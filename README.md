@@ -120,6 +120,7 @@ print("Done.")
 ### Modeling
 
 ```python
+# Define the preprocessing function
 def preprocess(df, scaler_path):
     new_column_names = [
         'Band_3_Post', 'Band_4_Post', 'Band_5_Post', 'Band_6_Post',
@@ -139,6 +140,7 @@ def preprocess(df, scaler_path):
 ```
 
 ```python
+# Define the prediction function
 def make_predictions(directory, df_rename):
     loaded_model = pickle.load(open(directory, 'rb'))
     y_pred = loaded_model.predict(df_rename)
@@ -149,10 +151,10 @@ def make_predictions(directory, df_rename):
         print(f"Label {label}: {count}")
 
     return df_rename
-
 ```
 
 ```python
+# Define the function to create GeoTIFF from predictions
 def create_geotiff_from_predictions(predictions, original_tif_path, output_tif_path):
     with rasterio.open(original_tif_path) as src:
         original_metadata = src.meta.copy()
@@ -172,6 +174,7 @@ def create_geotiff_from_predictions(predictions, original_tif_path, output_tif_p
 ```
 
 ```python
+# Directory containing the raster files
 raster_dir = r"raster"
 scaler_path = r"model/min_max_scaler.pkl"
 model_path = r"model/Model_LGBM.sav"
@@ -179,16 +182,17 @@ model_path = r"model/Model_LGBM.sav"
 
 
 ```python
+# Loop through each file in the directory
 for file_name in os.listdir(raster_dir):
     if file_name.endswith(".tif"):
         file_path = os.path.join(raster_dir, file_name)
 
-
+        # Extract year from the filename using regex
         match = re.search(r'_(\d{4})', file_name)
         if match:
             year = match.group(1)
 
-
+            # Process the file
             img = rasterio.open(file_path)
             array = img.read()
             n_bands = array.shape[0]
@@ -197,11 +201,13 @@ for file_name in os.listdir(raster_dir):
             df_rename = preprocess(df, scaler_path)
             df_predicted = make_predictions(model_path, df_rename)
 
+            # Create GeoTIFF file from predictions
             output_tif_path = os.path.join(raster_dir, f'output_{year}.tif')
             create_geotiff_from_predictions(df_predicted["BURN_PREDICTED"], file_path, output_tif_path)
 
 ```
 
+### Create Polygon
 
 ```python
 # Step 1: Read the raster file
