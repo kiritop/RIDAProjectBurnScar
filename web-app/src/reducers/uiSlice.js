@@ -34,7 +34,7 @@ const uiSlice = createSlice({
     isSidebarOpen: false,
     sidebarForm :{
       yearRange : [year, year],
-      country : 'ALL',
+      country : 'THA',
       province : 'ALL',
       city : 'All',
       date: dayjs(currentDate).format('YYYY-MM-DD'),

@@ -14,22 +14,30 @@ const MapBurnScar = () => {
   const layersRef = React.useRef([]);
 
   useEffect(() => {
+    const clearLayers = () => {
+      layersRef.current.forEach(layer => {
+        if (map.hasLayer(layer)) {
+          map.removeLayer(layer);
+        }
+      });
+      layersRef.current = [];
+    };
+
     const addLayers = () => {
       dispatch(setLoadingMap(true));
       let layersAdded = 0;
 
-      // Clear existing layers
-      layersRef.current.forEach(layer => map.removeLayer(layer));
-      layersRef.current = [];
+      clearLayers(); // Clear existing layers
 
       burntScarData.forEach((data, index) => {
         const geoJsonLayer = L.geoJSON(data, {
           style: feature => style(feature),
           coordsToLatLng: coords => new L.LatLng(coords[1], coords[0]),
           onEachFeature: onEachFeature
-        }).addTo(map);
+        });
 
         geoJsonLayer._leaflet_id = `burntScarLayer-${index}`; // Ensure unique key for each layer
+        geoJsonLayer.addTo(map);
         layersRef.current.push(geoJsonLayer);
 
         geoJsonLayer.on('add', () => {
@@ -41,13 +49,12 @@ const MapBurnScar = () => {
       });
     };
 
-    // Add layers on mount
+    // Add layers on mount and when burntScarData changes
     addLayers();
 
     // Clear layers on unmount or when dependencies change
     return () => {
-      layersRef.current.forEach(layer => map.removeLayer(layer));
-      layersRef.current = [];
+      clearLayers();
     };
   }, [dispatch, burntScarData, map]);
 
