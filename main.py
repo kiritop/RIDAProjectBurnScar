@@ -89,11 +89,11 @@ def main():
     print(f"Created directory: sentinel_process/Image")
     os.makedirs('sentinel_process/Raster_Burncon')
     print(f"Created directory: sentinel_process/Raster_Burncon")
-    os.makedirs('sentinel_process/Raster_burnshape')
+
 
     predict_main()
     print("Predict Done.")
-    
+
     input_raster_path = find_tif_file('raster_output')
     if not input_raster_path:
         logger.error("No .tif file found in the specified directory.")
