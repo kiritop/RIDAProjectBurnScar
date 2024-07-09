@@ -26,3 +26,8 @@ presentation.
 - Images from Sentienl-2
 ## Duration: 
 6 months
+
+## Acknowledgements
+
+Gratitude is extended to [axonapiwit](https://github.com/axonapiwit) for their excellent work on the [react-leaflet-project](https://github.com/axonapiwit/react-leaflet-project). Portions of the code, specifically related to the Leaflet map and AQI (Air Quality Index) implementation, have been utilized and further developed in this project. Their contributions have been invaluable to this work.
+Thank you.
