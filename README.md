@@ -86,8 +86,8 @@ logger = logging.getLogger()
 
 ### Data Preparation
 
+![png](flow.png)
 
-![png]('flow.png')
 
 
     'main.py' are contain big tree function which consists of "data_preparation from 'image_processing.py'" ,"predict_main from 'predict_module.py'" and the last one "create_polygon from 'create_polygon.py'"
@@ -124,7 +124,7 @@ logger = logging.getLogger()
     - Step 2 : Convert .tif to polygon
     - Step 3 : Test plot Shape file on online map https://mapshaper.org/
     
-![png]('plot_example.png')
+![png](plot_example.png)
 
 ### Folder Structure
 
