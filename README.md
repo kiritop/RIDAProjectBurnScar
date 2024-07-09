@@ -89,11 +89,16 @@ logger = logging.getLogger()
 
 ![png]('material/flow.png')
 
+```python
 'main.py' are contain big tree function which consists of "data_preparation from 'image_processing.py'" , "predict_main from 'predict_module.py'" and the last one "create_polygon from 'create_polygon.py'"
+```
 
+```python
 'data_preparation' function is image processing which will resample satellite image(jp2) all range into 10m
 and move into 'sentinel_process/Image' folder. And next step finction will call subprocess 'sentinel_process.py'.
+```
 
+```python
 'sentinel_process.py' is subprocess file which are contain function 'process_bands' it will use 'sentinel_process/Image'
 folder for read raster from 'data_preparation' here is step of subprocess
 
@@ -102,17 +107,21 @@ folder for read raster from 'data_preparation' here is step of subprocess
  - Step 3 : Process_bands function is read all raster and combine band and save into GeoTiff 
  - Step 4 : Use water mask.tiff and combine.tiff merge together and which raster map to mask made value = 0
  - step 5 : Save .tif to 'raster' folder for predict and modeling step
+```
 
-
+```python
 'predict_main' function is machine lerning process, The process of function are read rester then using ML for calculate which pixel in raster is burn and output in .tif which is contain burn location
 
  - Step 1 : The 'predict_main' will read tiff for 'raster' folder and get value of each band into 'df' 
  - Step 2 : The 'df' contain dataframe for predict by using pickle LGBM (Light GBM) which learning from training pipeline
  - Step 3 : Process burn location tif which contain metadata of area and save to 'raster_output'
+```
 
+```python
 'create_polygon' function is using tif to convert into set of Shape file (cph,dbf,prj,shp,shx) 
  - Step 1 : 'create_polygon' will read .tif from 'raster_output' folder
  - Step 2 : Convert .tif to polygon
+```
 
 ### Folder Structure
 
