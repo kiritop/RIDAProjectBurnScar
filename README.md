@@ -87,36 +87,21 @@ logger = logging.getLogger()
 ### Data Preparation
 
 
-```python
-folder_paths = ["satellite_Image"]
-output_folder_after = "sentinel_process/Image"
-
-data_preparation(folder_paths, output_folder_after)
-print("Finish process prepared data.")
-print("Next stage to predict process.")
+![png]('material/flow.png')
 
 
-try:
-    shutil.rmtree('prepare_image')
-    print(f"Removed directory: prepare_image")
-except FileNotFoundError:
-    pass  
+'data_preparation' function is image processing which will resample satellite image(jp2) all range into 10m
+and move into 'sentinel_process/Image' folder. And next step finction will call subprocess 'sentinel_process.py'.
 
-try:
-    shutil.rmtree('rename_image')
-    print(f"Removed directory: rename_image")
-except FileNotFoundError:
-    pass
+'sentinel_process.py' is subprocess file which are contain function 'process_bands' it will use 'sentinel_process/Image'
+folder for read raster from 'data_preparation' here is step of subprocess
 
-shutil.rmtree('sentinel_process')
-os.makedirs('sentinel_process')
-os.makedirs('sentinel_process/Image')
-print(f"Created directory: sentinel_process/Image")
-os.makedirs('sentinel_process/Raster_Burncon')
-print(f"Created directory: sentinel_process/Raster_Burncon")
+ - Step 1 : check all raster are in 'sentinel_process/Image' 
+ - Step 2 : generate water detect mask using waterdect library (concept and reference from Maurício Cordeiro)
+ - Step 3 : process_bands function is read all raster and combine band and save into GeoTiff 
+ - Step 4 : use water mask.tiff and combine.tiff merge together and which raster map to mask made value = 0
+ - step 5 : save .tif to 'raster' folder for predict and modeling step
 
-print("Done.")
-```
 ### Modeling
 
 ```python
@@ -377,7 +362,6 @@ print(f"Total burn area: {total_area:.2f} square meters")
 - logging: A module that provides a flexible framework for emitting log messages from Python programs. It is useful for tracking events that happen during the execution of the program.
 - ast: A module that helps Python applications process trees of the Python abstract syntax grammar. It can be used to safely evaluate or manipulate Python expressions.
 - shapely.geometry.Polygon: Part of the Shapely library, it is used to create polygon geometric objects. It supports various geometric operations and manipulations.
-- lightgbm is a gradient boosting framework that uses tree based learning algorithms.
 
 ### Library install
-- pip install rasterio numpy pandas pickle5 geopandas shapely scipy reverse_geocoder pycountry scikit-learn lightgbm
+- pip install rasterio numpy pandas pickle5 geopandas shapely scipy reverse_geocoder pycountry scikit-learn

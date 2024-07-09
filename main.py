@@ -16,9 +16,11 @@ from sklearn.cluster import KMeans, DBSCAN
 import logging
 import shutil
 import re
+import rasterio
 
 from image_processing import data_preparation
 from predict_module import predict_main
+from create_polygon import create_polygon
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -46,6 +48,13 @@ def find_folders(base_dir):
 
     return found_folders
 
+def find_tif_file(directory):
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            if file.endswith('.tif'):
+                return os.path.join(root, file)
+    return None
+
 def main():
 
     base_dir = 'satellite_image'
@@ -60,9 +69,7 @@ def main():
     print("Finish process prepared data.")
     print("Next stage to predict process.")
 
-
     predict_main()
-
 
     try:
         shutil.rmtree('prepare_image')
@@ -84,17 +91,18 @@ def main():
     print(f"Created directory: sentinel_process/Raster_Burncon")
     os.makedirs('sentinel_process/Raster_burnshape')
 
-
-    # Ensure these paths are correct and necessary
-    raster_path = 'raster'
-    if os.path.exists(raster_path):
-        shutil.rmtree(raster_path)
-    os.makedirs(raster_path)
-
-    satellite_image_path = 'satellite_image'
-    if os.path.exists(satellite_image_path):
-        shutil.rmtree(satellite_image_path)
-    os.makedirs(satellite_image_path)
+    input_raster_path = find_tif_file('raster')
+    if not input_raster_path:
+        logger.error("No .tif file found in the specified directory.")
+        return
+    
+    output_shapefile_path = r'polygon/burn_condition.shp'
+    
+    total_polygons, shown_polygons, total_area = create_polygon(input_raster_path, output_shapefile_path)
+    
+    print(f"Total number of polygons: {total_polygons}")
+    print(f"Number of polygons shown: {shown_polygons}")
+    print(f"Total burn area: {total_area:.2f} square meters")
 
     print("Done.")
 

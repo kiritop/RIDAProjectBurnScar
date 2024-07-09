@@ -40,10 +40,6 @@ RtbShape = os.path.join(Drive, "Raster_Burnshape")
 RtbLevel = os.path.join(Drive, "Raster_Burnlevel")
 
 
-# Track_arr = [
-#     "T47QNB\\" ,"T47QNC"
-# ]
-
 def loadCooldown():
     global mode
 
