@@ -89,6 +89,7 @@ logger = logging.getLogger()
 
 ![png]('material/flow.png')
 
+'main.py' are contain big tree function which consists of "data_preparation from 'image_processing.py'" , "predict_main from 'predict_module.py'" and the last one "create_polygon from 'create_polygon.py'"
 
 'data_preparation' function is image processing which will resample satellite image(jp2) all range into 10m
 and move into 'sentinel_process/Image' folder. And next step finction will call subprocess 'sentinel_process.py'.
@@ -96,12 +97,22 @@ and move into 'sentinel_process/Image' folder. And next step finction will call 
 'sentinel_process.py' is subprocess file which are contain function 'process_bands' it will use 'sentinel_process/Image'
 folder for read raster from 'data_preparation' here is step of subprocess
 
- - Step 1 : check all raster are in 'sentinel_process/Image' 
- - Step 2 : generate water detect mask using waterdect library (concept and reference from Maurício Cordeiro)
- - Step 3 : process_bands function is read all raster and combine band and save into GeoTiff 
- - Step 4 : use water mask.tiff and combine.tiff merge together and which raster map to mask made value = 0
- - step 5 : save .tif to 'raster' folder for predict and modeling step
- 
+ - Step 1 : Check all raster are in 'sentinel_process/Image' 
+ - Step 2 : Generate water detect mask using waterdect library (concept and reference from Maurício Cordeiro)
+ - Step 3 : Process_bands function is read all raster and combine band and save into GeoTiff 
+ - Step 4 : Use water mask.tiff and combine.tiff merge together and which raster map to mask made value = 0
+ - step 5 : Save .tif to 'raster' folder for predict and modeling step
+
+
+'predict_main' function is machine lerning process, The process of function are read rester then using ML for calculate which pixel in raster is burn and output in .tif which is contain burn location
+
+ - Step 1 : The 'predict_main' will read tiff for 'raster' folder and get value of each band into 'df' 
+ - Step 2 : The 'df' contain dataframe for predict by using pickle LGBM (Light GBM) which learning from training pipeline
+ - Step 3 : Process burn location tif which contain metadata of area and save to 'raster_output'
+
+'create_polygon' function is using tif to convert into set of Shape file (cph,dbf,prj,shp,shx) 
+ - Step 1 : 'create_polygon' will read .tif from 'raster_output' folder
+ - Step 2 : Convert .tif to polygon
 
 ### Folder Structure
 
@@ -115,7 +126,6 @@ RidaProject
      |_model
      |_WaterDectect
      |_raster
-     |_raster_combined
      |_raster_output
      |_polygon
 ```
