@@ -190,10 +190,37 @@ def find_tif_files(directory):
                     tif_files.append(os.path.abspath(os.path.join(root, file)))
     return tif_files
 
+def create_geotiff_from_predictions(predictions, original_tif_path, output_tif_path):
+    # Ensure predictions is a DataFrame or Series before accessing .values
+    if isinstance(predictions, np.ndarray):
+        predictions_array = predictions
+    else:
+        predictions_array = predictions.values
+
+    with rio.open(original_tif_path) as src:
+        original_metadata = src.meta.copy()
+    
+    original_metadata.update({
+        'dtype': 'uint8',
+        'count': 1,
+    })
+
+    band_1 = predictions_array.reshape((original_metadata['height'], original_metadata['width']))
+
+    with rio.open(output_tif_path, 'w', **original_metadata) as new_img:
+        new_img.write(band_1, 1)
+
+    print(f"New GeoTIFF file '{output_tif_path}' has been created.")
+
+
 def predict_main():
     base_dir = r"raster"
+    output_dir = r"raster_output"
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+        
     tif_files = find_tif_files(base_dir)
-    
+
     try:
         for tif_file in tif_files:
             try:
@@ -243,11 +270,14 @@ def predict_main():
                     
                     print(f"Processing completed for {tif_file}")
 
+                    output_tif_path = os.path.join(output_dir, os.path.basename(tif_file).replace('.tif', '_predicted.tif'))
+                    create_geotiff_from_predictions(predictions, tif_file, output_tif_path)
+
             except Exception as e:
                 print(f"An error occurred while processing file {tif_file}: {e}")
                 logger.error(f"An error occurred while processing file {tif_file}: {e}")
     finally:
-        print("Sucess Prediction Process.")
+        print("Success Prediction Process.")
 
 if __name__ == "__main__":
     predict_main()

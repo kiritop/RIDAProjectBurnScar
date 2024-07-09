@@ -69,7 +69,7 @@ def main():
     print("Finish process prepared data.")
     print("Next stage to predict process.")
 
-    predict_main()
+    
 
     try:
         shutil.rmtree('prepare_image')
@@ -91,7 +91,10 @@ def main():
     print(f"Created directory: sentinel_process/Raster_Burncon")
     os.makedirs('sentinel_process/Raster_burnshape')
 
-    input_raster_path = find_tif_file('raster')
+    predict_main()
+    print("Predict Done.")
+    
+    input_raster_path = find_tif_file('raster_output')
     if not input_raster_path:
         logger.error("No .tif file found in the specified directory.")
         return
