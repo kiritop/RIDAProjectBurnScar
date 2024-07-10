@@ -261,8 +261,26 @@ main()
 
 
 ```
+### Purpose
 
-### Special Thank
+1. The prototype of the burnt scar profiling system and associated libraries of programs implementing: data loading, data pre-processing, burnt scar detection, aggregation of temporal-based detection results, risk assessment and visualisation (as a spatial layer of measurement that complies with the specification of GISTDA’s online map platform).
+
+2. The prototype of a new method to improve the performance of the previous detection model, with a report of experiments on datasets purposefully collected by GISTDA for this project.
+
+3. The demonstration and assessment of GISTDA’s online map with the visualisation of risk metric obtained in 1., by experts of GISTDA, DoF and representatives of other ASEAN countries. This is to be carried out using data and case studies specific to the scope of study (covering northern Thailand and areas of neighbouring countries).
+
+4. Two technical workshops (at GISTDA and MFU) for other user organisations (governmental and industrial), community representatives, researchers, and the public. These will promote the applicability of this system as well as the dissemination of knowledge and tools within the community of practice.
+
+5. Publication of the techniques and system developed in this project: one draft of a journal article and another draft for international conference presentation
+
+### Collaboration
+
+![png](VeryTha.png)
+
+### Special Thank 
+
+Maurício Cordeiro
+Ph.D. Geospatial Data Scientist and water specialist at Brazilian National Water and Sanitation Agency. To get in touch: https://www.linkedin.com/in/cordmaur/
 
 https://medium.com/analytics-vidhya/creating-training-patches-for-deep-learning-image-segmentation-of-satellite-sentinel-2-imagery-d3dd368c9c64
 
@@ -270,3 +288,7 @@ https://medium.com/analytics-vidhya/creating-training-patches-for-deep-learning-
 
 https://mapshaper.org/
 
+### Contact us
+
+Center of Excellence in AI and Emerging Technology
+School of Information Technology, Mae Fah Luang University
