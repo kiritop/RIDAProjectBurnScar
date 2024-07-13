@@ -284,6 +284,10 @@ Ph.D. Geospatial Data Scientist and water specialist at Brazilian National Water
 
 https://medium.com/analytics-vidhya/creating-training-patches-for-deep-learning-image-segmentation-of-satellite-sentinel-2-imagery-d3dd368c9c64
 
+LightGBM gradient boosting framework: https://github.com/Microsoft/LightGBM
+
+LightGBM Classifier in Python: https://www.kaggle.com/code/prashant111/lightgbm-classifier-in-python/notebook#4.-LightGBM-Parameters-
+
 ### Resource 
 
 https://mapshaper.org/
