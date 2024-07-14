@@ -288,6 +288,8 @@ LightGBM gradient boosting framework: https://github.com/Microsoft/LightGBM
 
 LightGBM Classifier in Python: https://www.kaggle.com/code/prashant111/lightgbm-classifier-in-python/notebook#4.-LightGBM-Parameters-
 
+Reverse Geocoder: https://github.com/thampiman/reverse-geocoder
+
 ### Resource 
 
 https://mapshaper.org/
