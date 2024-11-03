@@ -32,7 +32,7 @@ function PM25() {
   const tableData = [...dataPM25.map((item) => [item.city, item.pm25])];
 
   const LineOptions = {
-    title: "Air Quality Index (PM 2.5) for Given Date" + dateTitle,
+    title: "PM 2.5 for Given Date" + dateTitle,
     hAxis: {
       title: "City",
     },
@@ -123,7 +123,7 @@ function PM25() {
           <Box height={20} />
           <Box sx={{ borderRadius: 5, overflow: "hidden", flex: 1 }}>
             <MUIDataTable
-              title={<h3>Air Quality Index (PM 2.5) for Given Date{dateTitle}</h3>}
+              title={<h3>PM 2.5 for Given Date{dateTitle}</h3>}
               data={tableData}
               columns={columns}
               options={options}

@@ -124,8 +124,8 @@ const spec = {
     "/api/get-air-quality": {
       get: {
         tags: ["API LIST"],
-        summary: "Get air quality data",
-        description: "This API endpoint returns json data for air quality on the provided query parameters.",
+        summary: "Get PM 2.5 data",
+        description: "This API endpoint returns json data for PM 2.5 on the provided query parameters.",
         parameters: [
           {
             in: "query",

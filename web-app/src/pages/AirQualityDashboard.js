@@ -339,10 +339,10 @@ function AirQualityDashboard() {
             <Card sx={{ borderRadius: 3, overflow: "hidden", height:'540px' }} variant="outlined">
               <CardContent>
                 <Typography  variant="h4" component="div">
-                  Air Quality Summary
+                  PM 2.5 Summary
                 </Typography>
                 <Typography  variant="subtitle1" color="text.secondary">
-                  {provinceText != 'All' ? provinceText +', '+ countryText : countryText} air quality (  {format(new Date(startDate),'MMM dd yyyy')} - {format(new Date(endDate),'MMM dd yyyy')} )
+                  {provinceText != 'All' ? provinceText +', '+ countryText : countryText} PM 2.5 (  {format(new Date(startDate),'MMM dd yyyy')} - {format(new Date(endDate),'MMM dd yyyy')} )
                 </Typography>
                 <Box height={50}/>
                 <Typography  variant="h3" component="div">
@@ -381,7 +381,7 @@ function AirQualityDashboard() {
             <Card sx={{ borderRadius: 3, overflow: "hidden" }} variant="outlined">
               <CardContent>
                 <Typography variant="h4" component="div" gutterBottom>
-                  Air Quality By Time
+                  PM 2.5 By Time
                 </Typography>
                 <LineChartAqi/>      
               </CardContent>
@@ -392,7 +392,7 @@ function AirQualityDashboard() {
             <Card sx={{ borderRadius: 3, overflow: "hidden" }} variant="outlined">
               <CardContent>
                 <Typography variant="h4" component="div" gutterBottom>
-                  Air Quality By Location
+                  PM 2.5 By Location
                 </Typography>
                 <MapContainer center={center} zoom={zoom} style={{ height: "500px", width: "100%" }}>
                   <TileLayer
@@ -426,7 +426,7 @@ function AirQualityDashboard() {
           <Grid item xs={12} md={12}>
             <Box sx={{ borderRadius: 3, overflow: "hidden", flex: 1}}>
                 <MUIDataTable
-                  title={<h4>Air Quality Ranking {format(new Date(startDate),'MMM dd yyyy')} - {format(new Date(endDate),'MMM dd yyyy')}</h4>}
+                  title={<h4>PM 2.5 Ranking {format(new Date(startDate),'MMM dd yyyy')} - {format(new Date(endDate),'MMM dd yyyy')}</h4>}
                   data={tableData}
                   columns={columns}
                   options={options}

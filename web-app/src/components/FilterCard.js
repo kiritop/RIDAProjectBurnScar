@@ -251,7 +251,7 @@ function FilterCard() {
             />
           </FormControl>
           <FormControl fullWidth margin="normal" sx={{ mt: isSmallScreen ? 1 : 2 }}>
-            <FormLabel>Air quality layer</FormLabel>
+            <FormLabel>PM 2.5 layer</FormLabel>
             <FormHelperText sx={{ typography: 'body-sm' }}>
               (Data Source: openweathermap.org)
             </FormHelperText>

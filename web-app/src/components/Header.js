@@ -21,7 +21,7 @@ const pages = [
   { name: "Map" },
   {
     name: "Dashboard",
-    subMenu: ["Burnt Level", "Hotspot", "Air Quality"],
+    subMenu: ["Burnt Level", "Hotspot", "PM 2.5"],
   },
   { name: "Learning Materials" },
   { name: "APIs" },
@@ -38,7 +38,11 @@ export default function Header() {
 
   const handleNavigation = (page) => {
     const url = getPageUrl(page);
-    navigate(url);
+    if (page === "Map") {
+      window.location.href = url;
+    } else {
+      navigate(url);
+    }
   };
 
   const getPageUrl = (page) => {
@@ -47,7 +51,7 @@ export default function Header() {
         return "/";
       case "Hotspot":
         return "/hot_spot";
-      case "Air Quality":
+      case "PM 2.5":
         return "/pm_25";
       case "Burnt Level":
         return "/burn_scar";

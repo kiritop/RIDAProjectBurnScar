@@ -352,7 +352,7 @@ export default function Sidebar({ isOpen, toggleDrawer }) {
 
           <FormControl orientation="horizontal">
             <Box sx={{ flex: 1, mt: 1, mr: 1 }}>
-              <FormLabel sx={{ typography: 'title-sm' }}>Air quality layer</FormLabel>
+              <FormLabel sx={{ typography: 'title-sm' }}>PM 2.5 layer</FormLabel>
               <FormHelperText sx={{ typography: 'body-sm' }}>
                 On {dayjs(date).format('MM/DD/YYYY')}
               </FormHelperText>

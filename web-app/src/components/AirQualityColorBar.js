@@ -22,7 +22,7 @@ const AirQualityColorBar = () => {
 
   return (
     <Box display="flex" flexDirection="column" alignItems="center" padding={1}>
-      <Typography fontWeight="bold">Air Quality Index (AQI) Levels</Typography>
+      <Typography fontWeight="bold">PM2.5 Levels</Typography>
       <GradientBar>
         {aqiColors.map((item, index) => (
           <Box

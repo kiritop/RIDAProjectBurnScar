@@ -113,7 +113,7 @@ const DrilldownChart = () => {
     <Grid container spacing={3}>
       <Grid item xs={12}>
         <Typography variant="h4" component="div" gutterBottom>
-          Air Quality
+          PM 2.5
         </Typography>
         <Button onClick={handleBack} disabled={!drilldownData}>Back</Button>
       </Grid>
